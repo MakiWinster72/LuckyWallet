@@ -16,6 +16,12 @@ npm run dev
 
 ## 启动后端
 
+我们这里用uv来管理python项目，所以需要安装uv
+
+```pwsh
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
 ```bash
 cd backend
 
