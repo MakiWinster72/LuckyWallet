@@ -4,6 +4,4 @@ from landen
 
 from maki
 
-from Ula
-
-from Anna
+from Ula 2
