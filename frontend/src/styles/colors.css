@@ -1,38 +1,44 @@
 :root {
-  /* Brand */
-  --color-primary: #0b57d0;
-  --color-primary-hover: #0842a0;
-  --color-on-primary: #ffffff;
-  --color-primary-container: #d3e3fd;
-  --color-primary-container-soft: rgb(211 227 253 / 72%);
-  --color-on-primary-container: #a8c7fa;
+  color-scheme: light;
 
-  /* Supporting wallet colors */
-  --color-accent-yellow: #fdd663;
-  --color-accent-green: #81c995;
+  /* Brand palette from docs/color design.md */
+  --color-primary: #c8a5c2;
+  --color-primary-hover: #9a6986;
+  --color-on-primary: #331e2a;
+  --color-primary-container: #edcdc2;
+  --color-primary-container-soft: rgb(200 165 194 / 42%);
+  --color-on-primary-container: #704264;
+  --color-secondary: #9a6986;
+  --color-accent: #edcdc2;
+  --color-accent-hover: #dbafa0;
+  --color-on-accent: #331e2a;
+
+  /* Wallet illustration */
+  --color-wallet-back: #edcdc2;
+  --color-wallet-middle: #bb8493;
 
   /* Surfaces */
   --color-surface: #ffffff;
-  --color-surface-page: #f8fafd;
-  --color-surface-container: #f0f4f9;
-  --color-surface-highlight: #eaf1fb;
-  --color-surface-hover: #ecf3fe;
+  --color-surface-page: #fffdfc;
+  --color-surface-container: #f8f0f3;
+  --color-surface-highlight: #f8eef3;
+  --color-surface-hover: #f7e8e3;
 
   /* Text */
-  --color-text-primary: #1f1f1f;
-  --color-text-brand: #202124;
-  --color-text-secondary: #444746;
-  --color-text-muted: #5f6368;
-  --color-text-label: #3c4043;
-  --color-text-placeholder: #80868b;
+  --color-text-primary: #331e2a;
+  --color-text-brand: #49243e;
+  --color-text-secondary: #704264;
+  --color-text-muted: #76596b;
+  --color-text-label: #49243e;
+  --color-text-placeholder: #8a7180;
 
   /* Borders and states */
-  --color-border: #dde3ea;
-  --color-border-control: #747775;
-  --color-error: #b3261e;
-  --color-shadow-soft: rgb(60 64 67 / 8%);
-  --color-shadow-low: rgb(60 64 67 / 10%);
-  --color-shadow-medium: rgb(60 64 67 / 24%);
-  --color-shadow-strong: rgb(60 64 67 / 30%);
-  --color-wallet-shadow: rgb(32 33 36 / 12%);
+  --color-border: #ddc8d1;
+  --color-border-control: #9a6986;
+  --color-error: #a33d36;
+  --color-shadow-soft: rgb(73 36 62 / 7%);
+  --color-shadow-low: rgb(73 36 62 / 10%);
+  --color-shadow-medium: rgb(73 36 62 / 20%);
+  --color-shadow-strong: rgb(73 36 62 / 28%);
+  --color-wallet-shadow: rgb(73 36 62 / 16%);
 }
