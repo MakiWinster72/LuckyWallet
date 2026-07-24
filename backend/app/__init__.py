@@ -1,0 +1,1 @@
+"""LuckyWallet backend application."""
