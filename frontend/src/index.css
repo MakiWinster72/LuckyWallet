@@ -387,7 +387,7 @@ input:focus-visible {
 
 .not-found-heading .not-found-code {
   width: 100%;
-  margin: 0 0 6px;
+  margin: 0 0 0 0;
   color: var(--color-primary-container);
   font-size: clamp(84px, 13vw, 144px);
   font-weight: 700;
@@ -399,7 +399,7 @@ input:focus-visible {
 .not-found-heading h1 {
   width: 100%;
   max-width: none;
-  margin: 0;
+  margin: 1rem 0 5rem;
   color: var(--color-text-primary);
   font-size: clamp(36px, 5vw, 52px);
   font-weight: 500;
