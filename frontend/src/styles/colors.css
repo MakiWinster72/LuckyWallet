@@ -1,0 +1,38 @@
+:root {
+  /* Brand */
+  --color-primary: #0b57d0;
+  --color-primary-hover: #0842a0;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #d3e3fd;
+  --color-primary-container-soft: rgb(211 227 253 / 72%);
+  --color-on-primary-container: #a8c7fa;
+
+  /* Supporting wallet colors */
+  --color-accent-yellow: #fdd663;
+  --color-accent-green: #81c995;
+
+  /* Surfaces */
+  --color-surface: #ffffff;
+  --color-surface-page: #f8fafd;
+  --color-surface-container: #f0f4f9;
+  --color-surface-highlight: #eaf1fb;
+  --color-surface-hover: #ecf3fe;
+
+  /* Text */
+  --color-text-primary: #1f1f1f;
+  --color-text-brand: #202124;
+  --color-text-secondary: #444746;
+  --color-text-muted: #5f6368;
+  --color-text-label: #3c4043;
+  --color-text-placeholder: #80868b;
+
+  /* Borders and states */
+  --color-border: #dde3ea;
+  --color-border-control: #747775;
+  --color-error: #b3261e;
+  --color-shadow-soft: rgb(60 64 67 / 8%);
+  --color-shadow-low: rgb(60 64 67 / 10%);
+  --color-shadow-medium: rgb(60 64 67 / 24%);
+  --color-shadow-strong: rgb(60 64 67 / 30%);
+  --color-wallet-shadow: rgb(32 33 36 / 12%);
+}
