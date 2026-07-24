@@ -1,8 +1,9 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 
 import { ProtectedRoute } from "./auth/ProtectedRoute";
 import { DashboardPage } from "./pages/DashboardPage";
 import { LoginPage } from "./pages/LoginPage";
+import { NotFoundPage } from "./pages/NotFoundPage";
 
 export default function App() {
   return (
@@ -11,7 +12,7 @@ export default function App() {
       <Route element={<ProtectedRoute />}>
         <Route path="/dashboard" element={<DashboardPage />} />
       </Route>
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 }
