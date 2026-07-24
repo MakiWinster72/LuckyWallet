@@ -2,24 +2,25 @@
   color-scheme: light;
 
   /* Brand palette from docs/color design.md */
-  --color-primary: #c8a5c2;
+  --color-primary: #49243E; /*左边第一张卡片*/
   --color-primary-hover: #9a6986;
-  --color-on-primary: #331e2a;
-  --color-primary-container: #edcdc2;
-  --color-primary-container-soft: rgb(200 165 194 / 42%);
-  --color-on-primary-container: #704264;
+  --color-on-primary: #fbf9fa; /*1280，L*/
+  --color-primary-container: #fafafa;/*本月正常支出*/
+  --color-primary-container-soft: rgba(156, 65, 141, 0.6);/*最后层左上角的渐变*/
+  --color-on-primary-container: #825d77;/*卡片上的小框左上角*/
   --color-secondary: #9a6986;
-  --color-accent: #edcdc2;
-  --color-accent-hover: #dbafa0;
+  --color-accent: #bb8493;
+  --color-accent-hover: #d68367;
   --color-on-accent: #331e2a;
 
   /* Wallet illustration */
+  --color-wallet-chip: #49243e;
   --color-wallet-back: #edcdc2;
-  --color-wallet-middle: #bb8493;
+  --color-wallet-middle: #c8a5c2;
 
   /* Surfaces */
   --color-surface: #ffffff;
-  --color-surface-page: #fffdfc;
+  --color-surface-page: #f6dfd4;/*最后层的底色*/
   --color-surface-container: #f8f0f3;
   --color-surface-highlight: #f8eef3;
   --color-surface-hover: #f7e8e3;
@@ -29,7 +30,7 @@
   --color-text-brand: #49243e;
   --color-text-secondary: #704264;
   --color-text-muted: #76596b;
-  --color-text-label: #49243e;
+  --color-text-label: #7d1661;
   --color-text-placeholder: #8a7180;
 
   /* Borders and states */
