@@ -436,9 +436,6 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .bill-dialog label, .bill-dialog fieldset { display: grid; gap: 7px; margin: 0; padding: 0; border: 0; color: var(--muted); font-size: 12px; font-weight: 600; }
 .field-wide { grid-column: 1 / -1; }
 .bill-dialog input, .bill-dialog select { width: 100%; height: 43px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; color: var(--ink); background: var(--page); }
-.money-input { position: relative; }
-.money-input span { position: absolute; top: 13px; left: 12px; }
-.money-input input { padding-left: 29px; }
 .category-options, .member-options { display: flex; flex-wrap: wrap; gap: 8px; }
 .category-options button, .member-options button { display: flex; align-items: center; gap: 7px; min-height: 39px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; color: var(--muted); background: var(--surface); }
 .category-options button.selected, .member-options button.selected { border-color: var(--plum); color: var(--plum-deep); background: var(--soft); }
