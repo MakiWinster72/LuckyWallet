@@ -1,0 +1,16 @@
+myDocs/
+.git/
+.gitignore
+AGENTS.md
+README.md
+*.md
+.env
+.env.*
+!.env.example
+__pycache__/
+*.pyc
+.venv/
+node_modules/
+frontend/dist/
+uploads/*
+!uploads/.gitkeep

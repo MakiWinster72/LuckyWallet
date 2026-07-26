@@ -1,0 +1,51 @@
+services:
+
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./sql:/docker-entrypoint-initdb.d
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpass}
+      MYSQL_DATABASE: ${DB_NAME:-luckywallet}
+      MYSQL_USER: ${DB_USER:-luckywallet}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-luckywallet}
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - uploads:/app/uploads
+      # Mount host ~/.claude so Claude Code can read credentials & persist conversations
+      - ${HOME}/.claude:/root/.claude
+    environment:
+      DATABASE_URL: mysql+pymysql://${DB_USER:-luckywallet}:${DB_PASSWORD:-luckywallet}@db:3306/${DB_NAME:-luckywallet}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
+      FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-http://localhost}
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+
+volumes:
+  db-data:
+  uploads:
