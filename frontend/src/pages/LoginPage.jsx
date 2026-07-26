@@ -4,6 +4,7 @@ import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { ApiError } from "../api/auth";
 import { useAuth } from "../auth/useAuth";
 import { AppIcon } from "../components/AppIcon";
+import { BrandIcon } from "../components/BrandIcon";
 
 export function LoginPage() {
   const { user, login } = useAuth();
@@ -47,7 +48,7 @@ export function LoginPage() {
       <section className="login-shell" aria-labelledby="login-title">
         <div className="login-intro">
           <div className="brand-lockup">
-            <span className="brand-mark" aria-hidden="true">L</span>
+            <BrandIcon size={38} />
             <span>LuckyWallet</span>
           </div>
 

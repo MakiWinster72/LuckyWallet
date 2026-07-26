@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { BrandIcon } from "../components/BrandIcon";
 import { AppIcon } from "../components/AppIcon";
 import { AdminUsersView } from "../components/AdminUsersView";
 import { BillsView } from "../components/BillsView";
@@ -578,7 +579,7 @@ export function DashboardPage() {
   return (
     <div className={`app-shell ${dark ? "theme-dark" : ""}`}>
       <aside className="sidebar">
-        <div className="brand-lockup"><span className="brand-mark">L</span><span>LuckyWallet</span></div>
+        <div className="brand-lockup"><BrandIcon size={38} /><span>LuckyWallet</span></div>
         <nav aria-label="主导航">{navItems.map(([icon, label]) => <button key={label} className={activeNav === label ? "active" : ""} onClick={() => setActiveNav(label)}><AppIcon name={icon} /><span>{label}</span></button>)}</nav>
         <BudgetCard spending={monthlySummary.total} summary={budgetSummary} canEdit={user.role === "admin"} onEdit={() => setIsBudgetOpen(true)} />
         <div className="profile-card" role="button" tabIndex={0} onClick={() => setIsProfileOpen(true)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") setIsProfileOpen(true); }}><UserAvatar user={currentUser} avatarUrl={user.avatar_url} label={`${user.nickname ?? user.username}的头像`} /><span><strong>{user.nickname ?? user.username}</strong><small>{user.role === "admin" ? "管理员" : "团队成员"}</small></span><button className="profile-logout" type="button" onClick={(event) => { event.stopPropagation(); handleLogout(); }} aria-label="退出登录" title="退出登录"><AppIcon name="logout" size={17} /></button></div>
@@ -586,7 +587,7 @@ export function DashboardPage() {
 
       <main className="workspace">
         <header className="topbar">
-          <div className="mobile-brand"><span className="brand-mark">L</span><strong>LuckyWallet</strong></div>
+          <div className="mobile-brand"><BrandIcon size={32} /><strong>LuckyWallet</strong></div>
           {isUserManagement || activeNav === "账单" ? <span /> : <label className="search-box"><AppIcon name="search" size={18} /><input name="global-search" type="search" aria-label="搜索账单或分类" autoComplete="off" spellCheck={false} value={query} onChange={(e) => setQuery(e.target.value)} placeholder="搜索账单或分类…" /></label>}
           <div className="top-actions"><button className="icon-button" onClick={() => setDark((value) => !value)} aria-label="切换主题"><AppIcon name={dark ? "sun" : "moon"} /></button><button className="icon-button notification" aria-label="通知"><AppIcon name="bell" /></button>{isUserManagement ? null : <button className="add-button" onClick={() => setIsAdding(true)}><AppIcon name="plus" size={18} />记一笔</button>}</div>
         </header>
