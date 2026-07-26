@@ -12,6 +12,7 @@ dependencies = [
   "python-multipart>=0.0.20",
   "sqlalchemy>=2.0",
   "uvicorn[standard]>=0.34",
+  "websockets>=12",
 ]
 
 [dependency-groups]
