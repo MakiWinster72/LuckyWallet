@@ -9,22 +9,37 @@ const marked = new Marked({
 });
 
 const TOKEN_KEY = "luckywallet_access_token";
+const STORAGE_KEY = "lw_claude_chat_history";
 
 function wsUrl(token) {
   const proto = window.location.protocol === "https:" ? "wss:" : "ws:";
   return `${proto}//${window.location.host}/api/v1/ws/claude?token=${token}`;
 }
 
+function loadHistory() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
+}
+
+function saveHistory(msgs) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(msgs));
+  } catch { /* ignore quota errors */ }
+}
+
 export function ClaudeCodeChat() {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState(() => loadHistory());
   const [input, setInput] = useState("");
   const [status, setStatus] = useState("");
   const [connected, setConnected] = useState(false);
   const [busy, setBusy] = useState(false);
   const wsRef = useRef(null);
   const listRef = useRef(null);
+  const restoredRef = useRef(false);
 
   // ── WebSocket lifecycle ────────────────────────────────────────
 
@@ -37,7 +52,14 @@ export function ClaudeCodeChat() {
 
     ws.onopen = () => {
       setConnected(true);
-      setMessages((prev) => [...prev, { role: "system", text: "已连接到 Claude Code" }]);
+      // Restore previous conversation history on the backend
+      const saved = loadHistory();
+      const conversations = saved.filter((m) => m.role === "user" || m.role === "assistant");
+      if (conversations.length > 0) {
+        ws.send(JSON.stringify({ type: "restore", history: conversations }));
+        restoredRef.current = true;
+      }
+      setMessages((prev) => [...prev, { role: "system", text: restoredRef.current ? "会话已恢复" : "已连接到 Claude Code" }]);
     };
 
     ws.onmessage = (event) => {
@@ -114,6 +136,12 @@ export function ClaudeCodeChat() {
       }
     };
   }, [open, connect]);
+
+  // ── persist messages ──────────────────────────────────────────
+
+  useEffect(() => {
+    saveHistory(messages);
+  }, [messages]);
 
   // ── send ───────────────────────────────────────────────────────
 

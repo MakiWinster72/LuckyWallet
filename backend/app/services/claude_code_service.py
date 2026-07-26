@@ -25,12 +25,17 @@ class ClaudeCodeSession:
         self._permission_mode = "auto" if is_admin else "plan"
         self._claude_path: str | None = None
         self._history: list[dict[str, str]] = []
+        self.restore_history: list[dict[str, str]] = []
+        self._restored = False
         self._resolve_claude()
 
     # ── public API ────────────────────────────────────────────────
 
     async def send_message(self, text: str) -> AsyncIterator[str]:
         """调用 ``claude --print`` 并逐行 yield 响应。"""
+        if not self._restored and self.restore_history:
+            self._history = list(self.restore_history)
+            self._restored = True
         self._history.append({"role": "user", "content": text})
 
         prompt = self._build_prompt()
