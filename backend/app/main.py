@@ -11,6 +11,7 @@ from app.api.routes.admin_users import router as admin_users_router
 from app.api.routes.bills import router as bills_router
 from app.api.routes.members import router as members_router
 from app.api.routes.statistics import router as statistics_router
+from app.api.routes.claude_code import router as claude_code_router
 from app.api.routes.settings import router as settings_router
 from app.config import get_settings
 from app.database import engine
@@ -51,6 +52,7 @@ app.include_router(bills_router, prefix="/api/v1")
 app.include_router(members_router, prefix="/api/v1")
 app.include_router(statistics_router, prefix="/api/v1")
 app.include_router(settings_router, prefix="/api/v1")
+app.include_router(claude_code_router, prefix="/api/v1")
 app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
 
 
