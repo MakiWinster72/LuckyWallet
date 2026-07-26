@@ -13,10 +13,10 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD:-luckywallet}
     # 不暴露端口到宿主机（后端通过内部网络连接）
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-rootpass}"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
 
   backend:
     build: ./backend
