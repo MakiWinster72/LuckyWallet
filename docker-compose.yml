@@ -11,8 +11,7 @@ services:
       MYSQL_DATABASE: ${DB_NAME:-luckywallet}
       MYSQL_USER: ${DB_USER:-luckywallet}
       MYSQL_PASSWORD: ${DB_PASSWORD:-luckywallet}
-    ports:
-      - "3306:3306"
+    # 不暴露端口到宿主机（后端通过内部网络连接）
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
@@ -39,7 +38,10 @@ services:
       - "8000:8000"
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: /api/v1
     restart: unless-stopped
     depends_on:
       - backend
