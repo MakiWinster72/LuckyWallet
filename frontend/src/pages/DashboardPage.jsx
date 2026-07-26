@@ -588,7 +588,7 @@ export function DashboardPage() {
       <main className="workspace">
         <header className="topbar">
           <div className="mobile-brand"><BrandIcon size={32} /><strong>LuckyWallet</strong></div>
-          {isUserManagement || activeNav === "账单" ? <span /> : <label className="search-box"><AppIcon name="search" size={18} /><input name="global-search" type="search" aria-label="搜索账单或分类" autoComplete="off" spellCheck={false} value={query} onChange={(e) => setQuery(e.target.value)} placeholder="搜索账单或分类…" /></label>}
+          {isUserManagement || activeNav === "账单" || activeNav === "统计" ? <span /> : <label className="search-box"><AppIcon name="search" size={18} /><input name="global-search" type="search" aria-label="搜索账单或分类" autoComplete="off" spellCheck={false} value={query} onChange={(e) => setQuery(e.target.value)} placeholder="搜索账单或分类…" /></label>}
           <div className="top-actions"><button className="icon-button" onClick={() => setDark((value) => !value)} aria-label="切换主题"><AppIcon name={dark ? "sun" : "moon"} /></button><button className="icon-button notification" aria-label="通知"><AppIcon name="bell" /></button>{isUserManagement ? null : <button className="add-button" onClick={() => setIsAdding(true)}><AppIcon name="plus" size={18} />记一笔</button>}</div>
         </header>
 
