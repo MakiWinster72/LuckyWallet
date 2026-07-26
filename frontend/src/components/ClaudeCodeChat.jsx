@@ -1,6 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Marked } from "marked";
 import { useAuth } from "../auth/useAuth";
 import { AppIcon } from "./AppIcon";
+
+const marked = new Marked({
+  breaks: true,
+  gfm: true,
+});
 
 const TOKEN_KEY = "luckywallet_access_token";
 
@@ -126,6 +132,13 @@ export function ClaudeCodeChat() {
     }
   }
 
+  // ── markdown helper ────────────────────────────────────────────
+
+  function renderMarkdown(text) {
+    const html = marked.parse(text, { async: false });
+    return { __html: html };
+  }
+
   // ── auto scroll ────────────────────────────────────────────────
 
   useEffect(() => {
@@ -201,7 +214,9 @@ export function ClaudeCodeChat() {
                 <div key={idx} className={`cc-msg cc-msg-${msg.role}`}>
                   {msg.role === "assistant" ? <ClaudeCodeIcon /> : null}
                   {msg.role === "user" ? <div className="cc-user-label">{user.nickname ?? user.username}</div> : null}
-                  <div className="cc-bubble">{msg.text}</div>
+                  {msg.role === "assistant"
+                    ? <div className="cc-bubble cc-md" dangerouslySetInnerHTML={renderMarkdown(msg.text)} />
+                    : <div className="cc-bubble">{msg.text}</div>}
                 </div>
               ))
             )}
