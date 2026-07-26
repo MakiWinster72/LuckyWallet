@@ -783,6 +783,33 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   background: var(--soft, #f5edef); color: var(--ink, #34252f);
   border-bottom-left-radius: 4px;
 }
+
+/* ── thinking indicator ────────────────────────────── */
+
+.cc-thinking {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 14px; font-size: 13px; color: var(--muted, #806f78);
+}
+.cc-dot-pulse {
+  display: inline-flex; align-items: center; gap: 3px;
+}
+.cc-dot-pulse::before,
+.cc-dot-pulse::after {
+  content: ""; display: inline-block; width: 5px; height: 5px;
+  border-radius: 50%; background: currentColor;
+  animation: cc-blink 1.4s ease-in-out infinite both;
+}
+.cc-dot-pulse::before { animation-delay: 0.2s; }
+.cc-dot-pulse::after  { animation-delay: 0.4s; }
+.cc-dot-pulse span {
+  display: inline-block; width: 5px; height: 5px;
+  border-radius: 50%; background: currentColor;
+  animation: cc-blink 1.4s ease-in-out infinite both;
+}
+@keyframes cc-blink {
+  0%, 80%, 100% { opacity: 0.2; }
+  40%           { opacity: 1; }
+}
 .cc-msg-system .cc-bubble {
   background: transparent; font-size: 12px; color: var(--muted, #806f78);
   text-align: center; padding: 2px 8px;

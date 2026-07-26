@@ -220,6 +220,15 @@ export function ClaudeCodeChat() {
                 </div>
               ))
             )}
+            {busy && messages.length > 0 && messages.at(-1)?.role !== "assistant" ? (
+              <div className="cc-msg cc-msg-assistant">
+                <ClaudeCodeIcon />
+                <div className="cc-bubble cc-thinking">
+                  <span className="cc-dot-pulse"><span /></span>
+                  思考中
+                </div>
+              </div>
+            ) : null}
           </div>
 
           {/* input */}
