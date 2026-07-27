@@ -1,7 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { summarizeSpending } from "../src/data/demoData.js";
+import { summarizeSpending } from "../src/data/spendingSummary.js";
+
+const members = [
+  { id: 1, name: "Maki" },
+  { id: 2, name: "Lucky" },
+];
 
 const bills = [
   { amount: 120, category: "餐饮", payer: 1 },
@@ -10,14 +15,14 @@ const bills = [
 ];
 
 test("summarizeSpending calculates totals and average", () => {
-  const summary = summarizeSpending(bills);
+  const summary = summarizeSpending(bills, members);
 
   assert.equal(summary.total, 250);
   assert.equal(summary.average, 250 / 3);
 });
 
 test("summarizeSpending orders categories and payers by amount", () => {
-  const summary = summarizeSpending(bills);
+  const summary = summarizeSpending(bills, members);
 
   assert.deepEqual(
     summary.byCategory.map(({ name, amount, count }) => ({ name, amount, count })),
@@ -31,7 +36,7 @@ test("summarizeSpending orders categories and payers by amount", () => {
 });
 
 test("summarizeSpending handles an empty month", () => {
-  const summary = summarizeSpending([]);
+  const summary = summarizeSpending([], members);
 
   assert.equal(summary.total, 0);
   assert.equal(summary.average, 0);
