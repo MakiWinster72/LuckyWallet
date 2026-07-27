@@ -52,11 +52,14 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .sidebar-note { margin-top: auto; padding: 18px; border: 1px solid rgb(255 255 255 / 10%); border-radius: 14px; background: rgb(255 255 255 / 6%); }
 .sidebar-note > span, .sidebar-note small { display: block; color: #cbb8c3; font-size: 12px; }
 .sidebar-note strong { display: block; margin-top: 6px; font-size: 20px; }
+.sidebar-note strong small { display: inline; font-size: 11px; font-weight: 500; }
 .sidebar-note div { height: 5px; margin: 14px 0 7px; overflow: hidden; border-radius: 5px; background: rgb(255 255 255 / 12%); }
 .sidebar-note i { display: block; height: 100%; border-radius: inherit; background: #d9a9be; }
 .profile-card { display: flex; align-items: center; width: 100%; gap: 10px; margin-top: 16px; padding: 12px 4px; border: 0; color: white; background: transparent; text-align: left; }
 .profile-card > span:nth-child(2) { display: grid; flex: 1; }
 .profile-card small { color: #cbb8c3; font-size: 11px; }
+.profile-logout { display: grid; width: 34px; height: 34px; place-items: center; border: 0; border-radius: 9px; color: #cbb8c3; background: transparent; }
+.profile-logout:hover { color: white; background: rgb(255 255 255 / 10%); }
 .avatar { display: inline-grid; width: 36px; height: 36px; flex: 0 0 auto; place-items: center; border-radius: 50%; border: 2px solid var(--surface); color: white; background: var(--avatar); font-size: 10px; font-weight: 700; }
 .avatar-small { width: 28px; height: 28px; border-width: 2px; font-size: 8px; }
 .avatar-more { background: var(--soft); color: var(--muted); }
@@ -191,6 +194,10 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .login-panel form { display: grid; gap: 17px; margin-top: 30px; }
 .field { display: grid; gap: 7px; color: #49243e; font-size: 13px; font-weight: 600; }
 .field input { height: 46px; padding: 0 13px; border: 1px solid #ddc8d1; border-radius: 10px; }
+.password-control { position: relative; }
+.password-control input { padding-right: 52px; }
+.password-control button { position: absolute; top: 50%; right: 8px; display: grid; width: 34px; min-height: 34px; place-items: center; transform: translateY(-50%); border: 0; border-radius: 8px; color: #704264; background: transparent; }
+.password-control button:hover:not(:disabled) { background: #f7e8e3; }
 .form-message { min-height: 18px; color: #a33d36; font-size: 12px; }
 .form-message p { margin: 0; }
 .login-panel .primary-button { width: 100%; }
