@@ -125,6 +125,37 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .settle-card button { display: flex; align-items: center; gap: 5px; margin-top: 19px; padding: 0; border: 0; color: #49243e; background: transparent; font-size: 12px; font-weight: 700; }
 .empty-state { padding: 50px 20px; border-top: 1px solid var(--line); color: var(--muted); text-align: center; }
 
+.statistics-view { margin-top: 34px; }
+.statistics-heading { padding-bottom: 20px; }
+.statistics-heading h2 { margin: 6px 0 4px; font-family: "Noto Serif SC", serif; font-size: 25px; text-wrap: balance; }
+.statistics-heading p { margin: 0; color: var(--muted); font-size: 12px; }
+.stats-kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.stats-kpis article { min-height: 130px; padding: 23px 25px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); box-shadow: var(--shadow); }
+.stats-kpis span, .stats-kpis small { display: block; color: var(--muted); font-size: 11px; }
+.stats-kpis strong { display: block; margin: 13px 0 10px; color: var(--plum-deep); font-size: clamp(22px, 2.5vw, 31px); font-variant-numeric: tabular-nums; letter-spacing: -.04em; }
+.stats-layout { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(300px, .85fr); gap: 18px; margin-top: 18px; }
+.chart-caption { color: var(--muted); font-size: 10px; }
+.bar-list { display: grid; gap: 4px; padding: 0 25px 25px; }
+.bar-row { display: grid; grid-template-columns: 38px minmax(120px, 1fr) 90px; align-items: center; gap: 12px; min-height: 58px; }
+.bar-icon { display: grid; width: 35px; height: 35px; place-items: center; border-radius: 10px; background: color-mix(in srgb, var(--category) 15%, var(--surface)); }
+.bar-row > div { display: grid; gap: 8px; }
+.bar-row > div > span { display: flex; align-items: center; justify-content: space-between; }
+.bar-row strong { font-size: 12px; }
+.bar-row small { color: var(--muted); font-size: 9px; }
+.bar-row > strong { font-variant-numeric: tabular-nums; text-align: right; }
+.bar-row i, .payer-list i { display: block; height: 6px; overflow: hidden; border-radius: 8px; background: var(--soft); }
+.bar-row i b { display: block; height: 100%; border-radius: inherit; background: var(--category); transition: width .5s ease-out; }
+.payer-list { padding: 0 23px 22px; }
+.payer-list > div { display: flex; align-items: center; gap: 9px; min-height: 61px; border-top: 1px solid var(--line); }
+.rank { width: 18px; color: var(--muted); font-size: 9px; }
+.payer-list > div > span:nth-child(3) { display: grid; flex: 1; gap: 8px; }
+.payer-list > div > span:nth-child(3) strong, .payer-list > div > strong { font-size: 11px; }
+.payer-list > div > strong { font-variant-numeric: tabular-nums; }
+.payer-list i b { display: block; height: 100%; border-radius: inherit; background: var(--plum); }
+.statistics-empty { display: grid; min-height: 260px; margin-top: 18px; place-content: center; justify-items: center; padding: 36px; border: 1px dashed var(--line); border-radius: 18px; color: var(--muted); background: var(--surface); text-align: center; }
+.statistics-empty > span { color: var(--plum); font-size: 36px; }
+.statistics-empty h3 { margin: 10px 0 5px; color: var(--ink); font-family: "Noto Serif SC", serif; font-size: 18px; text-wrap: balance; }
+.statistics-empty p { max-width: 360px; margin: 0; font-size: 11px; line-height: 1.7; text-wrap: pretty; }
 .bills-view { margin-top: 32px; }
 .bills-heading { display: flex; align-items: end; justify-content: space-between; gap: 20px; padding-bottom: 20px; }
 .bills-heading h2 { margin: 6px 0 4px; font-family: "Noto Serif SC", serif; font-size: 25px; text-wrap: balance; }
@@ -288,6 +319,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 @media (max-width: 1050px) {
   .content-grid { grid-template-columns: 1fr; }
   .right-column { grid-template-columns: 1fr 1fr; }
+  .stats-layout { grid-template-columns: 1fr; }
   .member-card-grid { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 760px) {
@@ -304,6 +336,8 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   .summary-grid { grid-template-columns: 1fr 1fr; }
   .hero-total { grid-column: 1 / -1; }
   .right-column { grid-template-columns: 1fr; }
+  .stats-kpis { grid-template-columns: 1fr 1fr; }
+  .stats-kpis article:first-child { grid-column: 1 / -1; }
   .member-summary { grid-template-columns: 1fr 1fr; }
   .member-summary article:first-child { grid-column: 1 / -1; }
   .bill-filters { align-items: stretch; flex-wrap: wrap; }
@@ -322,6 +356,9 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   .welcome h1 { font-size: 26px; }
   .welcome p:last-child { max-width: 230px; font-size: 12px; }
   .summary-grid { gap: 10px; }
+  .stats-kpis { gap: 10px; }
+  .stats-kpis article { min-height: 115px; padding: 18px; }
+  .bar-list { padding-inline: 16px; }
   .bills-heading { align-items: center; }
   .bills-heading .add-button { display: none; }
   .bill-filters label { min-width: 100%; }
