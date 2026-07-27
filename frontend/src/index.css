@@ -51,6 +51,9 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .sidebar nav button:hover, .sidebar nav button.active { color: white; background: rgb(255 255 255 / 11%); }
 .sidebar nav button.active { box-shadow: inset 3px 0 #d9a9be; }
 .sidebar-note { margin-top: auto; padding: 18px; border: 1px solid rgb(255 255 255 / 10%); border-radius: 14px; background: rgb(255 255 255 / 6%); }
+.sidebar-note.is-editable { width: 100%; color: inherit; font: inherit; text-align: left; cursor: pointer; transition: border-color .2s, background .2s, transform .2s; }
+.sidebar-note.is-editable:hover { border-color: rgb(255 255 255 / 24%); background: rgb(255 255 255 / 10%); transform: translateY(-1px); }
+.sidebar-note.is-editable:focus-visible { outline: 2px solid #e7b9cc; outline-offset: 3px; }
 .sidebar-note > span, .sidebar-note small { display: block; color: #cbb8c3; font-size: 12px; }
 .sidebar-note strong { display: block; margin-top: 6px; font-size: 20px; }
 .sidebar-note strong small { display: inline; font-size: 11px; font-weight: 500; }
@@ -350,6 +353,17 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .confirm-dialog h2 { margin: 0; font-family: "Noto Serif SC", serif; font-size: 21px; }
 .confirm-dialog p { margin: 10px 0 24px; color: var(--muted); font-size: 12px; line-height: 1.6; }
 .confirm-dialog footer { display: flex; justify-content: center; gap: 8px; }
+.budget-dialog { width: min(430px, 100%); padding: 26px; border: 1px solid var(--line); border-radius: 20px; color: var(--ink); background: var(--surface); box-shadow: 0 30px 80px rgb(20 10 17 / 30%); }
+.budget-dialog > header { display: flex; align-items: start; justify-content: space-between; gap: 16px; }
+.budget-dialog h2 { margin: 4px 0 0; font-family: "Noto Serif SC", serif; font-size: 23px; }
+.budget-dialog > p { margin: 14px 0 20px; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.budget-dialog > label { display: grid; gap: 8px; color: var(--muted); font-size: 12px; }
+.money-input { display: flex; align-items: center; gap: 9px; padding: 0 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--soft); }
+.money-input b { font-size: 18px; }
+.money-input input { min-width: 0; flex: 1; padding: 13px 0; border: 0; outline: 0; color: var(--ink); background: transparent; font: inherit; font-size: 18px; font-weight: 700; }
+.budget-dialog .form-error { margin: 10px 0 0; color: #a64343; }
+.budget-dialog .form-success { margin: 10px 0 0; color: #317054; }
+.budget-dialog footer { display: flex; justify-content: flex-end; gap: 9px; margin-top: 22px; }
 .delete-button { min-height: 40px; padding: 0 16px; border: 0; border-radius: 9px; color: white; background: #9d4b46; font-size: 12px; font-weight: 600; }
 
 /* Existing login */
