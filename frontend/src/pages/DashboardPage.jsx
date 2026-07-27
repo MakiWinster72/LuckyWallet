@@ -14,7 +14,7 @@ function Avatar({ member, small = false }) {
   return <span className={`avatar ${small ? "avatar-small" : ""}`} style={{ "--avatar": member.color }}>{member.initials}</span>;
 }
 
-function BillRow({ bill }) {
+function BillRow({ bill, onOpen }) {
   const payer = members.find((member) => member.id === bill.payer);
   const category = categories[bill.category];
   return (
@@ -29,8 +29,48 @@ function BillRow({ bill }) {
         {bill.participants.length > 3 ? <span className="avatar avatar-small avatar-more">+{bill.participants.length - 3}</span> : null}
       </div>
       <div className="bill-amount"><strong>{formatMoney(bill.amount)}</strong><span>人均 {formatMoney(bill.amount / bill.participants.length)}</span></div>
-      <button className="row-action" aria-label={`查看${bill.title}`}><AppIcon name="arrow" size={17} /></button>
+      <button className="row-action" onClick={() => onOpen(bill)} aria-label={`查看${bill.title}`}><AppIcon name="arrow" size={17} /></button>
     </article>
+  );
+}
+
+function BillDetails({ bill, onClose }) {
+  const payer = members.find((member) => member.id === bill.payer);
+  const category = categories[bill.category];
+  const share = bill.amount / bill.participants.length;
+
+  return (
+    <div className="detail-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
+      <aside className="detail-drawer" role="dialog" aria-modal="true" aria-labelledby="bill-detail-title">
+        <header>
+          <div><span className="overline">BILL DETAILS</span><h2 id="bill-detail-title">账单详情</h2></div>
+          <button className="icon-button" onClick={onClose} aria-label="关闭"><AppIcon name="close" /></button>
+        </header>
+        <div className="detail-hero">
+          <span className="detail-category" style={{ "--category": category.color }}>{category.icon}</span>
+          <span>{bill.category}</span>
+          <h3>{bill.title}</h3>
+          <strong>{formatMoney(bill.amount)}</strong>
+          <p><AppIcon name="calendar" size={15} /> {bill.date}</p>
+        </div>
+        <dl className="detail-facts">
+          <div><dt>付款人</dt><dd><Avatar member={payer} small />{payer.name}</dd></div>
+          <div><dt>参与人数</dt><dd>{bill.participants.length} 人</dd></div>
+          <div><dt>分摊方式</dt><dd>平均分摊</dd></div>
+        </dl>
+        <section className="split-section">
+          <header><h3>分摊明细</h3><span>每人 {formatMoney(share)}</span></header>
+          <div>
+            {bill.participants.map((id) => {
+              const member = members.find((item) => item.id === id);
+              return <article key={id}><Avatar member={member} /><span><strong>{member.name}</strong><small>{id === bill.payer ? "已付款" : "待结算"}</small></span><b>{formatMoney(share)}</b></article>;
+            })}
+          </div>
+        </section>
+        <section className="detail-note"><span>备注</span><p>{bill.note || "这笔账单没有备注。"}</p></section>
+        <footer><span>账单编号</span><strong>LW-{String(bill.id).padStart(5, "0")}</strong></footer>
+      </aside>
+    </div>
   );
 }
 
@@ -95,6 +135,7 @@ export function DashboardPage() {
   const [activeNav, setActiveNav] = useState("总览");
   const [query, setQuery] = useState("");
   const [isAdding, setIsAdding] = useState(false);
+  const [selectedBill, setSelectedBill] = useState(null);
   const [dark, setDark] = useState(false);
   const [bills, setBills] = useState(() => {
     try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) ?? initialBills; }
@@ -147,7 +188,7 @@ export function DashboardPage() {
 
           <div className="content-grid">
             <section className="panel bill-panel"><header><div><span className="overline">RECENT ENTRIES</span><h2>最近账单</h2></div><button className="link-button" onClick={() => setActiveNav("账单")}>查看全部 <AppIcon name="arrow" size={15} /></button></header>
-              <div className="bill-list">{visibleBills.length ? visibleBills.slice(0, activeNav === "账单" ? 20 : 5).map((bill) => <BillRow key={bill.id} bill={bill} />) : <div className="empty-state">没有找到匹配的账单，换个关键词试试。</div>}</div>
+              <div className="bill-list">{visibleBills.length ? visibleBills.slice(0, activeNav === "账单" ? 20 : 5).map((bill) => <BillRow key={bill.id} bill={bill} onOpen={setSelectedBill} />) : <div className="empty-state">没有找到匹配的账单，换个关键词试试。</div>}</div>
             </section>
             <aside className="right-column">
               <section className="panel member-panel"><header><div><span className="overline">THE HOUSE</span><h2>共同成员</h2></div><span className="member-count">5 人</span></header><div className="member-list">{members.map((member, index) => <div key={member.id}><Avatar member={member} /><span><strong>{member.name}</strong><small>{index === 0 ? "本月垫付最多" : `${index + 1} 笔参与`}</small></span><b>{formatMoney([784, 213, 186.5, 64, 88][index])}</b></div>)}</div></section>
@@ -158,6 +199,7 @@ export function DashboardPage() {
       </main>
       <nav className="mobile-nav">{navItems.map(([icon, label]) => <button key={label} className={activeNav === label ? "active" : ""} onClick={() => setActiveNav(label)}><AppIcon name={icon} /><span>{label}</span></button>)}</nav>
       {isAdding ? <AddBillDialog onClose={() => setIsAdding(false)} onSave={saveBill} /> : null}
+      {selectedBill ? <BillDetails bill={selectedBill} onClose={() => setSelectedBill(null)} /> : null}
     </div>
   );
 }
