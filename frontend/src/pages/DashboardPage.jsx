@@ -11,6 +11,7 @@ import { resolveAssetUrl, uploadAvatarApi } from "../api/auth";
 import { listMembersApi } from "../api/members";
 import { categories, getCategory } from "../data/categories";
 import { getChineseMonthLabel, getLocalDateString, summarizeMonthlyBills } from "../data/monthlyBills";
+import { summarizeMonthlyTrend } from "../data/monthlyTrend";
 import { summarizeProfileFinance } from "../data/profileFinance";
 import { summarizeSpending } from "../data/spendingSummary";
 import { summarizePendingSettlement } from "../data/settlementSummary";
@@ -335,6 +336,10 @@ export function DashboardPage() {
     () => summarizeMonthlyBills(bills, referenceDate),
     [bills, referenceDate],
   );
+  const monthlyTrend = useMemo(
+    () => summarizeMonthlyTrend(bills, referenceDate),
+    [bills, referenceDate],
+  );
   const monthLabel = getChineseMonthLabel(referenceDate);
   const currentUser = members.find((member) => member.id === Number(user.id));
   const overviewStats = useMemo(
@@ -424,7 +429,7 @@ export function DashboardPage() {
             : activeNav === "成员" ? <MembersView members={members} bills={bills} currentMemberId={currentUser?.id} />
               : activeNav === "统计" ? <StatisticsView bills={bills} members={members} /> : <>
           <section className="summary-grid">
-            <article className="hero-total"><span className="card-label">{monthLabel}共同支出</span><strong>{formatMoney(monthlySummary.total)}</strong><div className="trend-note"><AppIcon name="trend" size={16} /><span>比上月少 8.4%</span></div><div className="receipt-edge" /></article>
+            <article className="hero-total"><span className="card-label">{monthLabel}共同支出</span><strong>{formatMoney(monthlySummary.total)}</strong><div className={`trend-note trend-${monthlyTrend.direction}`}><AppIcon name={monthlyTrend.direction === "down" ? "trendDown" : monthlyTrend.direction === "flat" ? "minus" : "trend"} size={16} /><span>{monthlyTrend.label}</span></div><div className="receipt-edge" /></article>
             <article className="summary-card"><span className="card-label">我的待结算</span><strong>{formatMoney(pendingSettlement.amount)}</strong><span className="status-pill">{pendingSettlement.count} 笔待处理</span></article>
             <article className="summary-card"><span className="card-label">本月账单</span><strong>{monthlySummary.count}<small> 笔</small></strong><span className="muted">最近更新于今天</span></article>
           </section>
