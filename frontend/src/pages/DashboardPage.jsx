@@ -42,7 +42,7 @@ function BillDetails({ bill, onClose }) {
   const share = bill.amount / bill.participants.length;
 
   return (
-    <div className="detail-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
+    <div className="detail-backdrop" role="presentation">
       <aside className="detail-drawer" role="dialog" aria-modal="true" aria-labelledby="bill-detail-title">
         <header>
           <div><span className="overline">BILL DETAILS</span><h2 id="bill-detail-title">账单详情</h2></div>
@@ -107,18 +107,18 @@ function AddBillDialog({ onClose, onSave }) {
   }
 
   return (
-    <div className="dialog-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
+    <div className="dialog-backdrop" role="presentation">
       <section className="bill-dialog" role="dialog" aria-modal="true" aria-labelledby="new-bill-title">
         <header><div><span className="overline">NEW ENTRY</span><h2 id="new-bill-title">记一笔共同消费</h2></div><button className="icon-button" onClick={onClose} aria-label="关闭"><AppIcon name="close" /></button></header>
         <form onSubmit={submit}>
-          <label className="field-wide">账单名称<input autoFocus value={form.title} onChange={(e) => update("title", e.target.value)} placeholder="例如：周末火锅" /></label>
-          <label>总金额<div className="money-input"><span>¥</span><input type="number" min="0.01" step="0.01" value={form.amount} onChange={(e) => update("amount", e.target.value)} placeholder="0.00" /></div></label>
-          <label>消费日期<input type="date" value={form.date} onChange={(e) => update("date", e.target.value)} /></label>
+          <label className="field-wide">账单名称<input name="bill-title" autoComplete="off" value={form.title} onChange={(e) => update("title", e.target.value)} placeholder="例如：周末火锅…" /></label>
+          <label>总金额<div className="money-input"><span>¥</span><input name="bill-amount" type="number" inputMode="decimal" autoComplete="off" min="0.01" step="0.01" value={form.amount} onChange={(e) => update("amount", e.target.value)} placeholder="0.00" /></div></label>
+          <label>消费日期<input name="bill-date" type="date" autoComplete="off" value={form.date} onChange={(e) => update("date", e.target.value)} /></label>
           <fieldset className="field-wide"><legend>分类</legend><div className="category-options">
             {Object.entries(categories).map(([name, item]) => <button className={form.category === name ? "selected" : ""} type="button" key={name} onClick={() => update("category", name)}><span>{item.icon}</span>{name}</button>)}
           </div></fieldset>
-          <label>付款人<select value={form.payer} onChange={(e) => update("payer", e.target.value)}>{members.map((member) => <option key={member.id} value={member.id}>{member.name}</option>)}</select></label>
-          <label>备注<input value={form.note} onChange={(e) => update("note", e.target.value)} placeholder="可选" /></label>
+          <label>付款人<select name="bill-payer" value={form.payer} onChange={(e) => update("payer", e.target.value)}>{members.map((member) => <option key={member.id} value={member.id}>{member.name}</option>)}</select></label>
+          <label>备注<input name="bill-note" autoComplete="off" value={form.note} onChange={(e) => update("note", e.target.value)} placeholder="可选…" /></label>
           <fieldset className="field-wide"><legend>参与分摊</legend><div className="member-options">
             {members.map((member) => <button type="button" className={form.participants.includes(member.id) ? "selected" : ""} key={member.id} onClick={() => toggleParticipant(member.id)}><Avatar member={member} small /><span>{member.name}</span><span className="check"><AppIcon name="check" size={13} /></span></button>)}
           </div></fieldset>
