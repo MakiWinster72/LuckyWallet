@@ -5,12 +5,16 @@ import { AppIcon } from "../components/AppIcon";
 import { AdminUsersView } from "../components/AdminUsersView";
 import { BillsView } from "../components/BillsView";
 import { MembersView } from "../components/MembersView";
+import { SettlementDialog } from "../components/SettlementDialog";
 import { createBillApi, deleteBillApi, listBillsApi, updateBillApi } from "../api/bills";
+import { getBudgetApi, updateBudgetApi } from "../api/budget";
 import { useAuth } from "../auth/useAuth";
 import { resolveAssetUrl, uploadAvatarApi } from "../api/auth";
 import { listMembersApi } from "../api/members";
 import { categories, getCategory } from "../data/categories";
+import { summarizeBudgetProgress } from "../data/budgetProgress";
 import { getChineseMonthLabel, getLocalDateString, summarizeMonthlyBills } from "../data/monthlyBills";
+import { summarizeMonthlyTrend } from "../data/monthlyTrend";
 import { summarizeProfileFinance } from "../data/profileFinance";
 import { summarizeSpending } from "../data/spendingSummary";
 import { summarizePendingSettlement } from "../data/settlementSummary";
@@ -286,6 +290,57 @@ function DeleteBillDialog({ bill, onCancel, onConfirm }) {
   );
 }
 
+function BudgetCard({ spending, summary, canEdit, onEdit }) {
+  const content = <>
+    <span>本月预算</span>
+    <strong>{formatMoney(spending)} <small>/ {formatMoney(summary.budget)}</small></strong>
+    <div><i style={{ width: `${summary.progress}%` }} /></div>
+    <small>已使用 {summary.percentage}%{canEdit ? " · 点击设置" : ""}</small>
+  </>;
+
+  return canEdit
+    ? <button className="sidebar-note is-editable" type="button" onClick={onEdit} aria-label={`设置本月预算，当前${formatMoney(summary.budget)}`}>{content}</button>
+    : <div className="sidebar-note">{content}</div>;
+}
+
+function BudgetDialog({ budget, onClose, onSaved }) {
+  const [value, setValue] = useState(String(budget));
+  const [status, setStatus] = useState({ saving: false, error: "", success: "" });
+  const parsedValue = Number(value);
+  const isValid = Number.isFinite(parsedValue) && parsedValue > 0;
+
+  async function saveBudget(event) {
+    event.preventDefault();
+    if (!isValid) {
+      setStatus({ saving: false, error: "月预算必须大于 0", success: "" });
+      return;
+    }
+
+    setStatus({ saving: true, error: "", success: "" });
+    try {
+      const savedBudget = await updateBudgetApi(parsedValue);
+      onSaved(savedBudget);
+      setValue(String(savedBudget));
+      setStatus({ saving: false, error: "", success: "预算已保存" });
+    } catch (error) {
+      setStatus({ saving: false, error: error.message, success: "" });
+    }
+  }
+
+  return (
+    <div className="dialog-backdrop" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
+      <form className="budget-dialog" onSubmit={saveBudget} role="dialog" aria-modal="true" aria-labelledby="budget-dialog-title">
+        <header><div><span className="overline">HOUSEHOLD BUDGET</span><h2 id="budget-dialog-title">设置本月预算</h2></div><button className="icon-button" type="button" onClick={onClose} aria-label="关闭">×</button></header>
+        <p>预算会应用于所有成员的总览，并保存在家庭账户中。</p>
+        <label>月预算金额<span className="money-input"><b>¥</b><input type="number" min="0.01" step="0.01" value={value} onChange={(event) => { setValue(event.target.value); setStatus({ saving: false, error: "", success: "" }); }} autoFocus /></span></label>
+        {status.error ? <p className="form-error" role="alert">{status.error}</p> : null}
+        {status.success ? <p className="form-success" role="status">{status.success}</p> : null}
+        <footer><button className="text-button" type="button" onClick={onClose}>取消</button><button className="add-button" type="submit" disabled={!isValid || status.saving}>{status.saving ? "保存中…" : "保存预算"}</button></footer>
+      </form>
+    </div>
+  );
+}
+
 export function DashboardPage() {
   const { user, logout, updateUser } = useAuth();
   const navigate = useNavigate();
@@ -297,9 +352,12 @@ export function DashboardPage() {
   const [deletingBill, setDeletingBill] = useState(null);
   const [dark, setDark] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isBudgetOpen, setIsBudgetOpen] = useState(false);
+  const [monthlyBudget, setMonthlyBudget] = useState(2400);
   const [bills, setBills] = useState([]);
   const [members, setMembers] = useState([]);
   const [billStatus, setBillStatus] = useState({ loading: true, error: "" });
+  const [isSettlementOpen, setIsSettlementOpen] = useState(false);
   const navItems = user.role === "admin"
     ? [...sharedNavItems, ["shield", "用户管理"]]
     : sharedNavItems;
@@ -309,13 +367,15 @@ export function DashboardPage() {
     let ignore = false;
     async function loadDashboard() {
       try {
-        const [billResult, memberResult] = await Promise.all([
+        const [billResult, memberResult, budgetResult] = await Promise.all([
           listBillsApi(),
           listMembersApi(),
+          getBudgetApi(),
         ]);
         if (!ignore) {
           setBills(billResult);
           setMembers(memberResult);
+          setMonthlyBudget(budgetResult);
           setBillStatus({ loading: false, error: "" });
         }
       } catch (error) {
@@ -335,7 +395,12 @@ export function DashboardPage() {
     () => summarizeMonthlyBills(bills, referenceDate),
     [bills, referenceDate],
   );
+  const monthlyTrend = useMemo(
+    () => summarizeMonthlyTrend(bills, referenceDate),
+    [bills, referenceDate],
+  );
   const monthLabel = getChineseMonthLabel(referenceDate);
+  const budgetSummary = summarizeBudgetProgress(monthlySummary.total, monthlyBudget);
   const currentUser = members.find((member) => member.id === Number(user.id));
   const overviewStats = useMemo(
     () => summarizeSpending(monthlySummary.bills, members),
@@ -403,7 +468,7 @@ export function DashboardPage() {
       <aside className="sidebar">
         <div className="brand-lockup"><span className="brand-mark">L</span><span>LuckyWallet</span></div>
         <nav aria-label="主导航">{navItems.map(([icon, label]) => <button key={label} className={activeNav === label ? "active" : ""} onClick={() => setActiveNav(label)}><AppIcon name={icon} /><span>{label}</span></button>)}</nav>
-        <div className="sidebar-note"><span>本月预算</span><strong>{formatMoney(monthlySummary.total)} <small>/ ¥2,400</small></strong><div><i style={{ width: `${Math.min(monthlySummary.total / 24, 100)}%` }} /></div><small>已使用 {Math.round(monthlySummary.total / 24)}%</small></div>
+        <BudgetCard spending={monthlySummary.total} summary={budgetSummary} canEdit={user.role === "admin"} onEdit={() => setIsBudgetOpen(true)} />
         <div className="profile-card" role="button" tabIndex={0} onClick={() => setIsProfileOpen(true)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") setIsProfileOpen(true); }}><Avatar member={currentUser} avatarUrl={user.avatar_url} /><span><strong>{user.nickname ?? user.username}</strong><small>{user.role === "admin" ? "管理员" : "团队成员"}</small></span><button className="profile-logout" type="button" onClick={(event) => { event.stopPropagation(); handleLogout(); }} aria-label="退出登录" title="退出登录"><AppIcon name="logout" size={17} /></button></div>
       </aside>
 
@@ -424,7 +489,7 @@ export function DashboardPage() {
             : activeNav === "成员" ? <MembersView members={members} bills={bills} currentMemberId={currentUser?.id} />
               : activeNav === "统计" ? <StatisticsView bills={bills} members={members} /> : <>
           <section className="summary-grid">
-            <article className="hero-total"><span className="card-label">{monthLabel}共同支出</span><strong>{formatMoney(monthlySummary.total)}</strong><div className="trend-note"><AppIcon name="trend" size={16} /><span>比上月少 8.4%</span></div><div className="receipt-edge" /></article>
+            <article className="hero-total"><span className="card-label">{monthLabel}共同支出</span><strong>{formatMoney(monthlySummary.total)}</strong><div className={`trend-note trend-${monthlyTrend.direction}`}><AppIcon name={monthlyTrend.direction === "down" ? "trendDown" : monthlyTrend.direction === "flat" ? "minus" : "trend"} size={16} /><span>{monthlyTrend.label}</span></div><div className="receipt-edge" /></article>
             <article className="summary-card"><span className="card-label">我的待结算</span><strong>{formatMoney(pendingSettlement.amount)}</strong><span className="status-pill">{pendingSettlement.count} 笔待处理</span></article>
             <article className="summary-card"><span className="card-label">本月账单</span><strong>{monthlySummary.count}<small> 笔</small></strong><span className="muted">最近更新于今天</span></article>
           </section>
@@ -435,7 +500,7 @@ export function DashboardPage() {
             </section>
             <aside className="right-column">
               <section className="panel member-panel"><header><div><span className="overline">THE HOUSE</span><h2>共同成员</h2></div><span className="member-count">{members.length} 人</span></header><div className="member-list">{overviewStats.byPayer.map((member) => <div key={member.id}><Avatar member={member} /><span><strong>{member.name}</strong><small>{member.amount > 0 ? "本月有垫付" : "暂无垫付"}</small></span><b>{formatMoney(member.amount)}</b></div>)}</div></section>
-              <section className="settle-card"><span className="overline">QUICK SETTLE</span><h3>让欠款不过夜</h3><p>{pendingSettlement.count ? `当前有 ${pendingSettlement.count} 笔账单可以合并结算。` : "当前没有需要结算的账单。"}</p><button onClick={() => setActiveNav("统计")}>查看结算方案 <AppIcon name="arrow" size={16} /></button></section>
+              <section className="settle-card"><span className="overline">QUICK SETTLE</span><h3>让欠款不过夜</h3><p>{pendingSettlement.count ? `当前有 ${pendingSettlement.count} 笔账单可以合并结算。` : "当前没有需要结算的账单。"}</p><button onClick={() => setIsSettlementOpen(true)}>查看结算方案 <AppIcon name="arrow" size={16} /></button></section>
             </aside>
           </div>
           </>}
@@ -447,6 +512,8 @@ export function DashboardPage() {
       {editingBill ? <AddBillDialog members={members} initialBill={editingBill} onClose={() => setEditingBill(null)} onSave={updateBill} /> : null}
       {deletingBill ? <DeleteBillDialog bill={deletingBill} onCancel={() => setDeletingBill(null)} onConfirm={deleteBill} /> : null}
       {isProfileOpen ? <ProfileCenter user={user} member={currentUser} finance={profileFinance} onClose={() => setIsProfileOpen(false)} onUpdated={updateUser} /> : null}
+      {isSettlementOpen ? <SettlementDialog bills={bills} members={members} onClose={() => setIsSettlementOpen(false)} /> : null}
+      {isBudgetOpen ? <BudgetDialog budget={monthlyBudget} onClose={() => setIsBudgetOpen(false)} onSaved={setMonthlyBudget} /> : null}
     </div>
   );
 }
