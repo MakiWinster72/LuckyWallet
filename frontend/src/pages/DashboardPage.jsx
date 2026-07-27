@@ -2,6 +2,8 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { AppIcon } from "../components/AppIcon";
+import { BillsView } from "../components/BillsView";
+import { MembersView } from "../components/MembersView";
 import { useAuth } from "../auth/useAuth";
 import { categories, formatMoney, initialBills, members, summarizeSpending } from "../data/demoData";
 
@@ -40,7 +42,7 @@ function BillDetails({ bill, onClose }) {
   const share = bill.amount / bill.participants.length;
 
   return (
-    <div className="detail-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
+    <div className="detail-backdrop" role="presentation">
       <aside className="detail-drawer" role="dialog" aria-modal="true" aria-labelledby="bill-detail-title">
         <header>
           <div><span className="overline">BILL DETAILS</span><h2 id="bill-detail-title">账单详情</h2></div>
@@ -105,18 +107,18 @@ function AddBillDialog({ onClose, onSave }) {
   }
 
   return (
-    <div className="dialog-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
+    <div className="dialog-backdrop" role="presentation">
       <section className="bill-dialog" role="dialog" aria-modal="true" aria-labelledby="new-bill-title">
         <header><div><span className="overline">NEW ENTRY</span><h2 id="new-bill-title">记一笔共同消费</h2></div><button className="icon-button" onClick={onClose} aria-label="关闭"><AppIcon name="close" /></button></header>
         <form onSubmit={submit}>
-          <label className="field-wide">账单名称<input autoFocus value={form.title} onChange={(e) => update("title", e.target.value)} placeholder="例如：周末火锅" /></label>
-          <label>总金额<div className="money-input"><span>¥</span><input type="number" min="0.01" step="0.01" value={form.amount} onChange={(e) => update("amount", e.target.value)} placeholder="0.00" /></div></label>
-          <label>消费日期<input type="date" value={form.date} onChange={(e) => update("date", e.target.value)} /></label>
+          <label className="field-wide">账单名称<input name="bill-title" autoComplete="off" value={form.title} onChange={(e) => update("title", e.target.value)} placeholder="例如：周末火锅…" /></label>
+          <label>总金额<div className="money-input"><span>¥</span><input name="bill-amount" type="number" inputMode="decimal" autoComplete="off" min="0.01" step="0.01" value={form.amount} onChange={(e) => update("amount", e.target.value)} placeholder="0.00" /></div></label>
+          <label>消费日期<input name="bill-date" type="date" autoComplete="off" value={form.date} onChange={(e) => update("date", e.target.value)} /></label>
           <fieldset className="field-wide"><legend>分类</legend><div className="category-options">
             {Object.entries(categories).map(([name, item]) => <button className={form.category === name ? "selected" : ""} type="button" key={name} onClick={() => update("category", name)}><span>{item.icon}</span>{name}</button>)}
           </div></fieldset>
-          <label>付款人<select value={form.payer} onChange={(e) => update("payer", e.target.value)}>{members.map((member) => <option key={member.id} value={member.id}>{member.name}</option>)}</select></label>
-          <label>备注<input value={form.note} onChange={(e) => update("note", e.target.value)} placeholder="可选" /></label>
+          <label>付款人<select name="bill-payer" value={form.payer} onChange={(e) => update("payer", e.target.value)}>{members.map((member) => <option key={member.id} value={member.id}>{member.name}</option>)}</select></label>
+          <label>备注<input name="bill-note" autoComplete="off" value={form.note} onChange={(e) => update("note", e.target.value)} placeholder="可选…" /></label>
           <fieldset className="field-wide"><legend>参与分摊</legend><div className="member-options">
             {members.map((member) => <button type="button" className={form.participants.includes(member.id) ? "selected" : ""} key={member.id} onClick={() => toggleParticipant(member.id)}><Avatar member={member} small /><span>{member.name}</span><span className="check"><AppIcon name="check" size={13} /></span></button>)}
           </div></fieldset>
@@ -209,21 +211,23 @@ export function DashboardPage() {
       <aside className="sidebar">
         <div className="brand-lockup"><span className="brand-mark">L</span><span>LuckyWallet</span></div>
         <nav aria-label="主导航">{navItems.map(([icon, label]) => <button key={label} className={activeNav === label ? "active" : ""} onClick={() => setActiveNav(label)}><AppIcon name={icon} /><span>{label}</span></button>)}</nav>
-        <div className="sidebar-note"><span>本月预算</span><strong>¥ 2,400</strong><div><i style={{ width: `${Math.min(total / 24, 100)}%` }} /></div><small>已使用 {Math.round(total / 24)}%</small></div>
-        <button className="profile-card" onClick={handleLogout} title="退出登录"><Avatar member={currentUser} /><span><strong>{user.nickname ?? user.username}</strong><small>{user.role === "admin" ? "管理员" : "团队成员"}</small></span><AppIcon name="logout" size={17} /></button>
+        <div className="sidebar-note"><span>本月预算</span><strong>{formatMoney(total)} <small>/ ¥2,400</small></strong><div><i style={{ width: `${Math.min(total / 24, 100)}%` }} /></div><small>已使用 {Math.round(total / 24)}%</small></div>
+        <div className="profile-card"><Avatar member={currentUser} /><span><strong>{user.nickname ?? user.username}</strong><small>{user.role === "admin" ? "管理员" : "团队成员"}</small></span><button className="profile-logout" type="button" onClick={handleLogout} aria-label="退出登录" title="退出登录"><AppIcon name="logout" size={17} /></button></div>
       </aside>
 
       <main className="workspace">
         <header className="topbar">
           <div className="mobile-brand"><span className="brand-mark">L</span><strong>LuckyWallet</strong></div>
-          <label className="search-box"><AppIcon name="search" size={18} /><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="搜索账单或分类…" /></label>
+          <label className="search-box"><AppIcon name="search" size={18} /><input name="global-search" type="search" aria-label="搜索账单或分类" autoComplete="off" spellCheck={false} value={query} onChange={(e) => setQuery(e.target.value)} placeholder="搜索账单或分类…" /></label>
           <div className="top-actions"><button className="icon-button" onClick={() => setDark((value) => !value)} aria-label="切换主题"><AppIcon name={dark ? "sun" : "moon"} /></button><button className="icon-button notification" aria-label="通知"><AppIcon name="bell" /></button><button className="add-button" onClick={() => setIsAdding(true)}><AppIcon name="plus" size={18} />记一笔</button></div>
         </header>
 
         <div className="dashboard-content">
           <section className="welcome"><div><p className="overline">JULY · SHARED WALLET</p><h1>{activeNav === "总览" ? `早上好，${user.nickname ?? user.username}` : activeNav}</h1><p>{activeNav === "总览" ? "五个人的小日子，每一笔都清清楚楚。" : "共同生活的账目，都在这里。"}</p></div><button className="add-button mobile-add" onClick={() => setIsAdding(true)}><AppIcon name="plus" size={18} />记一笔</button></section>
 
-          {activeNav === "统计" ? <StatisticsView bills={bills} /> : <>
+          {activeNav === "账单" ? <BillsView bills={bills} members={members} query={query} onAdd={() => setIsAdding(true)} onOpen={setSelectedBill} />
+            : activeNav === "成员" ? <MembersView members={members} bills={bills} currentMemberId={currentUser.id} />
+              : activeNav === "统计" ? <StatisticsView bills={bills} /> : <>
           <section className="summary-grid">
             <article className="hero-total"><span className="card-label">七月共同支出</span><strong>{formatMoney(total)}</strong><div className="trend-note"><AppIcon name="trend" size={16} /><span>比六月少 8.4%</span></div><div className="receipt-edge" /></article>
             <article className="summary-card"><span className="card-label">我的待结算</span><strong>{formatMoney(184.3)}</strong><span className="status-pill">3 笔待处理</span></article>
@@ -232,7 +236,7 @@ export function DashboardPage() {
 
           <div className="content-grid">
             <section className="panel bill-panel"><header><div><span className="overline">RECENT ENTRIES</span><h2>最近账单</h2></div><button className="link-button" onClick={() => setActiveNav("账单")}>查看全部 <AppIcon name="arrow" size={15} /></button></header>
-              <div className="bill-list">{visibleBills.length ? visibleBills.slice(0, activeNav === "账单" ? 20 : 5).map((bill) => <BillRow key={bill.id} bill={bill} onOpen={setSelectedBill} />) : <div className="empty-state">没有找到匹配的账单，换个关键词试试。</div>}</div>
+              <div className="bill-list">{visibleBills.length ? visibleBills.slice(0, 5).map((bill) => <BillRow key={bill.id} bill={bill} onOpen={setSelectedBill} />) : <div className="empty-state">没有找到匹配的账单，换个关键词试试。</div>}</div>
             </section>
             <aside className="right-column">
               <section className="panel member-panel"><header><div><span className="overline">THE HOUSE</span><h2>共同成员</h2></div><span className="member-count">5 人</span></header><div className="member-list">{members.map((member, index) => <div key={member.id}><Avatar member={member} /><span><strong>{member.name}</strong><small>{index === 0 ? "本月垫付最多" : `${index + 1} 笔参与`}</small></span><b>{formatMoney([784, 213, 186.5, 64, 88][index])}</b></div>)}</div></section>
