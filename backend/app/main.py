@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
 from app.api.routes.auth import router as auth_router
+from app.api.routes.admin_users import router as admin_users_router
 from app.api.routes.bills import router as bills_router
 from app.config import get_settings
 from app.database import engine
@@ -23,6 +24,7 @@ app.add_middleware(
 )
 
 app.include_router(auth_router, prefix="/api/v1")
+app.include_router(admin_users_router, prefix="/api/v1")
 app.include_router(bills_router, prefix="/api/v1")
 
 
