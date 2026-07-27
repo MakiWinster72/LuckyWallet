@@ -125,8 +125,8 @@ export function DashboardPage() {
       <aside className="sidebar">
         <div className="brand-lockup"><span className="brand-mark">L</span><span>LuckyWallet</span></div>
         <nav aria-label="主导航">{navItems.map(([icon, label]) => <button key={label} className={activeNav === label ? "active" : ""} onClick={() => setActiveNav(label)}><AppIcon name={icon} /><span>{label}</span></button>)}</nav>
-        <div className="sidebar-note"><span>本月预算</span><strong>¥ 2,400</strong><div><i style={{ width: `${Math.min(total / 24, 100)}%` }} /></div><small>已使用 {Math.round(total / 24)}%</small></div>
-        <button className="profile-card" onClick={handleLogout} title="退出登录"><Avatar member={currentUser} /><span><strong>{user.nickname ?? user.username}</strong><small>{user.role === "admin" ? "管理员" : "团队成员"}</small></span><AppIcon name="logout" size={17} /></button>
+        <div className="sidebar-note"><span>本月预算</span><strong>{formatMoney(total)} <small>/ ¥2,400</small></strong><div><i style={{ width: `${Math.min(total / 24, 100)}%` }} /></div><small>已使用 {Math.round(total / 24)}%</small></div>
+        <div className="profile-card"><Avatar member={currentUser} /><span><strong>{user.nickname ?? user.username}</strong><small>{user.role === "admin" ? "管理员" : "团队成员"}</small></span><button className="profile-logout" type="button" onClick={handleLogout} aria-label="退出登录" title="退出登录"><AppIcon name="logout" size={17} /></button></div>
       </aside>
 
       <main className="workspace">
