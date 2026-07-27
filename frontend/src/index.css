@@ -173,6 +173,13 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .bill-register > header > div:last-child { text-align: right; }
 .bill-register > header strong { font-size: 14px; font-variant-numeric: tabular-nums; }
 .bill-register > header span { color: var(--muted); font-size: 10px; }
+.bill-register-search { display: flex; width: min(360px, 42%); min-height: 40px; align-items: center; gap: 8px; padding: 0 10px; border: 1px solid var(--line); border-radius: 10px; color: var(--muted); background: var(--page); }
+.bill-register-search:focus-within { border-color: var(--plum); box-shadow: 0 0 0 3px rgb(187 132 147 / 28%); }
+.bill-register-search input { min-width: 0; flex: 1; border: 0; color: var(--ink); background: transparent; }
+.bill-register-search input::placeholder { color: var(--muted); }
+.bill-register-search button { min-height: 30px; padding: 0 7px; border: 0; border-radius: 7px; color: var(--plum); background: var(--soft); font-size: 10px; font-weight: 700; }
+.bill-register-search button:hover { background: var(--peach); }
+.bill-result-status { margin: 0; padding: 9px 24px; overflow-wrap: anywhere; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 10px; }
 .bill-table-scroll { overflow-x: auto; }
 .bill-register table { width: 100%; border-collapse: collapse; }
 .bill-register th { padding: 12px 18px; color: var(--muted); background: var(--soft); font-size: 9px; font-weight: 600; text-align: left; letter-spacing: .05em; }
@@ -415,6 +422,8 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   .bill-filters { align-items: stretch; flex-wrap: wrap; }
   .bill-filters label { min-width: calc(50% - 5px); flex: 1; }
   .clear-filter { margin-left: 0; }
+  .bill-register > header { flex-wrap: wrap; gap: 14px; }
+  .bill-register-search { order: 3; width: 100%; }
   .admin-user-summary { grid-template-columns: repeat(3, 1fr); }
   .admin-user-toolbar > label { min-width: calc(50% - 5px); flex: 1; }
   .admin-user-toolbar .admin-user-search { min-width: 100%; }
@@ -437,6 +446,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   .bills-heading { align-items: center; }
   .bills-heading .add-button { display: none; }
   .bill-filters label { min-width: 100%; }
+  .bill-register > header > div:last-child { margin-left: auto; }
   .members-heading { align-items: start; }
   .member-card-grid, .member-summary { grid-template-columns: 1fr; }
   .member-summary article:first-child { grid-column: auto; }
