@@ -327,7 +327,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 
 .admin-users-view { margin-top: 4px; }
 .admin-users-heading { display: flex; align-items: end; justify-content: space-between; gap: 20px; padding-bottom: 22px; }
-.admin-users-heading h2 { margin: 6px 0 4px; font-family: "Noto Serif SC", serif; font-size: 28px; text-wrap: balance; }
+.admin-users-heading h1 { margin: 6px 0 4px; font-family: "Noto Serif SC", serif; font-size: 28px; text-wrap: balance; }
 .admin-users-heading p { margin: 0; color: var(--muted); font-size: 12px; }
 .admin-user-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
 .admin-user-summary article { padding: 19px 22px; border: 1px solid var(--line); border-radius: 15px; background: var(--surface); box-shadow: var(--shadow); }
@@ -382,6 +382,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .admin-user-dialog .dialog-error { margin: 0; }
 .admin-user-dialog footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 5px; }
 .primary-button:disabled { cursor: wait; opacity: .65; }
+.admin-change-confirm { position: fixed; inset: 50% auto auto 50%; z-index: 12; width: min(400px, calc(100% - 36px)); transform: translate(-50%, -50%); }
 
 @keyframes fade { from { opacity: 0; transform: translateY(5px); } }
 @keyframes slide-in { from { transform: translateX(100%); } }

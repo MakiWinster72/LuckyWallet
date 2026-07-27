@@ -21,6 +21,17 @@ const dateFormatter = new Intl.DateTimeFormat("zh-CN", {
   day: "numeric",
 });
 
+function readFiltersFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const role = params.get("userRole");
+  const status = params.get("userStatus");
+  return {
+    query: params.get("userQuery") ?? "",
+    role: role === "admin" || role === "user" ? role : "all",
+    status: status === "active" || status === "inactive" ? status : "all",
+  };
+}
+
 function displayName(user) {
   return user.nickname || user.username;
 }
@@ -111,6 +122,7 @@ function CreateUserDialog({ onClose, onCreated }) {
 function EditUserDialog({ user, currentUserId, onClose, onUpdated }) {
   const [form, setForm] = useState(() => ({ ...user }));
   const [status, setStatus] = useState({ saving: false, error: "" });
+  const [isConfirming, setIsConfirming] = useState(false);
   const isSelf = user.id === currentUserId;
   const isSensitiveChange = form.role !== user.role || form.isActive !== user.isActive;
 
@@ -118,12 +130,20 @@ function EditUserDialog({ user, currentUserId, onClose, onUpdated }) {
     setForm((current) => ({ ...current, [key]: value }));
   }
 
-  async function submit(event) {
+  function submit(event) {
     event.preventDefault();
     if (!form.nickname.trim()) {
       setStatus({ saving: false, error: "请填写昵称，以便团队成员识别该用户。" });
       return;
     }
+    if (isSensitiveChange) {
+      setIsConfirming(true);
+      return;
+    }
+    void save();
+  }
+
+  async function save() {
     setStatus({ saving: true, error: "" });
     try {
       const updated = await updateAdminUserApi(form);
@@ -135,7 +155,9 @@ function EditUserDialog({ user, currentUserId, onClose, onUpdated }) {
 
   return (
     <div className="dialog-backdrop">
-      <section className="admin-user-dialog" role="dialog" aria-modal="true" aria-labelledby="edit-user-title">
+      <section className="admin-user-dialog" role="dialog" aria-modal={isConfirming ? undefined : "true"}
+        aria-hidden={isConfirming ? "true" : undefined} inert={isConfirming ? "" : undefined}
+        aria-labelledby="edit-user-title">
         <header>
           <div>
             <span className="overline">ACCOUNT SETTINGS</span>
@@ -181,13 +203,29 @@ function EditUserDialog({ user, currentUserId, onClose, onUpdated }) {
           </footer>
         </form>
       </section>
+      {isConfirming ? (
+        <section className="confirm-dialog admin-change-confirm" role="alertdialog" aria-modal="true"
+          aria-labelledby="confirm-user-change-title" aria-describedby="confirm-user-change-copy">
+          <span className="confirm-icon" aria-hidden="true">!</span>
+          <h2 id="confirm-user-change-title">确认修改 {displayName(user)}？</h2>
+          <p id="confirm-user-change-copy">
+            {form.isActive ? "角色变更会立即影响该用户可访问的功能。" : "停用后，该用户将无法登录或继续使用 LuckyWallet。"}
+          </p>
+          <footer>
+            <button className="text-button" type="button" onClick={() => setIsConfirming(false)}>返回检查</button>
+            <button className="delete-button" type="button" disabled={status.saving} onClick={() => void save()}>
+              {status.saving ? "正在保存…" : "确认修改"}
+            </button>
+          </footer>
+        </section>
+      ) : null}
     </div>
   );
 }
 
 export function AdminUsersView({ currentUserId }) {
   const [users, setUsers] = useState([]);
-  const [filters, setFilters] = useState(EMPTY_FILTERS);
+  const [filters, setFilters] = useState(readFiltersFromUrl);
   const [status, setStatus] = useState({ loading: true, error: "" });
   const [isCreating, setIsCreating] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
@@ -220,6 +258,21 @@ export function AdminUsersView({ currentUserId }) {
     return () => { ignore = true; };
   }, []);
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const values = {
+      userQuery: filters.query,
+      userRole: filters.role === "all" ? "" : filters.role,
+      userStatus: filters.status === "all" ? "" : filters.status,
+    };
+    Object.entries(values).forEach(([key, value]) => {
+      if (value) params.set(key, value);
+      else params.delete(key);
+    });
+    const query = params.toString();
+    window.history.replaceState(null, "", `${window.location.pathname}${query ? `?${query}` : ""}${window.location.hash}`);
+  }, [filters]);
+
   const visibleUsers = useMemo(() => filterAdminUsers(users, {
     ...filters,
     query: deferredQuery,
@@ -246,7 +299,7 @@ export function AdminUsersView({ currentUserId }) {
       <header className="admin-users-heading">
         <div>
           <span className="overline">ACCESS CONTROL</span>
-          <h2 id="admin-users-title">用户管理</h2>
+          <h1 id="admin-users-title">用户管理</h1>
           <p>创建团队账号，并管理角色与登录权限。</p>
         </div>
         <button className="add-button" type="button" onClick={() => setIsCreating(true)}>
