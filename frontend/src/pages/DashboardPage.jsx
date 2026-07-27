@@ -10,6 +10,7 @@ import { useAuth } from "../auth/useAuth";
 import { listMembersApi } from "../api/members";
 import { categories, getCategory } from "../data/categories";
 import { summarizeSpending } from "../data/spendingSummary";
+import { summarizePendingSettlement } from "../data/settlementSummary";
 import { formatMoney } from "../utils/money";
 
 const sharedNavItems = [
@@ -249,6 +250,10 @@ export function DashboardPage() {
   const total = bills.reduce((sum, bill) => sum + bill.amount, 0);
   const currentUser = members.find((member) => member.id === Number(user.id));
   const overviewStats = useMemo(() => summarizeSpending(bills, members), [bills, members]);
+  const pendingSettlement = useMemo(
+    () => summarizePendingSettlement(bills, currentUser?.id),
+    [bills, currentUser?.id],
+  );
 
   async function saveBill(form) {
     try {
@@ -325,7 +330,7 @@ export function DashboardPage() {
               : activeNav === "统计" ? <StatisticsView bills={bills} members={members} /> : <>
           <section className="summary-grid">
             <article className="hero-total"><span className="card-label">七月共同支出</span><strong>{formatMoney(total)}</strong><div className="trend-note"><AppIcon name="trend" size={16} /><span>比六月少 8.4%</span></div><div className="receipt-edge" /></article>
-            <article className="summary-card"><span className="card-label">我的待结算</span><strong>{formatMoney(184.3)}</strong><span className="status-pill">3 笔待处理</span></article>
+            <article className="summary-card"><span className="card-label">我的待结算</span><strong>{formatMoney(pendingSettlement.amount)}</strong><span className="status-pill">{pendingSettlement.count} 笔待处理</span></article>
             <article className="summary-card"><span className="card-label">本月账单</span><strong>{bills.length}<small> 笔</small></strong><span className="muted">最近更新于今天</span></article>
           </section>
 
@@ -335,7 +340,7 @@ export function DashboardPage() {
             </section>
             <aside className="right-column">
               <section className="panel member-panel"><header><div><span className="overline">THE HOUSE</span><h2>共同成员</h2></div><span className="member-count">{members.length} 人</span></header><div className="member-list">{overviewStats.byPayer.map((member) => <div key={member.id}><Avatar member={member} /><span><strong>{member.name}</strong><small>{member.amount > 0 ? "本月有垫付" : "暂无垫付"}</small></span><b>{formatMoney(member.amount)}</b></div>)}</div></section>
-              <section className="settle-card"><span className="overline">QUICK SETTLE</span><h3>让欠款不过夜</h3><p>当前有 3 笔账单可以合并结算。</p><button onClick={() => setActiveNav("统计")}>查看结算方案 <AppIcon name="arrow" size={16} /></button></section>
+              <section className="settle-card"><span className="overline">QUICK SETTLE</span><h3>让欠款不过夜</h3><p>{pendingSettlement.count ? `当前有 ${pendingSettlement.count} 笔账单可以合并结算。` : "当前没有需要结算的账单。"}</p><button onClick={() => setActiveNav("统计")}>查看结算方案 <AppIcon name="arrow" size={16} /></button></section>
             </aside>
           </div>
           </>}
