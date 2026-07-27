@@ -5,6 +5,7 @@ import { AppIcon } from "../components/AppIcon";
 import { AdminUsersView } from "../components/AdminUsersView";
 import { BillsView } from "../components/BillsView";
 import { MembersView } from "../components/MembersView";
+import { SettlementDialog } from "../components/SettlementDialog";
 import { createBillApi, deleteBillApi, listBillsApi, updateBillApi } from "../api/bills";
 import { useAuth } from "../auth/useAuth";
 import { resolveAssetUrl, uploadAvatarApi } from "../api/auth";
@@ -300,6 +301,7 @@ export function DashboardPage() {
   const [bills, setBills] = useState([]);
   const [members, setMembers] = useState([]);
   const [billStatus, setBillStatus] = useState({ loading: true, error: "" });
+  const [isSettlementOpen, setIsSettlementOpen] = useState(false);
   const navItems = user.role === "admin"
     ? [...sharedNavItems, ["shield", "用户管理"]]
     : sharedNavItems;
@@ -435,7 +437,7 @@ export function DashboardPage() {
             </section>
             <aside className="right-column">
               <section className="panel member-panel"><header><div><span className="overline">THE HOUSE</span><h2>共同成员</h2></div><span className="member-count">{members.length} 人</span></header><div className="member-list">{overviewStats.byPayer.map((member) => <div key={member.id}><Avatar member={member} /><span><strong>{member.name}</strong><small>{member.amount > 0 ? "本月有垫付" : "暂无垫付"}</small></span><b>{formatMoney(member.amount)}</b></div>)}</div></section>
-              <section className="settle-card"><span className="overline">QUICK SETTLE</span><h3>让欠款不过夜</h3><p>{pendingSettlement.count ? `当前有 ${pendingSettlement.count} 笔账单可以合并结算。` : "当前没有需要结算的账单。"}</p><button onClick={() => setActiveNav("统计")}>查看结算方案 <AppIcon name="arrow" size={16} /></button></section>
+              <section className="settle-card"><span className="overline">QUICK SETTLE</span><h3>让欠款不过夜</h3><p>{pendingSettlement.count ? `当前有 ${pendingSettlement.count} 笔账单可以合并结算。` : "当前没有需要结算的账单。"}</p><button onClick={() => setIsSettlementOpen(true)}>查看结算方案 <AppIcon name="arrow" size={16} /></button></section>
             </aside>
           </div>
           </>}
@@ -447,6 +449,7 @@ export function DashboardPage() {
       {editingBill ? <AddBillDialog members={members} initialBill={editingBill} onClose={() => setEditingBill(null)} onSave={updateBill} /> : null}
       {deletingBill ? <DeleteBillDialog bill={deletingBill} onCancel={() => setDeletingBill(null)} onConfirm={deleteBill} /> : null}
       {isProfileOpen ? <ProfileCenter user={user} member={currentUser} finance={profileFinance} onClose={() => setIsProfileOpen(false)} onUpdated={updateUser} /> : null}
+      {isSettlementOpen ? <SettlementDialog bills={bills} members={members} onClose={() => setIsSettlementOpen(false)} /> : null}
     </div>
   );
 }
