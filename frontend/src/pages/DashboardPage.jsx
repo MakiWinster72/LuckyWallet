@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { AppIcon } from "../components/AppIcon";
 import { BillsView } from "../components/BillsView";
 import { MembersView } from "../components/MembersView";
-import { createBillApi, listBillsApi } from "../api/bills";
+import { createBillApi, deleteBillApi, listBillsApi, updateBillApi } from "../api/bills";
 import { useAuth } from "../auth/useAuth";
 import { categories, formatMoney, members, summarizeSpending } from "../data/demoData";
 
@@ -36,7 +36,7 @@ function BillRow({ bill, onOpen }) {
   );
 }
 
-function BillDetails({ bill, onClose }) {
+function BillDetails({ bill, onClose, onDelete, onEdit }) {
   const payer = members.find((member) => member.id === bill.payer);
   const category = categories[bill.category];
   const share = bill.amount / bill.participants.length;
@@ -70,18 +70,21 @@ function BillDetails({ bill, onClose }) {
           </div>
         </section>
         <section className="detail-note"><span>备注</span><p>{bill.note || "这笔账单没有备注。"}</p></section>
-        <footer><span>账单编号</span><strong>LW-{String(bill.id).padStart(5, "0")}</strong></footer>
+        <footer className="detail-footer">
+          <span>LW-{String(bill.id).padStart(5, "0")}</span>
+          <div><button className="text-button danger-button" type="button" onClick={() => onDelete(bill)}>删除</button><button className="edit-button" type="button" onClick={() => onEdit(bill)}><AppIcon name="edit" size={15} />编辑账单</button></div>
+        </footer>
       </aside>
     </div>
   );
 }
 
-function AddBillDialog({ onClose, onSave }) {
-  const [form, setForm] = useState({
+function AddBillDialog({ initialBill = null, onClose, onSave }) {
+  const [form, setForm] = useState(() => initialBill ?? ({
     title: "", amount: "", category: "餐饮", payer: 1,
     participants: members.map((member) => member.id),
     date: new Date().toISOString().slice(0, 10), note: "",
-  });
+  }));
   const [error, setError] = useState("");
 
   function update(key, value) {
@@ -109,7 +112,7 @@ function AddBillDialog({ onClose, onSave }) {
   return (
     <div className="dialog-backdrop" role="presentation">
       <section className="bill-dialog" role="dialog" aria-modal="true" aria-labelledby="new-bill-title">
-        <header><div><span className="overline">NEW ENTRY</span><h2 id="new-bill-title">记一笔共同消费</h2></div><button className="icon-button" onClick={onClose} aria-label="关闭"><AppIcon name="close" /></button></header>
+        <header><div><span className="overline">{initialBill ? "EDIT ENTRY" : "NEW ENTRY"}</span><h2 id="new-bill-title">{initialBill ? "编辑共同消费" : "记一笔共同消费"}</h2></div><button className="icon-button" onClick={onClose} aria-label="关闭"><AppIcon name="close" /></button></header>
         <form onSubmit={submit}>
           <label className="field-wide">账单名称<input name="bill-title" autoComplete="off" value={form.title} onChange={(e) => update("title", e.target.value)} placeholder="例如：周末火锅…" /></label>
           <label>总金额<div className="money-input"><span>¥</span><input name="bill-amount" type="number" inputMode="decimal" autoComplete="off" min="0.01" step="0.01" value={form.amount} onChange={(e) => update("amount", e.target.value)} placeholder="0.00" /></div></label>
@@ -124,7 +127,7 @@ function AddBillDialog({ onClose, onSave }) {
           </div></fieldset>
           {form.amount && form.participants.length ? <div className="split-preview field-wide"><span>平均分给 {form.participants.length} 人</span><strong>每人 {formatMoney(Number(form.amount) / form.participants.length)}</strong></div> : null}
           {error ? <p className="dialog-error field-wide" role="alert">{error}</p> : null}
-          <footer className="field-wide"><button className="text-button" type="button" onClick={onClose}>取消</button><button className="primary-button" type="submit">保存账单</button></footer>
+          <footer className="field-wide"><button className="text-button" type="button" onClick={onClose}>取消</button><button className="primary-button" type="submit">{initialBill ? "保存修改" : "保存账单"}</button></footer>
         </form>
       </section>
     </div>
@@ -182,6 +185,19 @@ function StatisticsView({ bills }) {
   );
 }
 
+function DeleteBillDialog({ bill, onCancel, onConfirm }) {
+  return (
+    <div className="dialog-backdrop">
+      <section className="confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="delete-bill-title" aria-describedby="delete-bill-copy">
+        <span className="confirm-icon" aria-hidden="true">!</span>
+        <h2 id="delete-bill-title">删除“{bill.title}”？</h2>
+        <p id="delete-bill-copy">账单和所有分摊明细都会删除，此操作无法撤销。</p>
+        <footer><button className="text-button" type="button" onClick={onCancel}>取消</button><button className="delete-button" type="button" onClick={() => onConfirm(bill.id)}>确认删除</button></footer>
+      </section>
+    </div>
+  );
+}
+
 export function DashboardPage() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -189,6 +205,8 @@ export function DashboardPage() {
   const [query, setQuery] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const [selectedBill, setSelectedBill] = useState(null);
+  const [editingBill, setEditingBill] = useState(null);
+  const [deletingBill, setDeletingBill] = useState(null);
   const [dark, setDark] = useState(false);
   const [bills, setBills] = useState([]);
   const [billStatus, setBillStatus] = useState({ loading: true, error: "" });
@@ -226,6 +244,38 @@ export function DashboardPage() {
     } catch (error) {
       setBillStatus({ loading: false, error: error.message });
     }
+  }
+
+  async function updateBill(form) {
+    try {
+      const updatedBill = await updateBillApi(form);
+      setBills((currentBills) => currentBills.map((bill) => bill.id === updatedBill.id ? updatedBill : bill));
+      setEditingBill(null);
+      setBillStatus({ loading: false, error: "" });
+    } catch (error) {
+      setBillStatus({ loading: false, error: error.message });
+    }
+  }
+
+  async function deleteBill(billId) {
+    try {
+      await deleteBillApi(billId);
+      setBills((currentBills) => currentBills.filter((bill) => bill.id !== billId));
+      setDeletingBill(null);
+      setBillStatus({ loading: false, error: "" });
+    } catch (error) {
+      setBillStatus({ loading: false, error: error.message });
+    }
+  }
+
+  function startEditing(bill) {
+    setSelectedBill(null);
+    setEditingBill(bill);
+  }
+
+  function startDeleting(bill) {
+    setSelectedBill(null);
+    setDeletingBill(bill);
   }
 
   function handleLogout() {
@@ -277,7 +327,9 @@ export function DashboardPage() {
       </main>
       <nav className="mobile-nav">{navItems.map(([icon, label]) => <button key={label} className={activeNav === label ? "active" : ""} onClick={() => setActiveNav(label)}><AppIcon name={icon} /><span>{label}</span></button>)}</nav>
       {isAdding ? <AddBillDialog onClose={() => setIsAdding(false)} onSave={saveBill} /> : null}
-      {selectedBill ? <BillDetails bill={selectedBill} onClose={() => setSelectedBill(null)} /> : null}
+      {selectedBill ? <BillDetails bill={selectedBill} onClose={() => setSelectedBill(null)} onEdit={startEditing} onDelete={startDeleting} /> : null}
+      {editingBill ? <AddBillDialog initialBill={editingBill} onClose={() => setEditingBill(null)} onSave={updateBill} /> : null}
+      {deletingBill ? <DeleteBillDialog bill={deletingBill} onCancel={() => setDeletingBill(null)} onConfirm={deleteBill} /> : null}
     </div>
   );
 }
