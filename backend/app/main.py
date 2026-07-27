@@ -1,5 +1,8 @@
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
 
 from app.api.routes.auth import router as auth_router
@@ -11,6 +14,8 @@ from app.database import engine
 
 
 settings = get_settings()
+uploads_dir = Path(__file__).resolve().parents[2] / "uploads"
+uploads_dir.mkdir(parents=True, exist_ok=True)
 app = FastAPI(
     title="LuckyWallet API",
     version="0.1.0",
@@ -28,6 +33,7 @@ app.include_router(auth_router, prefix="/api/v1")
 app.include_router(admin_users_router, prefix="/api/v1")
 app.include_router(bills_router, prefix="/api/v1")
 app.include_router(members_router, prefix="/api/v1")
+app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
 
 
 @app.get("/health")
