@@ -52,3 +52,42 @@ test("filterBills returns an empty result when filters do not match", () => {
     [],
   );
 });
+
+test("filterBills includes both date range boundaries", () => {
+  assert.deepEqual(
+    filterBills(bills, {
+      month: "",
+      startDate: "2026-06-28",
+      endDate: "2026-07-24",
+      category: "",
+      payerId: "",
+      query: "",
+    }).map((bill) => bill.id),
+    [2, 3],
+  );
+});
+
+test("filterBills supports open-ended date ranges", () => {
+  assert.deepEqual(
+    filterBills(bills, {
+      month: "",
+      startDate: "2026-07-24",
+      endDate: "",
+      category: "",
+      payerId: "",
+      query: "",
+    }).map((bill) => bill.id),
+    [1, 2],
+  );
+  assert.deepEqual(
+    filterBills(bills, {
+      month: "",
+      startDate: "",
+      endDate: "2026-06-28",
+      category: "",
+      payerId: "",
+      query: "",
+    }).map((bill) => bill.id),
+    [3],
+  );
+});
