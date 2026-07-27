@@ -10,6 +10,7 @@ export function LoginPage() {
   const location = useLocation();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -91,16 +92,27 @@ export function LoginPage() {
 
             <div className="field">
               <label htmlFor="password">密码</label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                placeholder="请输入密码"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                disabled={isSubmitting}
-              />
+              <div className="password-control">
+                <input
+                  id="password"
+                  name="password"
+                  type={isPasswordVisible ? "text" : "password"}
+                  autoComplete="current-password"
+                  placeholder="请输入密码"
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  disabled={isSubmitting}
+                />
+                <button
+                  type="button"
+                  aria-label={isPasswordVisible ? "隐藏密码" : "显示密码"}
+                  aria-pressed={isPasswordVisible}
+                  onClick={() => setIsPasswordVisible((visible) => !visible)}
+                  disabled={isSubmitting}
+                >
+                  {isPasswordVisible ? "隐藏" : "显示"}
+                </button>
+              </div>
             </div>
 
             <div className="form-message" aria-live="polite">
