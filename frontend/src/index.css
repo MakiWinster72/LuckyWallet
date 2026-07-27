@@ -165,6 +165,9 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .bill-filters { display: flex; align-items: end; gap: 10px; padding: 15px; border: 1px solid var(--line); border-radius: 15px; background: var(--surface); }
 .bill-filters label { display: grid; min-width: 150px; gap: 6px; color: var(--muted); font-size: 10px; font-weight: 600; }
 .bill-filters input, .bill-filters select { height: 38px; padding: 0 11px; border: 1px solid var(--line); border-radius: 9px; color: var(--ink); background-color: var(--page); }
+.date-range-fields { display: grid; grid-template-columns: repeat(2, minmax(150px, 1fr)); gap: 6px 10px; }
+.date-range-fields .filter-error { grid-column: 1 / -1; color: #b42318; font-size: 10px; font-weight: 600; }
+.bill-filters input[aria-invalid="true"] { border-color: #b42318; }
 .clear-filter { min-height: 38px; margin-left: auto; padding: 0 12px; border: 0; border-radius: 9px; color: var(--plum); background: var(--soft); font-size: 11px; font-weight: 600; }
 .clear-filter:hover { color: var(--plum-deep); background: var(--peach); }
 .bill-register { margin-top: 14px; overflow: hidden; }
@@ -414,6 +417,8 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   .member-summary article:first-child { grid-column: 1 / -1; }
   .bill-filters { align-items: stretch; flex-wrap: wrap; }
   .bill-filters label { min-width: calc(50% - 5px); flex: 1; }
+  .date-range-fields { width: 100%; }
+  .date-range-fields label { min-width: 0; }
   .clear-filter { margin-left: 0; }
   .admin-user-summary { grid-template-columns: repeat(3, 1fr); }
   .admin-user-toolbar > label { min-width: calc(50% - 5px); flex: 1; }
@@ -437,6 +442,8 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   .bills-heading { align-items: center; }
   .bills-heading .add-button { display: none; }
   .bill-filters label { min-width: 100%; }
+  .date-range-fields { grid-template-columns: 1fr; }
+  .date-range-fields .filter-error { grid-column: auto; }
   .members-heading { align-items: start; }
   .member-card-grid, .member-summary { grid-template-columns: 1fr; }
   .member-summary article:first-child { grid-column: auto; }
