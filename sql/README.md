@@ -7,7 +7,7 @@
 | 文件 | 用途 |
 | --- | --- |
 | `001_init_luckywallet.sql` | 创建 `luckywallet_dev` 数据库、数据表和默认账单分类 |
-| `002_seed_demo_bills.sql` | 为前 5 名启用用户生成 100 笔模拟账单及分摊明细 |
+| `002_seed_demo_bills.sql` | 为 Maki、Landen、Lucky、Ula、Anna 生成 100 笔模拟账单及分摊明细 |
 
 模拟账单的消费日期覆盖 `2026-05-01` 至 `2026-07-27`，适合检查总览、
 账单筛选、成员余额和统计图表。
@@ -22,22 +22,22 @@ mysql -u root -p < sql/001_init_luckywallet.sql
 
 脚本会创建并使用 `luckywallet_dev` 数据库。
 
-## 2. 准备 5 名成员
+## 2. 准备指定成员
 
-模拟数据脚本会按照用户 ID，从所有启用用户中选择前 5 名作为共同成员。
-运行脚本前，确认数据库中至少存在 5 名启用用户：
+模拟数据只会使用用户名为 `Maki`、`Landen`、`Lucky`、`Ula`、`Anna`
+的 5 名启用用户，用户名匹配不区分大小写。运行脚本前确认这 5 名用户均存在：
 
 ```sql
 USE luckywallet_dev;
 
 SELECT id, username, nickname, is_active
 FROM users
-WHERE is_active = TRUE
-ORDER BY id
-LIMIT 5;
+WHERE LOWER(username) IN ('maki', 'landen', 'lucky', 'ula', 'anna')
+ORDER BY FIELD(LOWER(username), 'maki', 'landen', 'lucky', 'ula', 'anna');
 ```
 
-如果不足 5 名，请先通过后端管理脚本或数据库管理工具创建成员。用户必须：
+如果查询结果不足 5 名，请先在管理员的“用户管理”页面创建或启用缺少的成员。
+用户必须：
 
 - `is_active = TRUE`
 - 使用有效的 Argon2 密码哈希
@@ -89,9 +89,10 @@ WHERE note LIKE '[demo-seed-2026]%';
 
 ## 常见问题
 
-### 提示需要 5 名启用用户
+### 提示需要指定的 5 名启用用户
 
-检查 `users` 表中是否至少有 5 条 `is_active = TRUE` 的记录。
+检查 `Maki`、`Landen`、`Lucky`、`Ula`、`Anna` 是否全部存在，并且
+`is_active = TRUE`。其他用户名不会被模拟数据脚本选用。
 
 ### 提示需要 6 个启用分类
 
