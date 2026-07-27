@@ -2,13 +2,14 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { AppIcon } from "../components/AppIcon";
+import { AdminUsersView } from "../components/AdminUsersView";
 import { BillsView } from "../components/BillsView";
 import { MembersView } from "../components/MembersView";
 import { createBillApi, deleteBillApi, listBillsApi, updateBillApi } from "../api/bills";
 import { useAuth } from "../auth/useAuth";
 import { categories, formatMoney, members, summarizeSpending } from "../data/demoData";
 
-const navItems = [
+const sharedNavItems = [
   ["home", "总览"], ["receipt", "账单"], ["users", "成员"], ["chart", "统计"],
 ];
 
@@ -210,6 +211,10 @@ export function DashboardPage() {
   const [dark, setDark] = useState(false);
   const [bills, setBills] = useState([]);
   const [billStatus, setBillStatus] = useState({ loading: true, error: "" });
+  const navItems = user.role === "admin"
+    ? [...sharedNavItems, ["shield", "用户管理"]]
+    : sharedNavItems;
+  const isUserManagement = activeNav === "用户管理";
 
   useEffect(() => {
     let ignore = false;
@@ -295,16 +300,17 @@ export function DashboardPage() {
       <main className="workspace">
         <header className="topbar">
           <div className="mobile-brand"><span className="brand-mark">L</span><strong>LuckyWallet</strong></div>
-          <label className="search-box"><AppIcon name="search" size={18} /><input name="global-search" type="search" aria-label="搜索账单或分类" autoComplete="off" spellCheck={false} value={query} onChange={(e) => setQuery(e.target.value)} placeholder="搜索账单或分类…" /></label>
-          <div className="top-actions"><button className="icon-button" onClick={() => setDark((value) => !value)} aria-label="切换主题"><AppIcon name={dark ? "sun" : "moon"} /></button><button className="icon-button notification" aria-label="通知"><AppIcon name="bell" /></button><button className="add-button" onClick={() => setIsAdding(true)}><AppIcon name="plus" size={18} />记一笔</button></div>
+          {isUserManagement ? <span /> : <label className="search-box"><AppIcon name="search" size={18} /><input name="global-search" type="search" aria-label="搜索账单或分类" autoComplete="off" spellCheck={false} value={query} onChange={(e) => setQuery(e.target.value)} placeholder="搜索账单或分类…" /></label>}
+          <div className="top-actions"><button className="icon-button" onClick={() => setDark((value) => !value)} aria-label="切换主题"><AppIcon name={dark ? "sun" : "moon"} /></button><button className="icon-button notification" aria-label="通知"><AppIcon name="bell" /></button>{isUserManagement ? null : <button className="add-button" onClick={() => setIsAdding(true)}><AppIcon name="plus" size={18} />记一笔</button>}</div>
         </header>
 
         <div className="dashboard-content">
           {billStatus.loading ? <div className="data-notice" role="status">正在加载账单…</div> : null}
           {billStatus.error ? <div className="data-notice is-error" role="alert">{billStatus.error} 请确认后端服务与数据库已经启动。</div> : null}
-          <section className="welcome"><div><p className="overline">JULY · SHARED WALLET</p><h1>{activeNav === "总览" ? `早上好，${user.nickname ?? user.username}` : activeNav}</h1><p>{activeNav === "总览" ? "五个人的小日子，每一笔都清清楚楚。" : "共同生活的账目，都在这里。"}</p></div><button className="add-button mobile-add" onClick={() => setIsAdding(true)}><AppIcon name="plus" size={18} />记一笔</button></section>
+          {isUserManagement ? null : <section className="welcome"><div><p className="overline">JULY · SHARED WALLET</p><h1>{activeNav === "总览" ? `早上好，${user.nickname ?? user.username}` : activeNav}</h1><p>{activeNav === "总览" ? "五个人的小日子，每一笔都清清楚楚。" : "共同生活的账目，都在这里。"}</p></div><button className="add-button mobile-add" onClick={() => setIsAdding(true)}><AppIcon name="plus" size={18} />记一笔</button></section>}
 
-          {activeNav === "账单" ? <BillsView bills={bills} members={members} query={query} onAdd={() => setIsAdding(true)} onOpen={setSelectedBill} />
+          {isUserManagement ? <AdminUsersView currentUserId={Number(user.id)} />
+            : activeNav === "账单" ? <BillsView bills={bills} members={members} query={query} onAdd={() => setIsAdding(true)} onOpen={setSelectedBill} />
             : activeNav === "成员" ? <MembersView members={members} bills={bills} currentMemberId={currentUser.id} />
               : activeNav === "统计" ? <StatisticsView bills={bills} /> : <>
           <section className="summary-grid">
