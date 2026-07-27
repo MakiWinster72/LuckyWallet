@@ -9,11 +9,11 @@ skills-lock.json
 !.env.example
 
 # Python
-__Pycache__/  
+__Pycache__/
 *.py[cod]
 .venv/
 
-# Node  
+# Node
 node_modules/
 frontend/dist/
 
