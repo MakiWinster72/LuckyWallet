@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS users (
     CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
   nickname VARCHAR(50) NULL,
+  avatar_url VARCHAR(255) NULL,
   role VARCHAR(20) NOT NULL DEFAULT 'user',
   is_active BOOLEAN NOT NULL DEFAULT TRUE,
   created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
@@ -30,6 +31,13 @@ CREATE TABLE IF NOT EXISTS users (
   PRIMARY KEY (id),
   CONSTRAINT uq_users_username UNIQUE (username),
   CONSTRAINT ck_users_role CHECK (role IN ('admin', 'user'))
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS household_settings (
+  id INT NOT NULL,
+  monthly_budget DECIMAL(10,2) NOT NULL DEFAULT 2400.00,
+  PRIMARY KEY (id),
+  CONSTRAINT ck_household_settings_budget_positive CHECK (monthly_budget > 0)
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS categories (
