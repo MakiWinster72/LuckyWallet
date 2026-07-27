@@ -3,7 +3,7 @@
 --
 -- Prerequisites:
 --   1. Run sql/001_init_luckywallet.sql.
---   2. Create at least five active users.
+--   2. Create active users named Maki, Landen, Lucky, Ula, and Anna.
 --
 -- Usage:
 --   mysql -u root -p luckywallet_dev < sql/002_seed_demo_bills.sql
@@ -60,11 +60,18 @@ BEGIN
   );
 
   INSERT INTO seed_users (slot, user_id)
-  SELECT ROW_NUMBER() OVER (ORDER BY id), id
-  FROM users
-  WHERE is_active = TRUE
-  ORDER BY id
-  LIMIT 5;
+  SELECT required_users.slot, users.id
+  FROM (
+    SELECT 1 AS slot, 'maki' AS username
+    UNION ALL SELECT 2, 'landen'
+    UNION ALL SELECT 3, 'lucky'
+    UNION ALL SELECT 4, 'ula'
+    UNION ALL SELECT 5, 'anna'
+  ) AS required_users
+  JOIN users
+    ON LOWER(users.username) = required_users.username
+   AND users.is_active = TRUE
+  ORDER BY required_users.slot;
 
   INSERT INTO seed_categories (slot, category_id)
   SELECT ROW_NUMBER() OVER (ORDER BY sort_order, id), id
@@ -78,7 +85,7 @@ BEGIN
 
   IF v_user_count < 5 THEN
     SIGNAL SQLSTATE '45000'
-      SET MESSAGE_TEXT = 'Demo seed requires at least five active users';
+      SET MESSAGE_TEXT = 'Demo seed requires active users: Maki, Landen, Lucky, Ula, Anna';
   END IF;
 
   IF v_category_count < 6 THEN
