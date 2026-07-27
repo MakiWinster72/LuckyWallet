@@ -1,12 +1,13 @@
 -- LuckyWallet demo bills for local development
--- Creates exactly 100 bills dated from 2026-05-01 through 2026-07-27.
+-- Creates exactly 100 bills from 2025-01-01 through 2026-07-31.
+-- Each month has at most 6 bills and the monthly total stays below 2000.
 --
 -- Prerequisites:
 --   1. Run sql/001_init_luckywallet.sql.
 --   2. Create active users named Maki, Landen, Lucky, Ula, and Anna.
 --
 -- Usage:
---   mysql -u root -p luckywallet_dev < sql/002_seed_demo_bills.sql
+--   mysql -u root -p luckywallet_dev < sql/003_seed_demo_bills.sql
 --
 -- This script is idempotent. It only replaces rows marked with its own
 -- [demo-seed-2026] note prefix and never deletes user-created bills.
@@ -102,8 +103,11 @@ BEGIN
     SET v_payer_slot = MOD(v_index - 1, 5) + 1;
     SET v_category_slot = MOD(v_index - 1, 6) + 1;
     SET v_participant_count = MOD(v_index - 1, 4) + 2;
-    SET v_bill_date = DATE_ADD('2026-05-01', INTERVAL MOD((v_index - 1) * 37, 88) DAY);
-    SET v_amount = 18 + MOD(v_index * 43, 483) + MOD(v_index * 17, 100) / 100;
+    SET v_bill_date = DATE_ADD(
+      DATE_ADD('2025-01-01', INTERVAL MOD(v_index - 1, 19) MONTH),
+      INTERVAL MOD(v_index * 7, 25) DAY
+    );
+    SET v_amount = 50 + MOD(v_index * 37, 251);
     SET v_total_cents = ROUND(v_amount * 100);
     SET v_base_share_cents = FLOOR(v_total_cents / v_participant_count);
     SET v_remainder_cents = MOD(v_total_cents, v_participant_count);
@@ -180,7 +184,7 @@ DELIMITER ;
 CALL seed_luckywallet_demo_bills();
 DROP PROCEDURE seed_luckywallet_demo_bills;
 
--- Verification: expected result is 100 rows spanning 2026-05-01 to 2026-07-27.
+-- Verification: expected result is 100 rows spanning 2025-01-01 to 2026-07-31.
 SELECT
   COUNT(*) AS demo_bill_count,
   MIN(bill_date) AS first_bill_date,
@@ -199,3 +203,14 @@ FROM (
   GROUP BY b.id, b.amount
   HAVING SUM(bp.share_amount) <> b.amount
 ) AS invalid_shares;
+
+-- Every month must stay below the 2000 budget.
+SELECT
+  DATE_FORMAT(bill_date, '%Y-%m') AS bill_month,
+  COUNT(*) AS bill_count,
+  SUM(amount) AS monthly_total
+FROM bills
+WHERE note LIKE '[demo-seed-2026]%'
+GROUP BY DATE_FORMAT(bill_date, '%Y-%m')
+HAVING SUM(amount) > 2000
+ORDER BY bill_month;
