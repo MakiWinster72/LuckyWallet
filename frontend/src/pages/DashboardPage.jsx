@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { AppIcon } from "../components/AppIcon";
 import { useAuth } from "../auth/useAuth";
-import { categories, formatMoney, initialBills, members } from "../data/demoData";
+import { categories, formatMoney, initialBills, members, summarizeSpending } from "../data/demoData";
 
 const STORAGE_KEY = "luckywallet.bills.v1";
 const navItems = [
@@ -129,6 +129,49 @@ function AddBillDialog({ onClose, onSave }) {
   );
 }
 
+function StatisticsView({ bills }) {
+  const summary = summarizeSpending(bills);
+  const maximumCategory = Math.max(...summary.byCategory.map((item) => item.amount), 1);
+  const maximumPayer = Math.max(...summary.byPayer.map((item) => item.amount), 1);
+
+  return (
+    <section className="statistics-view">
+      <div className="stats-kpis">
+        <article><span>本月总支出</span><strong>{formatMoney(summary.total)}</strong><small>全部共同账单</small></article>
+        <article><span>平均每笔</span><strong>{formatMoney(summary.average)}</strong><small>共 {bills.length} 笔消费</small></article>
+        <article><span>最高分类</span><strong>{summary.byCategory[0]?.name ?? "暂无"}</strong><small>{formatMoney(summary.byCategory[0]?.amount ?? 0)}</small></article>
+      </div>
+      <div className="stats-layout">
+        <article className="panel category-chart">
+          <header><div><span className="overline">CATEGORY MIX</span><h2>分类支出</h2></div><span className="chart-caption">按金额排序</span></header>
+          <div className="bar-list">
+            {summary.byCategory.map((item) => (
+              <div className="bar-row" key={item.name}>
+                <span className="bar-icon" style={{ "--category": item.color }}>{item.icon}</span>
+                <div><span><strong>{item.name}</strong><small>{item.count} 笔</small></span><i><b style={{ width: `${item.amount / maximumCategory * 100}%`, "--category": item.color }} /></i></div>
+                <strong>{formatMoney(item.amount)}</strong>
+              </div>
+            ))}
+          </div>
+        </article>
+        <article className="panel payer-chart">
+          <header><div><span className="overline">PAID BY</span><h2>成员垫付</h2></div></header>
+          <div className="payer-list">
+            {summary.byPayer.map((member, index) => (
+              <div key={member.id}>
+                <span className="rank">{String(index + 1).padStart(2, "0")}</span>
+                <Avatar member={member} />
+                <span><strong>{member.name}</strong><i><b style={{ width: `${member.amount / maximumPayer * 100}%` }} /></i></span>
+                <strong>{formatMoney(member.amount)}</strong>
+              </div>
+            ))}
+          </div>
+        </article>
+      </div>
+    </section>
+  );
+}
+
 export function DashboardPage() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -180,6 +223,7 @@ export function DashboardPage() {
         <div className="dashboard-content">
           <section className="welcome"><div><p className="overline">JULY · SHARED WALLET</p><h1>{activeNav === "总览" ? `早上好，${user.nickname ?? user.username}` : activeNav}</h1><p>{activeNav === "总览" ? "五个人的小日子，每一笔都清清楚楚。" : "共同生活的账目，都在这里。"}</p></div><button className="add-button mobile-add" onClick={() => setIsAdding(true)}><AppIcon name="plus" size={18} />记一笔</button></section>
 
+          {activeNav === "统计" ? <StatisticsView bills={bills} /> : <>
           <section className="summary-grid">
             <article className="hero-total"><span className="card-label">七月共同支出</span><strong>{formatMoney(total)}</strong><div className="trend-note"><AppIcon name="trend" size={16} /><span>比六月少 8.4%</span></div><div className="receipt-edge" /></article>
             <article className="summary-card"><span className="card-label">我的待结算</span><strong>{formatMoney(184.3)}</strong><span className="status-pill">3 笔待处理</span></article>
@@ -195,6 +239,7 @@ export function DashboardPage() {
               <section className="settle-card"><span className="overline">QUICK SETTLE</span><h3>让欠款不过夜</h3><p>当前有 3 笔账单可以合并结算。</p><button onClick={() => setActiveNav("统计")}>查看结算方案 <AppIcon name="arrow" size={16} /></button></section>
             </aside>
           </div>
+          </>}
         </div>
       </main>
       <nav className="mobile-nav">{navItems.map(([icon, label]) => <button key={label} className={activeNav === label ? "active" : ""} onClick={() => setActiveNav(label)}><AppIcon name={icon} /><span>{label}</span></button>)}</nav>
