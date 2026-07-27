@@ -1,13 +1,13 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { AppIcon } from "../components/AppIcon";
 import { BillsView } from "../components/BillsView";
 import { MembersView } from "../components/MembersView";
+import { createBillApi, listBillsApi } from "../api/bills";
 import { useAuth } from "../auth/useAuth";
-import { categories, formatMoney, initialBills, members, summarizeSpending } from "../data/demoData";
+import { categories, formatMoney, members, summarizeSpending } from "../data/demoData";
 
-const STORAGE_KEY = "luckywallet.bills.v1";
 const navItems = [
   ["home", "总览"], ["receipt", "账单"], ["users", "成员"], ["chart", "统计"],
 ];
@@ -190,10 +190,25 @@ export function DashboardPage() {
   const [isAdding, setIsAdding] = useState(false);
   const [selectedBill, setSelectedBill] = useState(null);
   const [dark, setDark] = useState(false);
-  const [bills, setBills] = useState(() => {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) ?? initialBills; }
-    catch { return initialBills; }
-  });
+  const [bills, setBills] = useState([]);
+  const [billStatus, setBillStatus] = useState({ loading: true, error: "" });
+
+  useEffect(() => {
+    let ignore = false;
+    async function loadBills() {
+      try {
+        const result = await listBillsApi();
+        if (!ignore) {
+          setBills(result);
+          setBillStatus({ loading: false, error: "" });
+        }
+      } catch (error) {
+        if (!ignore) setBillStatus({ loading: false, error: error.message });
+      }
+    }
+    void loadBills();
+    return () => { ignore = true; };
+  }, []);
 
   const visibleBills = useMemo(() => bills.filter((bill) =>
     bill.title.toLowerCase().includes(query.trim().toLowerCase()) ||
@@ -202,11 +217,15 @@ export function DashboardPage() {
   const total = bills.reduce((sum, bill) => sum + bill.amount, 0);
   const currentUser = members.find((member) => member.name.toLowerCase() === user.username?.toLowerCase()) ?? members[0];
 
-  function saveBill(form) {
-    const next = [{ ...form, id: Date.now() }, ...bills];
-    setBills(next);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-    setIsAdding(false);
+  async function saveBill(form) {
+    try {
+      const createdBill = await createBillApi(form);
+      setBills((currentBills) => [createdBill, ...currentBills]);
+      setBillStatus({ loading: false, error: "" });
+      setIsAdding(false);
+    } catch (error) {
+      setBillStatus({ loading: false, error: error.message });
+    }
   }
 
   function handleLogout() {
@@ -231,6 +250,8 @@ export function DashboardPage() {
         </header>
 
         <div className="dashboard-content">
+          {billStatus.loading ? <div className="data-notice" role="status">正在加载账单…</div> : null}
+          {billStatus.error ? <div className="data-notice is-error" role="alert">{billStatus.error} 请确认后端服务与数据库已经启动。</div> : null}
           <section className="welcome"><div><p className="overline">JULY · SHARED WALLET</p><h1>{activeNav === "总览" ? `早上好，${user.nickname ?? user.username}` : activeNav}</h1><p>{activeNav === "总览" ? "五个人的小日子，每一笔都清清楚楚。" : "共同生活的账目，都在这里。"}</p></div><button className="add-button mobile-add" onClick={() => setIsAdding(true)}><AppIcon name="plus" size={18} />记一笔</button></section>
 
           {activeNav === "账单" ? <BillsView bills={bills} members={members} query={query} onAdd={() => setIsAdding(true)} onOpen={setSelectedBill} />
