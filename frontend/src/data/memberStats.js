@@ -9,7 +9,7 @@ export function buildMemberStats(members, bills) {
   }]));
 
   for (const bill of bills) {
-    const share = bill.amount / bill.participants.length;
+    const share = bill.participants.length ? bill.amount / bill.participants.length : 0;
     const payer = stats.get(bill.payer);
 
     if (payer) payer.paid += bill.amount;
