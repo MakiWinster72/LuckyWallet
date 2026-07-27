@@ -62,7 +62,7 @@ BEGIN
   INSERT INTO seed_users (slot, user_id)
   SELECT required_users.slot, users.id
   FROM (
-    SELECT 1 AS slot, 'maki' AS username
+    SELECT 1 AS slot, 'makiwinster' AS username
     UNION ALL SELECT 2, 'landen'
     UNION ALL SELECT 3, 'lucky'
     UNION ALL SELECT 4, 'ula'
@@ -85,7 +85,7 @@ BEGIN
 
   IF v_user_count < 5 THEN
     SIGNAL SQLSTATE '45000'
-      SET MESSAGE_TEXT = 'Demo seed requires active users: Maki, Landen, Lucky, Ula, Anna';
+      SET MESSAGE_TEXT = 'Demo seed requires active users: MakiWinster, Landen, Lucky, Ula, Anna';
   END IF;
 
   IF v_category_count < 6 THEN
