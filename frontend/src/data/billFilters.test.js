@@ -8,6 +8,10 @@ const bills = [
   { id: 2, title: "超市补给", date: "2026-07-24", category: "日用品", payer: 3 },
   { id: 3, title: "六月聚餐", date: "2026-06-28", category: "餐饮", payer: 1 },
 ];
+const members = [
+  { id: 1, name: "MakiWinster" },
+  { id: 3, name: "Anna" },
+];
 
 test("filterBills combines month, category and payer filters", () => {
   assert.deepEqual(
@@ -24,6 +28,21 @@ test("filterBills searches bill titles and categories", () => {
   assert.deepEqual(
     filterBills(bills, { month: "", category: "", payerId: "", query: "餐饮" }).map((bill) => bill.id),
     [1, 3],
+  );
+});
+
+test("filterBills searches payer names without matching unrelated members", () => {
+  assert.deepEqual(
+    filterBills(bills, {
+      month: "", category: "", payerId: "", query: "anna", members,
+    }).map((bill) => bill.id),
+    [2],
+  );
+  assert.deepEqual(
+    filterBills(bills, {
+      month: "", category: "", payerId: "", query: "lucky", members,
+    }),
+    [],
   );
 });
 
