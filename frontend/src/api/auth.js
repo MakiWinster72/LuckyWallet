@@ -30,6 +30,27 @@ async function parseError(response) {
   );
 }
 
+export function getAccessToken() {
+  return sessionStorage.getItem("luckywallet_access_token");
+}
+
+export async function authenticatedApiRequest(path, options = {}) {
+  const token = getAccessToken();
+  if (!token) {
+    throw new ApiError(401, "UNAUTHORIZED", "登录状态已失效，请重新登录");
+  }
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    ...options,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      ...(options.body ? { "Content-Type": "application/json" } : {}),
+      ...options.headers,
+    },
+  });
+  if (!response.ok) throw await parseError(response);
+  return response;
+}
+
 export async function loginApi(data) {
   const response = await fetch(`${API_BASE_URL}/auth/login`, {
     method: "POST",
