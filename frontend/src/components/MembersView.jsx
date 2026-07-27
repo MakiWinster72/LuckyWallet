@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 
-import { formatMoney } from "../data/demoData";
+import { formatMoney } from "../utils/money";
 import { buildMemberStats, summarizeMembers } from "../data/memberStats";
 
 function MemberAvatar({ member }) {

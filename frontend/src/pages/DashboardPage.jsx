@@ -7,25 +7,29 @@ import { BillsView } from "../components/BillsView";
 import { MembersView } from "../components/MembersView";
 import { createBillApi, deleteBillApi, listBillsApi, updateBillApi } from "../api/bills";
 import { useAuth } from "../auth/useAuth";
-import { categories, formatMoney, members, summarizeSpending } from "../data/demoData";
+import { listMembersApi } from "../api/members";
+import { categories, getCategory } from "../data/categories";
+import { summarizeSpending } from "../data/spendingSummary";
+import { formatMoney } from "../utils/money";
 
 const sharedNavItems = [
   ["home", "总览"], ["receipt", "账单"], ["users", "成员"], ["chart", "统计"],
 ];
 
 function Avatar({ member, small = false }) {
+  if (!member) return <span className={`avatar ${small ? "avatar-small" : ""}`}>?</span>;
   return <span className={`avatar ${small ? "avatar-small" : ""}`} style={{ "--avatar": member.color }}>{member.initials}</span>;
 }
 
-function BillRow({ bill, onOpen }) {
+function BillRow({ bill, members, onOpen }) {
   const payer = members.find((member) => member.id === bill.payer);
-  const category = categories[bill.category];
+  const category = getCategory(bill.category);
   return (
     <article className="bill-row">
       <span className="category-icon" style={{ "--category": category.color }}>{category.icon}</span>
       <div className="bill-main">
         <strong>{bill.title}</strong>
-        <span>{bill.date.slice(5).replace("-", "月")}日 · {payer.name} 付款</span>
+        <span>{bill.date.slice(5).replace("-", "月")}日 · {payer?.name ?? "未知成员"} 付款</span>
       </div>
       <div className="participant-stack" aria-label={`${bill.participants.length} 位成员参与`}>
         {bill.participants.slice(0, 3).map((id) => <Avatar key={id} member={members.find((member) => member.id === id)} small />)}
@@ -37,10 +41,10 @@ function BillRow({ bill, onOpen }) {
   );
 }
 
-function BillDetails({ bill, onClose, onDelete, onEdit }) {
+function BillDetails({ bill, members, onClose, onDelete, onEdit }) {
   const payer = members.find((member) => member.id === bill.payer);
-  const category = categories[bill.category];
-  const share = bill.amount / bill.participants.length;
+  const category = getCategory(bill.category);
+  const share = bill.participants.length ? bill.amount / bill.participants.length : 0;
 
   return (
     <div className="detail-backdrop" role="presentation">
@@ -57,7 +61,7 @@ function BillDetails({ bill, onClose, onDelete, onEdit }) {
           <p><AppIcon name="calendar" size={15} /> {bill.date}</p>
         </div>
         <dl className="detail-facts">
-          <div><dt>付款人</dt><dd><Avatar member={payer} small />{payer.name}</dd></div>
+          <div><dt>付款人</dt><dd><Avatar member={payer} small />{payer?.name ?? "未知成员"}</dd></div>
           <div><dt>参与人数</dt><dd>{bill.participants.length} 人</dd></div>
           <div><dt>分摊方式</dt><dd>平均分摊</dd></div>
         </dl>
@@ -66,7 +70,7 @@ function BillDetails({ bill, onClose, onDelete, onEdit }) {
           <div>
             {bill.participants.map((id) => {
               const member = members.find((item) => item.id === id);
-              return <article key={id}><Avatar member={member} /><span><strong>{member.name}</strong><small>{id === bill.payer ? "已付款" : "待结算"}</small></span><b>{formatMoney(share)}</b></article>;
+              return <article key={id}><Avatar member={member} /><span><strong>{member?.name ?? "未知成员"}</strong><small>{id === bill.payer ? "已付款" : "待结算"}</small></span><b>{formatMoney(share)}</b></article>;
             })}
           </div>
         </section>
@@ -80,9 +84,9 @@ function BillDetails({ bill, onClose, onDelete, onEdit }) {
   );
 }
 
-function AddBillDialog({ initialBill = null, onClose, onSave }) {
+function AddBillDialog({ members, initialBill = null, onClose, onSave }) {
   const [form, setForm] = useState(() => initialBill ?? ({
-    title: "", amount: "", category: "餐饮", payer: 1,
+    title: "", amount: "", category: "餐饮", payer: members[0]?.id ?? "",
     participants: members.map((member) => member.id),
     date: new Date().toISOString().slice(0, 10), note: "",
   }));
@@ -135,8 +139,8 @@ function AddBillDialog({ initialBill = null, onClose, onSave }) {
   );
 }
 
-function StatisticsView({ bills }) {
-  const summary = summarizeSpending(bills);
+function StatisticsView({ bills, members }) {
+  const summary = summarizeSpending(bills, members);
   const maximumCategory = Math.max(...summary.byCategory.map((item) => item.amount), 1);
   const maximumPayer = Math.max(...summary.byPayer.map((item) => item.amount), 1);
   const hasSpending = bills.length > 0;
@@ -210,6 +214,7 @@ export function DashboardPage() {
   const [deletingBill, setDeletingBill] = useState(null);
   const [dark, setDark] = useState(false);
   const [bills, setBills] = useState([]);
+  const [members, setMembers] = useState([]);
   const [billStatus, setBillStatus] = useState({ loading: true, error: "" });
   const navItems = user.role === "admin"
     ? [...sharedNavItems, ["shield", "用户管理"]]
@@ -218,18 +223,22 @@ export function DashboardPage() {
 
   useEffect(() => {
     let ignore = false;
-    async function loadBills() {
+    async function loadDashboard() {
       try {
-        const result = await listBillsApi();
+        const [billResult, memberResult] = await Promise.all([
+          listBillsApi(),
+          listMembersApi(),
+        ]);
         if (!ignore) {
-          setBills(result);
+          setBills(billResult);
+          setMembers(memberResult);
           setBillStatus({ loading: false, error: "" });
         }
       } catch (error) {
         if (!ignore) setBillStatus({ loading: false, error: error.message });
       }
     }
-    void loadBills();
+    void loadDashboard();
     return () => { ignore = true; };
   }, []);
 
@@ -238,7 +247,8 @@ export function DashboardPage() {
     bill.category.includes(query.trim())
   ), [bills, query]);
   const total = bills.reduce((sum, bill) => sum + bill.amount, 0);
-  const currentUser = members.find((member) => member.name.toLowerCase() === user.username?.toLowerCase()) ?? members[0];
+  const currentUser = members.find((member) => member.id === Number(user.id));
+  const overviewStats = useMemo(() => summarizeSpending(bills, members), [bills, members]);
 
   async function saveBill(form) {
     try {
@@ -307,12 +317,12 @@ export function DashboardPage() {
         <div className="dashboard-content">
           {billStatus.loading ? <div className="data-notice" role="status">正在加载账单…</div> : null}
           {billStatus.error ? <div className="data-notice is-error" role="alert">{billStatus.error} 请确认后端服务与数据库已经启动。</div> : null}
-          {isUserManagement ? null : <section className="welcome"><div><p className="overline">JULY · SHARED WALLET</p><h1>{activeNav === "总览" ? `早上好，${user.nickname ?? user.username}` : activeNav}</h1><p>{activeNav === "总览" ? "五个人的小日子，每一笔都清清楚楚。" : "共同生活的账目，都在这里。"}</p></div><button className="add-button mobile-add" onClick={() => setIsAdding(true)}><AppIcon name="plus" size={18} />记一笔</button></section>}
+          {isUserManagement ? null : <section className="welcome"><div><p className="overline">JULY · SHARED WALLET</p><h1>{activeNav === "总览" ? `早上好，${user.nickname ?? user.username}` : activeNav}</h1><p>{activeNav === "总览" ? "共同生活的每一笔，都清清楚楚。" : "共同生活的账目，都在这里。"}</p></div><button className="add-button mobile-add" onClick={() => setIsAdding(true)}><AppIcon name="plus" size={18} />记一笔</button></section>}
 
           {isUserManagement ? <AdminUsersView currentUserId={Number(user.id)} />
             : activeNav === "账单" ? <BillsView bills={bills} members={members} query={query} onAdd={() => setIsAdding(true)} onOpen={setSelectedBill} />
-            : activeNav === "成员" ? <MembersView members={members} bills={bills} currentMemberId={currentUser.id} />
-              : activeNav === "统计" ? <StatisticsView bills={bills} /> : <>
+            : activeNav === "成员" ? <MembersView members={members} bills={bills} currentMemberId={currentUser?.id} />
+              : activeNav === "统计" ? <StatisticsView bills={bills} members={members} /> : <>
           <section className="summary-grid">
             <article className="hero-total"><span className="card-label">七月共同支出</span><strong>{formatMoney(total)}</strong><div className="trend-note"><AppIcon name="trend" size={16} /><span>比六月少 8.4%</span></div><div className="receipt-edge" /></article>
             <article className="summary-card"><span className="card-label">我的待结算</span><strong>{formatMoney(184.3)}</strong><span className="status-pill">3 笔待处理</span></article>
@@ -321,10 +331,10 @@ export function DashboardPage() {
 
           <div className="content-grid">
             <section className="panel bill-panel"><header><div><span className="overline">RECENT ENTRIES</span><h2>最近账单</h2></div><button className="link-button" onClick={() => setActiveNav("账单")}>查看全部 <AppIcon name="arrow" size={15} /></button></header>
-              <div className="bill-list">{visibleBills.length ? visibleBills.slice(0, 5).map((bill) => <BillRow key={bill.id} bill={bill} onOpen={setSelectedBill} />) : <div className="empty-state">没有找到匹配的账单，换个关键词试试。</div>}</div>
+              <div className="bill-list">{visibleBills.length ? visibleBills.slice(0, 5).map((bill) => <BillRow key={bill.id} bill={bill} members={members} onOpen={setSelectedBill} />) : <div className="empty-state">没有找到匹配的账单，换个关键词试试。</div>}</div>
             </section>
             <aside className="right-column">
-              <section className="panel member-panel"><header><div><span className="overline">THE HOUSE</span><h2>共同成员</h2></div><span className="member-count">5 人</span></header><div className="member-list">{members.map((member, index) => <div key={member.id}><Avatar member={member} /><span><strong>{member.name}</strong><small>{index === 0 ? "本月垫付最多" : `${index + 1} 笔参与`}</small></span><b>{formatMoney([784, 213, 186.5, 64, 88][index])}</b></div>)}</div></section>
+              <section className="panel member-panel"><header><div><span className="overline">THE HOUSE</span><h2>共同成员</h2></div><span className="member-count">{members.length} 人</span></header><div className="member-list">{overviewStats.byPayer.map((member) => <div key={member.id}><Avatar member={member} /><span><strong>{member.name}</strong><small>{member.amount > 0 ? "本月有垫付" : "暂无垫付"}</small></span><b>{formatMoney(member.amount)}</b></div>)}</div></section>
               <section className="settle-card"><span className="overline">QUICK SETTLE</span><h3>让欠款不过夜</h3><p>当前有 3 笔账单可以合并结算。</p><button onClick={() => setActiveNav("统计")}>查看结算方案 <AppIcon name="arrow" size={16} /></button></section>
             </aside>
           </div>
@@ -332,9 +342,9 @@ export function DashboardPage() {
         </div>
       </main>
       <nav className="mobile-nav">{navItems.map(([icon, label]) => <button key={label} className={activeNav === label ? "active" : ""} onClick={() => setActiveNav(label)}><AppIcon name={icon} /><span>{label}</span></button>)}</nav>
-      {isAdding ? <AddBillDialog onClose={() => setIsAdding(false)} onSave={saveBill} /> : null}
-      {selectedBill ? <BillDetails bill={selectedBill} onClose={() => setSelectedBill(null)} onEdit={startEditing} onDelete={startDeleting} /> : null}
-      {editingBill ? <AddBillDialog initialBill={editingBill} onClose={() => setEditingBill(null)} onSave={updateBill} /> : null}
+      {isAdding ? <AddBillDialog members={members} onClose={() => setIsAdding(false)} onSave={saveBill} /> : null}
+      {selectedBill ? <BillDetails bill={selectedBill} members={members} onClose={() => setSelectedBill(null)} onEdit={startEditing} onDelete={startDeleting} /> : null}
+      {editingBill ? <AddBillDialog members={members} initialBill={editingBill} onClose={() => setEditingBill(null)} onSave={updateBill} /> : null}
       {deletingBill ? <DeleteBillDialog bill={deletingBill} onCancel={() => setDeletingBill(null)} onConfirm={deleteBill} /> : null}
     </div>
   );

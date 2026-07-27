@@ -2,7 +2,8 @@ import { useMemo, useState } from "react";
 
 import { AppIcon } from "./AppIcon";
 import { filterBills } from "../data/billFilters";
-import { categories, formatMoney } from "../data/demoData";
+import { categories, getCategory } from "../data/categories";
+import { formatMoney } from "../utils/money";
 
 const dateFormatter = new Intl.DateTimeFormat("zh-CN", {
   month: "short",
@@ -65,7 +66,7 @@ export function BillsView({ bills, members, query, onAdd, onOpen }) {
               <thead><tr><th scope="col">账单</th><th scope="col">日期</th><th scope="col">付款人</th><th scope="col">参与</th><th scope="col">金额</th><th scope="col"><span className="sr-only">操作</span></th></tr></thead>
               <tbody>
                 {visibleBills.map((bill) => {
-                  const item = categories[bill.category];
+                  const item = getCategory(bill.category);
                   return (
                     <tr key={bill.id}>
                       <td><span className="category-icon" style={{ "--category": item.color }}>{item.icon}</span><span><strong>{bill.title}</strong><small>{bill.category}</small></span></td>
