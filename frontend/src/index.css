@@ -77,6 +77,8 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .add-button, .primary-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; padding: 0 18px; border: 0; border-radius: 11px; color: white; background: var(--plum-deep, #49243e); font-weight: 600; box-shadow: 0 8px 20px rgb(73 36 62 / 16%); }
 .mobile-brand, .mobile-nav, .mobile-add { display: none; }
 .dashboard-content { width: min(1440px, 100%); margin: 0 auto; padding: 45px 42px 64px; }
+.data-notice { margin-bottom: 16px; padding: 11px 14px; border: 1px solid var(--line); border-radius: 10px; color: var(--muted); background: var(--surface); font-size: 12px; }
+.data-notice.is-error { border-color: #d9aaa4; color: #934b45; background: #fae9e5; }
 .welcome { display: flex; align-items: end; justify-content: space-between; }
 .overline { color: var(--plum); font-size: 10px; font-weight: 700; letter-spacing: .16em; }
 .welcome h1 { margin: 7px 0 5px; font-family: "Noto Serif SC", serif; font-size: clamp(30px, 3vw, 42px); letter-spacing: -.045em; }
