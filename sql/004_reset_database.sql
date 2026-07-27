@@ -4,5 +4,5 @@
 
 DROP DATABASE IF EXISTS luckywallet_dev;
 SOURCE 001_init_luckywallet.sql;
-SOURCE 005_seed_demo_users.sql;
-SOURCE 002_seed_demo_bills.sql;
+SOURCE 002_seed_demo_users.sql;
+SOURCE 003_seed_demo_bills.sql;

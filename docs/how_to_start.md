@@ -20,10 +20,10 @@ npm run dev
 
 ```bash
 cd sql
-mysql -u root -p luckywallet_dev < 006_reset_database.sql
+mysql -u root -p luckywallet_dev < 004_reset_database.sql
 ```
 
-该脚本会重建本地数据库，并执行 `001`、`005`、`002`。其中 `avatar_url` 和 `household_settings` 已合并到 `001`，不要再单独执行旧的 `003`、`004`。
+该脚本会重建本地数据库，并执行 `001`、`002`、`003`。其中 `avatar_url` 和 `household_settings` 已合并到 `001`，不要再单独执行旧的 `003`、`004`。
 
 示例账号：`MakiWinster / maki1234`、`Ula / ula12345`、`Anna / anna1234`。
 
