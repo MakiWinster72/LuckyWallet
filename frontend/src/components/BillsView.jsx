@@ -19,9 +19,7 @@ function formatRange(startDate, endDate) {
   return `${start} – ${end}`;
 }
 
-function BillRegister({ bills, members, query, rangeLabel, dateError, onQuery, onAdd, onOpen }) {
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+function BillRegister({ bills, members, query, page, pageSize, rangeLabel, dateError, onQuery, onPage, onPageSize, onAdd, onOpen }) {
   const pagination = paginate(bills, page, pageSize);
   const visibleTotal = bills.reduce((sum, bill) => sum + bill.amount, 0);
   const memberIndex = new Map(members.map((member) => [member.id, member]));
@@ -65,16 +63,16 @@ function BillRegister({ bills, members, query, rangeLabel, dateError, onQuery, o
           <nav className="bill-pagination" aria-label="账单分页">
             <span aria-live="polite">第 {pagination.start}–{pagination.end} 条，共 {bills.length} 条</span>
             <label>每页
-              <select aria-label="每页账单数量" value={pageSize} onChange={(event) => { setPageSize(Number(event.target.value)); setPage(1); }}>
+              <select aria-label="每页账单数量" value={pageSize} onChange={(event) => onPageSize(Number(event.target.value))}>
                 {PAGE_SIZE_OPTIONS.map((size) => <option key={size} value={size}>{size} 条</option>)}
               </select>
             </label>
             <div>
-              <button type="button" onClick={() => setPage(pagination.currentPage - 1)} disabled={pagination.currentPage === 1} aria-label="上一页">上一页</button>
+              <button type="button" onClick={() => onPage(pagination.currentPage - 1)} disabled={pagination.currentPage === 1} aria-label="上一页">上一页</button>
               {Array.from({ length: pagination.pageCount }, (_, index) => index + 1).map((pageNumber) => (
-                <button key={pageNumber} type="button" aria-label={`第 ${pageNumber} 页`} aria-current={pagination.currentPage === pageNumber ? "page" : undefined} onClick={() => setPage(pageNumber)}>{pageNumber}</button>
+                <button key={pageNumber} type="button" aria-label={`第 ${pageNumber} 页`} aria-current={pagination.currentPage === pageNumber ? "page" : undefined} onClick={() => onPage(pageNumber)}>{pageNumber}</button>
               ))}
-              <button type="button" onClick={() => setPage(pagination.currentPage + 1)} disabled={pagination.currentPage === pagination.pageCount} aria-label="下一页">下一页</button>
+              <button type="button" onClick={() => onPage(pagination.currentPage + 1)} disabled={pagination.currentPage === pagination.pageCount} aria-label="下一页">下一页</button>
             </div>
           </nav>
         </>
@@ -89,20 +87,27 @@ export function BillsView({ bills, members, onAdd, onOpen }) {
   const [endDate, setEndDate] = useState("");
   const [category, setCategory] = useState("");
   const [payerId, setPayerId] = useState("");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const query = searchParams.get("billQuery") ?? "";
   const dateError = startDate && endDate && startDate > endDate ? "开始日期不能晚于结束日期" : "";
   const visibleBills = useMemo(() => dateError ? [] : filterBills(bills, {
     startDate, endDate, category, payerId, query, members,
   }), [bills, category, dateError, endDate, members, payerId, query, startDate]);
-  const filterKey = `${startDate}:${endDate}:${category}:${payerId}:${query}`;
 
   function setQuery(nextQuery) {
+    setPage(1);
     setSearchParams((currentParams) => {
       const nextParams = new URLSearchParams(currentParams);
       if (nextQuery) nextParams.set("billQuery", nextQuery);
       else nextParams.delete("billQuery");
       return nextParams;
     }, { replace: true });
+  }
+
+  function updateFilter(setFilter, value) {
+    setFilter(value);
+    setPage(1);
   }
 
   return (
@@ -113,16 +118,17 @@ export function BillsView({ bills, members, onAdd, onOpen }) {
       </header>
       <div className="bill-filters" aria-label="筛选账单">
         <div className="date-range-fields">
-          <label>开始日期<input name="bill-start-date" type="date" value={startDate} max={endDate || undefined} aria-describedby={dateError ? "bill-date-error" : undefined} aria-invalid={Boolean(dateError)} onChange={(event) => setStartDate(event.target.value)} /></label>
-          <label>结束日期<input name="bill-end-date" type="date" value={endDate} min={startDate || undefined} aria-describedby={dateError ? "bill-date-error" : undefined} aria-invalid={Boolean(dateError)} onChange={(event) => setEndDate(event.target.value)} /></label>
+          <label>开始日期<input name="bill-start-date" type="date" value={startDate} max={endDate || undefined} aria-describedby={dateError ? "bill-date-error" : undefined} aria-invalid={Boolean(dateError)} onChange={(event) => updateFilter(setStartDate, event.target.value)} /></label>
+          <label>结束日期<input name="bill-end-date" type="date" value={endDate} min={startDate || undefined} aria-describedby={dateError ? "bill-date-error" : undefined} aria-invalid={Boolean(dateError)} onChange={(event) => updateFilter(setEndDate, event.target.value)} /></label>
           {dateError && <span className="filter-error" id="bill-date-error" role="alert">{dateError}</span>}
         </div>
-        <label>分类<select name="bill-category" value={category} onChange={(event) => setCategory(event.target.value)}><option value="">全部分类</option>{Object.keys(categories).map((name) => <option key={name} value={name}>{name}</option>)}</select></label>
-        <label>付款人<select name="bill-payer" value={payerId} onChange={(event) => setPayerId(event.target.value)}><option value="">全部成员</option>{members.map((member) => <option key={member.id} value={member.id}>{member.name}</option>)}</select></label>
-        <button className="clear-filter" type="button" onClick={() => { setStartDate(""); setEndDate(""); setCategory(""); setPayerId(""); }}>清除筛选</button>
+        <label>分类<select name="bill-category" value={category} onChange={(event) => updateFilter(setCategory, event.target.value)}><option value="">全部分类</option>{Object.keys(categories).map((name) => <option key={name} value={name}>{name}</option>)}</select></label>
+        <label>付款人<select name="bill-payer" value={payerId} onChange={(event) => updateFilter(setPayerId, event.target.value)}><option value="">全部成员</option>{members.map((member) => <option key={member.id} value={member.id}>{member.name}</option>)}</select></label>
+        <button className="clear-filter" type="button" onClick={() => { setStartDate(""); setEndDate(""); setCategory(""); setPayerId(""); setPage(1); }}>清除筛选</button>
       </div>
-      <BillRegister key={filterKey} bills={visibleBills} members={members} query={query}
+      <BillRegister bills={visibleBills} members={members} query={query} page={page} pageSize={pageSize}
         rangeLabel={formatRange(startDate, endDate)} dateError={dateError} onQuery={setQuery}
+        onPage={setPage} onPageSize={(size) => { setPageSize(size); setPage(1); }}
         onAdd={onAdd} onOpen={onOpen} />
     </section>
   );
