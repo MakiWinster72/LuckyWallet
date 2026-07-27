@@ -10,6 +10,7 @@ import { useAuth } from "../auth/useAuth";
 import { resolveAssetUrl, uploadAvatarApi } from "../api/auth";
 import { listMembersApi } from "../api/members";
 import { categories, getCategory } from "../data/categories";
+import { getChineseMonthLabel, getLocalDateString, summarizeMonthlyBills } from "../data/monthlyBills";
 import { summarizeSpending } from "../data/spendingSummary";
 import { summarizePendingSettlement } from "../data/settlementSummary";
 import { formatMoney } from "../utils/money";
@@ -307,9 +308,17 @@ export function DashboardPage() {
     bill.title.toLowerCase().includes(query.trim().toLowerCase()) ||
     bill.category.includes(query.trim())
   ), [bills, query]);
-  const total = bills.reduce((sum, bill) => sum + bill.amount, 0);
+  const referenceDate = useMemo(() => getLocalDateString(), []);
+  const monthlySummary = useMemo(
+    () => summarizeMonthlyBills(bills, referenceDate),
+    [bills, referenceDate],
+  );
+  const monthLabel = getChineseMonthLabel(referenceDate);
   const currentUser = members.find((member) => member.id === Number(user.id));
-  const overviewStats = useMemo(() => summarizeSpending(bills, members), [bills, members]);
+  const overviewStats = useMemo(
+    () => summarizeSpending(monthlySummary.bills, members),
+    [monthlySummary.bills, members],
+  );
   const pendingSettlement = useMemo(
     () => summarizePendingSettlement(bills, currentUser?.id),
     [bills, currentUser?.id],
@@ -368,7 +377,7 @@ export function DashboardPage() {
       <aside className="sidebar">
         <div className="brand-lockup"><span className="brand-mark">L</span><span>LuckyWallet</span></div>
         <nav aria-label="主导航">{navItems.map(([icon, label]) => <button key={label} className={activeNav === label ? "active" : ""} onClick={() => setActiveNav(label)}><AppIcon name={icon} /><span>{label}</span></button>)}</nav>
-        <div className="sidebar-note"><span>本月预算</span><strong>{formatMoney(total)} <small>/ ¥2,400</small></strong><div><i style={{ width: `${Math.min(total / 24, 100)}%` }} /></div><small>已使用 {Math.round(total / 24)}%</small></div>
+        <div className="sidebar-note"><span>本月预算</span><strong>{formatMoney(monthlySummary.total)} <small>/ ¥2,400</small></strong><div><i style={{ width: `${Math.min(monthlySummary.total / 24, 100)}%` }} /></div><small>已使用 {Math.round(monthlySummary.total / 24)}%</small></div>
         <div className="profile-card" role="button" tabIndex={0} onClick={() => setIsProfileOpen(true)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") setIsProfileOpen(true); }}><Avatar member={currentUser} avatarUrl={user.avatar_url} /><span><strong>{user.nickname ?? user.username}</strong><small>{user.role === "admin" ? "管理员" : "团队成员"}</small></span><button className="profile-logout" type="button" onClick={(event) => { event.stopPropagation(); handleLogout(); }} aria-label="退出登录" title="退出登录"><AppIcon name="logout" size={17} /></button></div>
       </aside>
 
@@ -389,9 +398,9 @@ export function DashboardPage() {
             : activeNav === "成员" ? <MembersView members={members} bills={bills} currentMemberId={currentUser?.id} />
               : activeNav === "统计" ? <StatisticsView bills={bills} members={members} /> : <>
           <section className="summary-grid">
-            <article className="hero-total"><span className="card-label">七月共同支出</span><strong>{formatMoney(total)}</strong><div className="trend-note"><AppIcon name="trend" size={16} /><span>比六月少 8.4%</span></div><div className="receipt-edge" /></article>
+            <article className="hero-total"><span className="card-label">{monthLabel}共同支出</span><strong>{formatMoney(monthlySummary.total)}</strong><div className="trend-note"><AppIcon name="trend" size={16} /><span>比上月少 8.4%</span></div><div className="receipt-edge" /></article>
             <article className="summary-card"><span className="card-label">我的待结算</span><strong>{formatMoney(pendingSettlement.amount)}</strong><span className="status-pill">{pendingSettlement.count} 笔待处理</span></article>
-            <article className="summary-card"><span className="card-label">本月账单</span><strong>{bills.length}<small> 笔</small></strong><span className="muted">最近更新于今天</span></article>
+            <article className="summary-card"><span className="card-label">本月账单</span><strong>{monthlySummary.count}<small> 笔</small></strong><span className="muted">最近更新于今天</span></article>
           </section>
 
           <div className="content-grid">
