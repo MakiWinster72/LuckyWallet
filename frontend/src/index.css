@@ -119,6 +119,35 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .settle-card button { display: flex; align-items: center; gap: 5px; margin-top: 19px; padding: 0; border: 0; color: #49243e; background: transparent; font-size: 12px; font-weight: 700; }
 .empty-state { padding: 50px 20px; border-top: 1px solid var(--line); color: var(--muted); text-align: center; }
 
+.detail-backdrop { position: fixed; inset: 0; z-index: 9; background: rgb(30 18 27 / 45%); backdrop-filter: blur(3px); animation: fade .2s ease-out; }
+.detail-drawer { position: absolute; inset: 0 0 0 auto; width: min(440px, 100%); overflow-y: auto; color: var(--ink); background: var(--surface); box-shadow: -20px 0 70px rgb(20 10 17 / 22%); animation: slide-in .25s ease-out; }
+.detail-drawer > header { display: flex; align-items: start; justify-content: space-between; padding: 28px 30px 18px; }
+.detail-drawer h2 { margin: 6px 0 0; font-family: "Noto Serif SC", serif; font-size: 24px; }
+.detail-hero { display: grid; justify-items: center; margin: 4px 30px 0; padding: 28px; border-radius: 18px 18px 5px 18px; background: var(--soft); }
+.detail-category { display: grid; width: 48px; height: 48px; place-items: center; border-radius: 14px; background: color-mix(in srgb, var(--category) 18%, var(--surface)); font-size: 22px; }
+.detail-hero > span:nth-child(2) { margin-top: 8px; color: var(--muted); font-size: 11px; }
+.detail-hero h3 { margin: 6px 0 9px; font-family: "Noto Serif SC", serif; font-size: 20px; }
+.detail-hero > strong { color: var(--plum-deep); font-size: 33px; letter-spacing: -.04em; }
+.detail-hero p { display: flex; align-items: center; gap: 5px; margin: 13px 0 0; color: var(--muted); font-size: 11px; }
+.detail-facts { display: grid; grid-template-columns: repeat(3, 1fr); margin: 22px 30px; padding: 0; }
+.detail-facts div { display: grid; justify-items: center; gap: 7px; padding: 5px 8px; border-right: 1px solid var(--line); }
+.detail-facts div:last-child { border: 0; }
+.detail-facts dt { color: var(--muted); font-size: 10px; }
+.detail-facts dd { display: flex; align-items: center; gap: 5px; margin: 0; font-size: 12px; font-weight: 600; }
+.split-section { margin: 0 30px; border-top: 1px solid var(--line); }
+.split-section > header { display: flex; align-items: center; justify-content: space-between; padding: 21px 0 10px; }
+.split-section h3 { margin: 0; font-family: "Noto Serif SC", serif; font-size: 16px; }
+.split-section header span { color: var(--muted); font-size: 11px; }
+.split-section article { display: flex; align-items: center; gap: 10px; padding: 9px 0; }
+.split-section article > span { display: grid; flex: 1; }
+.split-section article strong, .split-section article b { font-size: 12px; }
+.split-section article small { color: var(--muted); font-size: 10px; }
+.detail-note { margin: 20px 30px; padding: 16px; border-radius: 12px; background: var(--soft); }
+.detail-note span, .detail-drawer > footer span { color: var(--muted); font-size: 10px; }
+.detail-note p { margin: 7px 0 0; font-size: 12px; line-height: 1.6; }
+.detail-drawer > footer { display: flex; justify-content: space-between; margin: 24px 30px; padding-top: 16px; border-top: 1px dashed var(--line); }
+.detail-drawer > footer strong { color: var(--muted); font-size: 10px; letter-spacing: .08em; }
+
 .dialog-backdrop { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; padding: 20px; background: rgb(30 18 27 / 62%); backdrop-filter: blur(4px); animation: fade .2s ease-out; }
 .bill-dialog { width: min(680px, 100%); max-height: calc(100vh - 40px); overflow: auto; border-radius: 20px; color: var(--ink); background: var(--surface); box-shadow: 0 35px 90px rgb(20 10 17 / 30%); }
 .bill-dialog > header { display: flex; align-items: start; justify-content: space-between; padding: 27px 30px 18px; }
@@ -168,6 +197,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .login-help { margin-top: 22px; text-align: center; }
 
 @keyframes fade { from { opacity: 0; transform: translateY(5px); } }
+@keyframes slide-in { from { transform: translateX(100%); } }
 @media (max-width: 1050px) {
   .content-grid { grid-template-columns: 1fr; }
   .right-column { grid-template-columns: 1fr 1fr; }
