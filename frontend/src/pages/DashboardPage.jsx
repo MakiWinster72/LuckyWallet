@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { AppIcon } from "../components/AppIcon";
+import { MembersView } from "../components/MembersView";
 import { useAuth } from "../auth/useAuth";
 import { categories, formatMoney, initialBills, members } from "../data/demoData";
 
@@ -180,6 +181,7 @@ export function DashboardPage() {
         <div className="dashboard-content">
           <section className="welcome"><div><p className="overline">JULY · SHARED WALLET</p><h1>{activeNav === "总览" ? `早上好，${user.nickname ?? user.username}` : activeNav}</h1><p>{activeNav === "总览" ? "五个人的小日子，每一笔都清清楚楚。" : "共同生活的账目，都在这里。"}</p></div><button className="add-button mobile-add" onClick={() => setIsAdding(true)}><AppIcon name="plus" size={18} />记一笔</button></section>
 
+          {activeNav === "成员" ? <MembersView members={members} bills={bills} currentMemberId={currentUser.id} /> : <>
           <section className="summary-grid">
             <article className="hero-total"><span className="card-label">七月共同支出</span><strong>{formatMoney(total)}</strong><div className="trend-note"><AppIcon name="trend" size={16} /><span>比六月少 8.4%</span></div><div className="receipt-edge" /></article>
             <article className="summary-card"><span className="card-label">我的待结算</span><strong>{formatMoney(184.3)}</strong><span className="status-pill">3 笔待处理</span></article>
@@ -195,6 +197,7 @@ export function DashboardPage() {
               <section className="settle-card"><span className="overline">QUICK SETTLE</span><h3>让欠款不过夜</h3><p>当前有 3 笔账单可以合并结算。</p><button onClick={() => setActiveNav("统计")}>查看结算方案 <AppIcon name="arrow" size={16} /></button></section>
             </aside>
           </div>
+          </>}
         </div>
       </main>
       <nav className="mobile-nav">{navItems.map(([icon, label]) => <button key={label} className={activeNav === label ? "active" : ""} onClick={() => setActiveNav(label)}><AppIcon name={icon} /><span>{label}</span></button>)}</nav>
