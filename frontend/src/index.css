@@ -261,8 +261,11 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .detail-note { margin: 20px 30px; padding: 16px; border-radius: 12px; background: var(--soft); }
 .detail-note span, .detail-drawer > footer span { color: var(--muted); font-size: 10px; }
 .detail-note p { margin: 7px 0 0; font-size: 12px; line-height: 1.6; }
-.detail-drawer > footer { display: flex; justify-content: space-between; margin: 24px 30px; padding-top: 16px; border-top: 1px dashed var(--line); }
-.detail-drawer > footer strong { color: var(--muted); font-size: 10px; letter-spacing: .08em; }
+.detail-footer { display: flex; align-items: center; justify-content: space-between; margin: 24px 30px; padding-top: 16px; border-top: 1px dashed var(--line); }
+.detail-footer > span { color: var(--muted); font-size: 10px; letter-spacing: .08em; }
+.detail-footer > div { display: flex; align-items: center; gap: 7px; }
+.edit-button { display: inline-flex; min-height: 36px; align-items: center; gap: 6px; padding: 0 12px; border: 1px solid var(--line); border-radius: 9px; color: var(--plum-deep); background: var(--surface); font-size: 11px; font-weight: 600; }
+.danger-button { color: #a04f49; }
 
 .dialog-backdrop { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; padding: 20px; background: rgb(30 18 27 / 62%); backdrop-filter: blur(4px); animation: fade .2s ease-out; }
 .bill-dialog { width: min(680px, 100%); max-height: calc(100vh - 40px); overflow: auto; overscroll-behavior: contain; border-radius: 20px; color: var(--ink); background: var(--surface); box-shadow: 0 35px 90px rgb(20 10 17 / 30%); }
@@ -285,6 +288,12 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .dialog-error { margin: -4px 0; color: #b54848; font-size: 12px; }
 .bill-dialog footer { display: flex; justify-content: flex-end; gap: 9px; margin-top: 4px; }
 .text-button { padding: 0 18px; border: 0; color: var(--muted); background: transparent; }
+.confirm-dialog { width: min(390px, 100%); padding: 30px; border-radius: 18px; color: var(--ink); background: var(--surface); box-shadow: 0 30px 80px rgb(20 10 17 / 30%); text-align: center; }
+.confirm-icon { display: grid; width: 44px; height: 44px; margin: 0 auto 15px; place-items: center; border-radius: 50%; color: #a04f49; background: #f8e1de; font-size: 20px; font-weight: 700; }
+.confirm-dialog h2 { margin: 0; font-family: "Noto Serif SC", serif; font-size: 21px; }
+.confirm-dialog p { margin: 10px 0 24px; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.confirm-dialog footer { display: flex; justify-content: center; gap: 8px; }
+.delete-button { min-height: 40px; padding: 0 16px; border: 0; border-radius: 9px; color: white; background: #9d4b46; font-size: 12px; font-weight: 600; }
 
 /* Existing login */
 .login-page { display: grid; min-height: 100vh; place-items: center; padding: 28px; background: radial-gradient(circle at 10% 10%, #ead5df, transparent 34%), #f8f3f1; }

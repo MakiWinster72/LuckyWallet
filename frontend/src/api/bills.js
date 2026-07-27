@@ -14,3 +14,17 @@ export async function createBillApi(bill) {
   });
   return adaptBillFromApi(await response.json());
 }
+
+export async function updateBillApi(bill) {
+  const response = await authenticatedApiRequest(`/bills/${bill.id}`, {
+    method: "PUT",
+    body: JSON.stringify(adaptBillToApi(bill)),
+  });
+  return adaptBillFromApi(await response.json());
+}
+
+export async function deleteBillApi(billId) {
+  await authenticatedApiRequest(`/bills/${billId}`, {
+    method: "DELETE",
+  });
+}
