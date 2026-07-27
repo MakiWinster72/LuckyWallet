@@ -10,5 +10,5 @@ test("bill search keeps the register mounted while pagination resets", () => {
     /<BillRegister\s+key=/,
     "keying BillRegister by query remounts the search input and drops focus",
   );
-  assert.match(source, /resetPageOn=/);
+  assert.match(source, /function setQuery\(nextQuery\) \{\s+setPage\(1\)/);
 });
