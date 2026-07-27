@@ -11,6 +11,7 @@ import { resolveAssetUrl, uploadAvatarApi } from "../api/auth";
 import { listMembersApi } from "../api/members";
 import { categories, getCategory } from "../data/categories";
 import { getChineseMonthLabel, getLocalDateString, summarizeMonthlyBills } from "../data/monthlyBills";
+import { summarizeProfileFinance } from "../data/profileFinance";
 import { summarizeSpending } from "../data/spendingSummary";
 import { summarizePendingSettlement } from "../data/settlementSummary";
 import { formatMoney } from "../utils/money";
@@ -27,10 +28,10 @@ function Avatar({ member, small = false, avatarUrl = "" }) {
   return <span className={`avatar ${small ? "avatar-small" : ""}`} style={{ "--avatar": member.color }}>{member.initials}</span>;
 }
 
-function ProfileCenter({ user, member, onClose, onUpdated }) {
+function ProfileCenter({ user, member, finance, onClose, onUpdated }) {
   const [preview, setPreview] = useState(user.avatar_url ? resolveAssetUrl(user.avatar_url) : "");
   const [file, setFile] = useState(null);
-  const [status, setStatus] = useState({ saving: false, error: "" });
+  const [status, setStatus] = useState({ saving: false, error: "", success: "" });
 
   useEffect(() => () => {
     if (preview.startsWith("blob:")) URL.revokeObjectURL(preview);
@@ -40,26 +41,26 @@ function ProfileCenter({ user, member, onClose, onUpdated }) {
     const nextFile = event.target.files?.[0];
     if (!nextFile) return;
     if (nextFile.size > 5 * 1024 * 1024) {
-      setStatus({ saving: false, error: "头像大小不能超过 5 MB" });
+      setStatus({ saving: false, error: "头像大小不能超过 5 MB", success: "" });
       event.target.value = "";
       return;
     }
     setFile(nextFile);
     setPreview(URL.createObjectURL(nextFile));
-    setStatus({ saving: false, error: "" });
+    setStatus({ saving: false, error: "", success: "" });
   }
 
   async function saveAvatar() {
     if (!file) return;
-    setStatus({ saving: true, error: "" });
+    setStatus({ saving: true, error: "", success: "" });
     try {
       const nextUser = await uploadAvatarApi(file);
       onUpdated(nextUser);
       setFile(null);
       setPreview(resolveAssetUrl(nextUser.avatar_url));
-      setStatus({ saving: false, error: "" });
+      setStatus({ saving: false, error: "", success: "头像已保存" });
     } catch (error) {
-      setStatus({ saving: false, error: error.message });
+      setStatus({ saving: false, error: error.message, success: "" });
     }
   }
 
@@ -75,7 +76,28 @@ function ProfileCenter({ user, member, onClose, onUpdated }) {
           <small>支持 JPG、PNG、WebP，最大 5 MB</small>
         </div>
         <div className="profile-details"><span>显示名字</span><strong>{user.nickname?.trim() || user.username}</strong><small>@{user.username}</small></div>
+        <section className="profile-finance" aria-labelledby="profile-finance-title">
+          <header>
+            <div><span className="overline">MY FINANCE</span><h3 id="profile-finance-title">收支概览</h3></div>
+            <small>全部共同账单</small>
+          </header>
+          <div className="profile-finance-grid">
+            <article>
+              <span>我的付款</span>
+              <strong>{formatMoney(finance.paid)}</strong>
+              <div className="profile-ratio-track" aria-hidden="true"><i style={{ width: `${Math.min(finance.paidRatio, 100)}%` }} /></div>
+              <small>占全部总支出 {finance.paidRatio.toFixed(1)}%</small>
+            </article>
+            <article>
+              <span>我的分摊</span>
+              <strong>{formatMoney(finance.share)}</strong>
+              <div className="profile-ratio-track is-share" aria-hidden="true"><i style={{ width: `${Math.min(finance.shareRatio, 100)}%` }} /></div>
+              <small>占全部总支出 {finance.shareRatio.toFixed(1)}%</small>
+            </article>
+          </div>
+        </section>
         {status.error ? <p className="form-error" role="alert">{status.error}</p> : null}
+        {status.success ? <p className="form-success" role="status">✓ {status.success}</p> : null}
         <footer><button className="text-button" type="button" onClick={onClose}>取消</button><button className="add-button" type="button" disabled={!file || status.saving} onClick={saveAvatar}>{status.saving ? "上传中…" : "保存头像"}</button></footer>
       </section>
     </div>
@@ -323,6 +345,10 @@ export function DashboardPage() {
     () => summarizePendingSettlement(bills, currentUser?.id),
     [bills, currentUser?.id],
   );
+  const profileFinance = useMemo(
+    () => summarizeProfileFinance(bills, currentUser?.id),
+    [bills, currentUser?.id],
+  );
 
   async function saveBill(form) {
     try {
@@ -420,7 +446,7 @@ export function DashboardPage() {
       {selectedBill ? <BillDetails bill={selectedBill} members={members} onClose={() => setSelectedBill(null)} onEdit={startEditing} onDelete={startDeleting} /> : null}
       {editingBill ? <AddBillDialog members={members} initialBill={editingBill} onClose={() => setEditingBill(null)} onSave={updateBill} /> : null}
       {deletingBill ? <DeleteBillDialog bill={deletingBill} onCancel={() => setDeletingBill(null)} onConfirm={deleteBill} /> : null}
-      {isProfileOpen ? <ProfileCenter user={user} member={currentUser} onClose={() => setIsProfileOpen(false)} onUpdated={updateUser} /> : null}
+      {isProfileOpen ? <ProfileCenter user={user} member={currentUser} finance={profileFinance} onClose={() => setIsProfileOpen(false)} onUpdated={updateUser} /> : null}
     </div>
   );
 }
