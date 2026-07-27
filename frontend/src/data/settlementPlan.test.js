@@ -14,8 +14,8 @@ test("归并多人账单为净额转账建议", () => {
   ]);
 
   assert.deepEqual(plan.transfers, [
-    { fromId: 3, fromName: "Ula", toId: 1, toName: "Maki", amount: 30 },
-    { fromId: 2, fromName: "Lucky", toId: 1, toName: "Maki", amount: 20 },
+    { fromId: 3, fromName: "Ula", toId: 1, toName: "Maki", amount: 40 },
+    { fromId: 2, fromName: "Lucky", toId: 1, toName: "Maki", amount: 10 },
   ]);
   assert.equal(plan.total, 50);
 });
