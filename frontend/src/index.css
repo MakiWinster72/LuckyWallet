@@ -242,6 +242,33 @@ input:focus-visible {
   box-shadow: 0 0 0 2px var(--color-primary);
 }
 
+.password-control {
+  position: relative;
+}
+
+.password-control input {
+  padding-right: 72px;
+}
+
+.password-control button {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  min-width: 50px;
+  min-height: 36px;
+  transform: translateY(-50%);
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.password-control button:hover:not(:disabled) {
+  background: var(--color-surface-hover);
+}
+
 .form-message {
   min-height: 22px;
 }
