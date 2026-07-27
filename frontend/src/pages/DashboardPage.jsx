@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { AppIcon } from "../components/AppIcon";
+import { BillsView } from "../components/BillsView";
 import { MembersView } from "../components/MembersView";
 import { useAuth } from "../auth/useAuth";
 import { categories, formatMoney, initialBills, members } from "../data/demoData";
@@ -181,7 +182,8 @@ export function DashboardPage() {
         <div className="dashboard-content">
           <section className="welcome"><div><p className="overline">JULY · SHARED WALLET</p><h1>{activeNav === "总览" ? `早上好，${user.nickname ?? user.username}` : activeNav}</h1><p>{activeNav === "总览" ? "五个人的小日子，每一笔都清清楚楚。" : "共同生活的账目，都在这里。"}</p></div><button className="add-button mobile-add" onClick={() => setIsAdding(true)}><AppIcon name="plus" size={18} />记一笔</button></section>
 
-          {activeNav === "成员" ? <MembersView members={members} bills={bills} currentMemberId={currentUser.id} /> : <>
+          {activeNav === "账单" ? <BillsView bills={bills} members={members} query={query} onAdd={() => setIsAdding(true)} onOpen={setSelectedBill} />
+            : activeNav === "成员" ? <MembersView members={members} bills={bills} currentMemberId={currentUser.id} /> : <>
           <section className="summary-grid">
             <article className="hero-total"><span className="card-label">七月共同支出</span><strong>{formatMoney(total)}</strong><div className="trend-note"><AppIcon name="trend" size={16} /><span>比六月少 8.4%</span></div><div className="receipt-edge" /></article>
             <article className="summary-card"><span className="card-label">我的待结算</span><strong>{formatMoney(184.3)}</strong><span className="status-pill">3 笔待处理</span></article>
@@ -190,7 +192,7 @@ export function DashboardPage() {
 
           <div className="content-grid">
             <section className="panel bill-panel"><header><div><span className="overline">RECENT ENTRIES</span><h2>最近账单</h2></div><button className="link-button" onClick={() => setActiveNav("账单")}>查看全部 <AppIcon name="arrow" size={15} /></button></header>
-              <div className="bill-list">{visibleBills.length ? visibleBills.slice(0, activeNav === "账单" ? 20 : 5).map((bill) => <BillRow key={bill.id} bill={bill} onOpen={setSelectedBill} />) : <div className="empty-state">没有找到匹配的账单，换个关键词试试。</div>}</div>
+              <div className="bill-list">{visibleBills.length ? visibleBills.slice(0, 5).map((bill) => <BillRow key={bill.id} bill={bill} onOpen={setSelectedBill} />) : <div className="empty-state">没有找到匹配的账单，换个关键词试试。</div>}</div>
             </section>
             <aside className="right-column">
               <section className="panel member-panel"><header><div><span className="overline">THE HOUSE</span><h2>共同成员</h2></div><span className="member-count">5 人</span></header><div className="member-list">{members.map((member, index) => <div key={member.id}><Avatar member={member} /><span><strong>{member.name}</strong><small>{index === 0 ? "本月垫付最多" : `${index + 1} 笔参与`}</small></span><b>{formatMoney([784, 213, 186.5, 64, 88][index])}</b></div>)}</div></section>
