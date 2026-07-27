@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI
@@ -11,14 +12,26 @@ from app.api.routes.bills import router as bills_router
 from app.api.routes.members import router as members_router
 from app.config import get_settings
 from app.database import engine
+from app.runtime_schema import ensure_user_avatar_column
 
 
 settings = get_settings()
 uploads_dir = Path(__file__).resolve().parents[2] / "uploads"
 uploads_dir.mkdir(parents=True, exist_ok=True)
+
+
+@asynccontextmanager
+async def lifespan(application: FastAPI):
+    del application
+    with engine.begin() as connection:
+        ensure_user_avatar_column(connection)
+    yield
+
+
 app = FastAPI(
     title="LuckyWallet API",
     version="0.1.0",
+    lifespan=lifespan,
 )
 
 app.add_middleware(
