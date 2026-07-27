@@ -135,22 +135,30 @@ function StatisticsView({ bills }) {
   const summary = summarizeSpending(bills);
   const maximumCategory = Math.max(...summary.byCategory.map((item) => item.amount), 1);
   const maximumPayer = Math.max(...summary.byPayer.map((item) => item.amount), 1);
+  const hasSpending = bills.length > 0;
 
   return (
-    <section className="statistics-view">
+    <section className="statistics-view" aria-labelledby="statistics-title">
+      <header className="statistics-heading">
+        <div>
+          <span className="overline">SPENDING INSIGHTS</span>
+          <h2 id="statistics-title">本月支出统计</h2>
+          <p>从分类与成员垫付两个维度了解共同消费。</p>
+        </div>
+      </header>
       <div className="stats-kpis">
         <article><span>本月总支出</span><strong>{formatMoney(summary.total)}</strong><small>全部共同账单</small></article>
         <article><span>平均每笔</span><strong>{formatMoney(summary.average)}</strong><small>共 {bills.length} 笔消费</small></article>
         <article><span>最高分类</span><strong>{summary.byCategory[0]?.name ?? "暂无"}</strong><small>{formatMoney(summary.byCategory[0]?.amount ?? 0)}</small></article>
       </div>
-      <div className="stats-layout">
+      {hasSpending ? <div className="stats-layout">
         <article className="panel category-chart">
           <header><div><span className="overline">CATEGORY MIX</span><h2>分类支出</h2></div><span className="chart-caption">按金额排序</span></header>
           <div className="bar-list">
             {summary.byCategory.map((item) => (
               <div className="bar-row" key={item.name}>
-                <span className="bar-icon" style={{ "--category": item.color }}>{item.icon}</span>
-                <div><span><strong>{item.name}</strong><small>{item.count} 笔</small></span><i><b style={{ width: `${item.amount / maximumCategory * 100}%`, "--category": item.color }} /></i></div>
+                <span className="bar-icon" style={{ "--category": item.color }} aria-hidden="true">{item.icon}</span>
+                <div><span><strong>{item.name}</strong><small>{item.count} 笔</small></span><i role="progressbar" aria-label={`${item.name}支出占最高分类的比例`} aria-valuemin="0" aria-valuemax="100" aria-valuenow={Math.round(item.amount / maximumCategory * 100)}><b style={{ width: `${item.amount / maximumCategory * 100}%`, "--category": item.color }} /></i></div>
                 <strong>{formatMoney(item.amount)}</strong>
               </div>
             ))}
@@ -163,13 +171,13 @@ function StatisticsView({ bills }) {
               <div key={member.id}>
                 <span className="rank">{String(index + 1).padStart(2, "0")}</span>
                 <Avatar member={member} />
-                <span><strong>{member.name}</strong><i><b style={{ width: `${member.amount / maximumPayer * 100}%` }} /></i></span>
+                <span><strong>{member.name}</strong><i role="progressbar" aria-label={`${member.name}垫付占最高垫付金额的比例`} aria-valuemin="0" aria-valuemax="100" aria-valuenow={Math.round(member.amount / maximumPayer * 100)}><b style={{ width: `${member.amount / maximumPayer * 100}%` }} /></i></span>
                 <strong>{formatMoney(member.amount)}</strong>
               </div>
             ))}
           </div>
         </article>
-      </div>
+      </div> : <div className="statistics-empty"><span aria-hidden="true">⌁</span><h3>本月还没有支出</h3><p>记录第一笔共同消费后，这里会生成分类与成员垫付统计。</p></div>}
     </section>
   );
 }
