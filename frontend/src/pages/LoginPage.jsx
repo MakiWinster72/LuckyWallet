@@ -3,6 +3,7 @@ import { Navigate, useLocation, useNavigate } from "react-router-dom";
 
 import { ApiError } from "../api/auth";
 import { useAuth } from "../auth/useAuth";
+import { AppIcon } from "../components/AppIcon";
 
 export function LoginPage() {
   const { user, login } = useAuth();
@@ -110,7 +111,7 @@ export function LoginPage() {
                   onClick={() => setIsPasswordVisible((visible) => !visible)}
                   disabled={isSubmitting}
                 >
-                  {isPasswordVisible ? "隐藏" : "显示"}
+                  <AppIcon name={isPasswordVisible ? "eyeOff" : "eye"} size={18} />
                 </button>
               </div>
             </div>
