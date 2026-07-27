@@ -16,7 +16,7 @@ import { summarizeBudgetProgress } from "../data/budgetProgress";
 import { getChineseMonthLabel, getLocalDateString, selectMonthlyBills, summarizeMonthlyBills } from "../data/monthlyBills";
 import { summarizeMonthlyTrend } from "../data/monthlyTrend";
 import { summarizeProfileFinance } from "../data/profileFinance";
-import { buildDailySeries, buildMonthlySeries } from "../data/statisticsCharts";
+import { buildDailySeries, buildMonthlySeries, buildSmoothSvgPath } from "../data/statisticsCharts";
 import { downloadStatisticsCsv } from "../data/statisticsExport";
 import { summarizeSpending } from "../data/spendingSummary";
 import { summarizePendingSettlement } from "../data/settlementSummary";
@@ -250,11 +250,12 @@ function StatisticsView({ bills, members }) {
   const maximumMonth = Math.max(...monthlySeries.map((item) => item.total), 1);
   const maximumDay = Math.max(...dailySeries.map((item) => item.total), 1);
   const maximumPayer = Math.max(...summary.byPayer.map((item) => item.amount), 1);
-  const dailyPoints = dailySeries.map((item, index) => {
+  const dailyCoordinates = dailySeries.map((item, index) => {
     const x = 12 + index * (476 / Math.max(dailySeries.length - 1, 1));
     const y = 132 - (item.total / maximumDay) * 112;
-    return `${x.toFixed(1)},${y.toFixed(1)}`;
-  }).join(" ");
+    return { x: Number(x.toFixed(1)), y: Number(y.toFixed(1)) };
+  });
+  const dailyPath = buildSmoothSvgPath(dailyCoordinates);
   let categoryOffset = 0;
   const categoryGradient = summary.byCategory.length
     ? `conic-gradient(${summary.byCategory.map((item) => {
@@ -296,7 +297,7 @@ function StatisticsView({ bills, members }) {
           <div className="daily-line">
             <svg viewBox="0 0 500 150" role="img" aria-label="本月每日支出折线图" preserveAspectRatio="none">
               <path d="M12 132H488M12 76H488M12 20H488" className="chart-grid-line" />
-              <polyline points={dailyPoints} />
+              <path d={dailyPath} className="daily-curve" />
               {dailySeries.filter((item) => item.total > 0).map((item) => {
                 const index = item.day - 1;
                 const x = 12 + index * (476 / Math.max(dailySeries.length - 1, 1));
