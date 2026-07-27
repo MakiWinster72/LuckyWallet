@@ -33,6 +33,13 @@ CREATE TABLE IF NOT EXISTS users (
   CONSTRAINT ck_users_role CHECK (role IN ('admin', 'user'))
 ) ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS household_settings (
+  id INT NOT NULL,
+  monthly_budget DECIMAL(10,2) NOT NULL DEFAULT 2400.00,
+  PRIMARY KEY (id),
+  CONSTRAINT ck_household_settings_budget_positive CHECK (monthly_budget > 0)
+) ENGINE=InnoDB;
+
 CREATE TABLE IF NOT EXISTS categories (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   name VARCHAR(50) NOT NULL,

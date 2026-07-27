@@ -9,6 +9,7 @@
 | `001_init_luckywallet.sql` | 创建 `luckywallet_dev` 数据库、数据表和默认账单分类 |
 | `002_seed_demo_bills.sql` | 为 Maki、Landen、Lucky、Ula、Anna 生成 100 笔模拟账单及分摊明细 |
 | `003_add_user_avatar.sql` | 为已有数据库添加用户头像字段 |
+| `004_add_household_settings.sql` | 为已有数据库添加家庭预算设置 |
 
 已有数据库启用个人头像时执行：
 
@@ -17,6 +18,12 @@ mysql -u root -p luckywallet_dev < sql/003_add_user_avatar.sql
 ```
 
 头像文件由后端写入项目根目录的 `uploads/`，数据库仅保存 `/uploads/...` 访问路径。
+
+已有数据库启用可配置月预算时执行：
+
+```bash
+mysql -u root -p luckywallet_dev < sql/004_add_household_settings.sql
+```
 
 模拟账单的消费日期覆盖 `2026-05-01` 至 `2026-07-27`，适合检查总览、
 账单筛选、成员余额和统计图表。

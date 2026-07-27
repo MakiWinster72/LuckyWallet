@@ -10,9 +10,10 @@ from app.api.routes.auth import router as auth_router
 from app.api.routes.admin_users import router as admin_users_router
 from app.api.routes.bills import router as bills_router
 from app.api.routes.members import router as members_router
+from app.api.routes.settings import router as settings_router
 from app.config import get_settings
 from app.database import engine
-from app.runtime_schema import ensure_user_avatar_column
+from app.runtime_schema import ensure_household_settings_table, ensure_user_avatar_column
 
 
 settings = get_settings()
@@ -25,6 +26,7 @@ async def lifespan(application: FastAPI):
     del application
     with engine.begin() as connection:
         ensure_user_avatar_column(connection)
+        ensure_household_settings_table(connection)
     yield
 
 
@@ -46,6 +48,7 @@ app.include_router(auth_router, prefix="/api/v1")
 app.include_router(admin_users_router, prefix="/api/v1")
 app.include_router(bills_router, prefix="/api/v1")
 app.include_router(members_router, prefix="/api/v1")
+app.include_router(settings_router, prefix="/api/v1")
 app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
 
 
