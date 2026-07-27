@@ -19,6 +19,10 @@ class UserRepository:
         statement = select(User).order_by(User.created_at.desc(), User.id.desc())
         return list(self.session.scalars(statement))
 
+    def list_active(self) -> list[User]:
+        statement = select(User).where(User.is_active.is_(True)).order_by(User.id)
+        return list(self.session.scalars(statement))
+
     def count_active_admins(self) -> int:
         statement = select(func.count(User.id)).where(
             User.role == "admin",
