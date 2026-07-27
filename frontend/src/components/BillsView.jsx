@@ -9,22 +9,36 @@ const dateFormatter = new Intl.DateTimeFormat("zh-CN", {
   month: "short",
   day: "numeric",
 });
-const monthFormatter = new Intl.DateTimeFormat("zh-CN", {
+const rangeDateFormatter = new Intl.DateTimeFormat("zh-CN", {
   year: "numeric",
-  month: "long",
+  month: "short",
+  day: "numeric",
 });
 
-function formatMonth(month) {
-  return monthFormatter.format(new Date(`${month}-01T00:00:00`));
+function formatRange(startDate, endDate) {
+  if (!startDate && !endDate) return "全部日期";
+  const start = startDate ? rangeDateFormatter.format(new Date(`${startDate}T00:00:00`)) : "最早";
+  const end = endDate ? rangeDateFormatter.format(new Date(`${endDate}T00:00:00`)) : "至今";
+  return `${start} – ${end}`;
 }
 
 export function BillsView({ bills, members, query, onAdd, onOpen }) {
-  const [month, setMonth] = useState("2026-07");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [category, setCategory] = useState("");
   const [payerId, setPayerId] = useState("");
+  const dateError = startDate && endDate && startDate > endDate
+    ? "开始日期不能晚于结束日期"
+    : "";
   const visibleBills = useMemo(
-    () => filterBills(bills, { month, category, payerId, query }),
-    [bills, category, month, payerId, query],
+    () => dateError ? [] : filterBills(bills, {
+      startDate,
+      endDate,
+      category,
+      payerId,
+      query,
+    }),
+    [bills, category, dateError, endDate, payerId, query, startDate],
   );
   const visibleTotal = visibleBills.reduce((sum, bill) => sum + bill.amount, 0);
   const memberIndex = new Map(members.map((member) => [member.id, member]));
@@ -43,7 +57,11 @@ export function BillsView({ bills, members, query, onAdd, onOpen }) {
       </header>
 
       <div className="bill-filters" aria-label="筛选账单">
-        <label>账期<input name="bill-month" type="month" value={month} onChange={(event) => setMonth(event.target.value)} /></label>
+        <div className="date-range-fields">
+          <label>开始日期<input name="bill-start-date" type="date" value={startDate} max={endDate || undefined} aria-describedby={dateError ? "bill-date-error" : undefined} aria-invalid={Boolean(dateError)} onChange={(event) => setStartDate(event.target.value)} /></label>
+          <label>结束日期<input name="bill-end-date" type="date" value={endDate} min={startDate || undefined} aria-describedby={dateError ? "bill-date-error" : undefined} aria-invalid={Boolean(dateError)} onChange={(event) => setEndDate(event.target.value)} /></label>
+          {dateError && <span className="filter-error" id="bill-date-error" role="alert">{dateError}</span>}
+        </div>
         <label>分类<select name="bill-category" value={category} onChange={(event) => setCategory(event.target.value)}>
           <option value="">全部分类</option>
           {Object.keys(categories).map((name) => <option key={name} value={name}>{name}</option>)}
@@ -52,15 +70,17 @@ export function BillsView({ bills, members, query, onAdd, onOpen }) {
           <option value="">全部成员</option>
           {members.map((member) => <option key={member.id} value={member.id}>{member.name}</option>)}
         </select></label>
-        <button className="clear-filter" type="button" onClick={() => { setMonth(""); setCategory(""); setPayerId(""); }}>清除筛选</button>
+        <button className="clear-filter" type="button" onClick={() => { setStartDate(""); setEndDate(""); setCategory(""); setPayerId(""); }}>清除筛选</button>
       </div>
 
       <div className="bill-register panel">
         <header>
-          <div><strong>{visibleBills.length} 笔账单</strong><span>{month ? formatMonth(month) : "全部账期"}</span></div>
+          <div><strong>{visibleBills.length} 笔账单</strong><span>{dateError ? "请修正日期范围" : formatRange(startDate, endDate)}</span></div>
           <div><span>筛选结果合计</span><strong>{formatMoney(visibleTotal)}</strong></div>
         </header>
-        {visibleBills.length ? (
+        {dateError ? (
+          <div className="bill-empty"><span>日期范围无效</span><p>请先修正开始日期和结束日期，再查看筛选结果。</p></div>
+        ) : visibleBills.length ? (
           <div className="bill-table-scroll">
             <table>
               <thead><tr><th scope="col">账单</th><th scope="col">日期</th><th scope="col">付款人</th><th scope="col">参与</th><th scope="col">金额</th><th scope="col"><span className="sr-only">操作</span></th></tr></thead>
