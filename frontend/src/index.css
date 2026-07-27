@@ -186,6 +186,15 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .bill-register th:nth-last-child(-n+2), .bill-register td:nth-last-child(-n+2) { text-align: right; }
 .bill-register td:last-child { min-width: 50px; }
 .bill-register td:last-child .row-action { margin-left: auto; }
+.bill-pagination { display: flex; min-height: 62px; align-items: center; gap: 16px; padding: 10px 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 10px; }
+.bill-pagination > span { margin-right: auto; font-variant-numeric: tabular-nums; }
+.bill-pagination label { display: flex; align-items: center; gap: 7px; white-space: nowrap; }
+.bill-pagination select { min-height: 34px; padding: 0 9px; border: 1px solid var(--line); border-radius: 8px; color: var(--ink); background: var(--page); }
+.bill-pagination > div { display: flex; gap: 5px; }
+.bill-pagination button { min-width: 34px; min-height: 34px; padding: 0 9px; border: 1px solid var(--line); border-radius: 8px; color: var(--muted); background: var(--surface); font-size: 10px; }
+.bill-pagination button:hover:not(:disabled) { border-color: var(--plum); color: var(--plum); background: var(--soft); }
+.bill-pagination button[aria-current="page"] { border-color: var(--plum); color: white; background: var(--plum); }
+.bill-pagination button:disabled { cursor: not-allowed; opacity: .45; }
 .bill-empty { padding: 70px 24px; text-align: center; }
 .bill-empty span { font-family: "Noto Serif SC", serif; font-size: 18px; font-weight: 700; }
 .bill-empty p { margin: 7px 0 17px; color: var(--muted); font-size: 11px; }
@@ -415,6 +424,9 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   .bill-filters { align-items: stretch; flex-wrap: wrap; }
   .bill-filters label { min-width: calc(50% - 5px); flex: 1; }
   .clear-filter { margin-left: 0; }
+  .bill-pagination { flex-wrap: wrap; }
+  .bill-pagination > span { flex: 1 0 100%; }
+  .bill-pagination > div { margin-left: auto; }
   .admin-user-summary { grid-template-columns: repeat(3, 1fr); }
   .admin-user-toolbar > label { min-width: calc(50% - 5px); flex: 1; }
   .admin-user-toolbar .admin-user-search { min-width: 100%; }
@@ -437,6 +449,10 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   .bills-heading { align-items: center; }
   .bills-heading .add-button { display: none; }
   .bill-filters label { min-width: 100%; }
+  .bill-pagination { gap: 10px; padding: 12px; }
+  .bill-pagination label { width: 100%; justify-content: space-between; }
+  .bill-pagination > div { width: 100%; margin-left: 0; overflow-x: auto; padding-bottom: 2px; }
+  .bill-pagination button { flex: 0 0 auto; }
   .members-heading { align-items: start; }
   .member-card-grid, .member-summary { grid-template-columns: 1fr; }
   .member-summary article:first-child { grid-column: auto; }
