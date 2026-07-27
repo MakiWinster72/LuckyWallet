@@ -12,6 +12,7 @@ class UserResponse(BaseModel):
     id: int
     username: str
     nickname: str | None
+    avatar_url: str | None = None
     role: Literal["admin", "user"]
     is_active: bool
 
