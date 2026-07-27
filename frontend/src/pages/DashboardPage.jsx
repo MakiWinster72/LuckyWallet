@@ -13,9 +13,11 @@ import { resolveAssetUrl, uploadAvatarApi } from "../api/auth";
 import { listMembersApi } from "../api/members";
 import { categories, getCategory } from "../data/categories";
 import { summarizeBudgetProgress } from "../data/budgetProgress";
-import { getChineseMonthLabel, getLocalDateString, summarizeMonthlyBills } from "../data/monthlyBills";
+import { getChineseMonthLabel, getLocalDateString, selectMonthlyBills, summarizeMonthlyBills } from "../data/monthlyBills";
 import { summarizeMonthlyTrend } from "../data/monthlyTrend";
 import { summarizeProfileFinance } from "../data/profileFinance";
+import { buildDailySeries, buildMonthlySeries } from "../data/statisticsCharts";
+import { downloadStatisticsCsv } from "../data/statisticsExport";
 import { summarizeSpending } from "../data/spendingSummary";
 import { summarizePendingSettlement } from "../data/settlementSummary";
 import { formatMoney } from "../utils/money";
@@ -227,10 +229,45 @@ function AddBillDialog({ members, initialBill = null, onClose, onSave }) {
 }
 
 function StatisticsView({ bills, members }) {
-  const summary = summarizeSpending(bills, members);
-  const maximumCategory = Math.max(...summary.byCategory.map((item) => item.amount), 1);
+  const referenceDate = useMemo(() => getLocalDateString(), []);
+  const month = referenceDate.slice(0, 7);
+  const monthlyBills = useMemo(
+    () => selectMonthlyBills(bills, referenceDate),
+    [bills, referenceDate],
+  );
+  const summary = useMemo(
+    () => summarizeSpending(monthlyBills, members),
+    [monthlyBills, members],
+  );
+  const monthlySeries = useMemo(
+    () => buildMonthlySeries(bills, referenceDate),
+    [bills, referenceDate],
+  );
+  const dailySeries = useMemo(
+    () => buildDailySeries(bills, referenceDate),
+    [bills, referenceDate],
+  );
+  const maximumMonth = Math.max(...monthlySeries.map((item) => item.total), 1);
+  const maximumDay = Math.max(...dailySeries.map((item) => item.total), 1);
   const maximumPayer = Math.max(...summary.byPayer.map((item) => item.amount), 1);
-  const hasSpending = bills.length > 0;
+  const dailyPoints = dailySeries.map((item, index) => {
+    const x = 12 + index * (476 / Math.max(dailySeries.length - 1, 1));
+    const y = 132 - (item.total / maximumDay) * 112;
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(" ");
+  let categoryOffset = 0;
+  const categoryGradient = summary.byCategory.length
+    ? `conic-gradient(${summary.byCategory.map((item) => {
+      const start = categoryOffset;
+      categoryOffset += item.amount / summary.total * 100;
+      return `${item.color} ${start}% ${categoryOffset}%`;
+    }).join(", ")})`
+    : "var(--soft)";
+  const hasSpending = monthlyBills.length > 0;
+
+  function exportReport() {
+    downloadStatisticsCsv({ month, bills: monthlyBills, members });
+  }
 
   return (
     <section className="statistics-view" aria-labelledby="statistics-title">
@@ -238,25 +275,47 @@ function StatisticsView({ bills, members }) {
         <div>
           <span className="overline">SPENDING INSIGHTS</span>
           <h2 id="statistics-title">本月支出统计</h2>
-          <p>从分类与成员垫付两个维度了解共同消费。</p>
+          <p>从时间、分类与成员付款三个维度了解共同消费。</p>
         </div>
+        <button className="statistics-export" type="button" onClick={exportReport}><AppIcon name="download" size={17} />导出 CSV</button>
       </header>
       <div className="stats-kpis">
         <article><span>本月总支出</span><strong>{formatMoney(summary.total)}</strong><small>全部共同账单</small></article>
-        <article><span>平均每笔</span><strong>{formatMoney(summary.average)}</strong><small>共 {bills.length} 笔消费</small></article>
+        <article><span>平均每笔</span><strong>{formatMoney(summary.average)}</strong><small>共 {monthlyBills.length} 笔消费</small></article>
         <article><span>最高分类</span><strong>{summary.byCategory[0]?.name ?? "暂无"}</strong><small>{formatMoney(summary.byCategory[0]?.amount ?? 0)}</small></article>
+      </div>
+      <div className="stats-trend-grid">
+        <article className="panel monthly-chart">
+          <header><div><span className="overline">6-MONTH RHYTHM</span><h2>月度支出趋势</h2></div><span className="chart-caption">近 6 个月</span></header>
+          <div className="month-bars" role="img" aria-label="近六个月支出柱状图">
+            {monthlySeries.map((item) => <div key={item.month}><strong>{item.total ? formatMoney(item.total) : "—"}</strong><span><i style={{ height: `${Math.max(item.total / maximumMonth * 100, item.total ? 8 : 2)}%` }} /></span><small>{item.label}</small></div>)}
+          </div>
+        </article>
+        <article className="panel daily-chart">
+          <header><div><span className="overline">DAILY PULSE</span><h2>每日支出走势</h2></div><span className="chart-caption">{Number(month.slice(5))}月</span></header>
+          <div className="daily-line">
+            <svg viewBox="0 0 500 150" role="img" aria-label="本月每日支出折线图" preserveAspectRatio="none">
+              <path d="M12 132H488M12 76H488M12 20H488" className="chart-grid-line" />
+              <polyline points={dailyPoints} />
+              {dailySeries.filter((item) => item.total > 0).map((item) => {
+                const index = item.day - 1;
+                const x = 12 + index * (476 / Math.max(dailySeries.length - 1, 1));
+                const y = 132 - (item.total / maximumDay) * 112;
+                return <circle key={item.date} cx={x} cy={y} r="3.5"><title>{item.day}日 {formatMoney(item.total)}</title></circle>;
+              })}
+            </svg>
+            <div><span>1日</span><span>{Math.ceil(dailySeries.length / 2)}日</span><span>{dailySeries.length}日</span></div>
+          </div>
+        </article>
       </div>
       {hasSpending ? <div className="stats-layout">
         <article className="panel category-chart">
-          <header><div><span className="overline">CATEGORY MIX</span><h2>分类支出</h2></div><span className="chart-caption">按金额排序</span></header>
-          <div className="bar-list">
-            {summary.byCategory.map((item) => (
-              <div className="bar-row" key={item.name}>
-                <span className="bar-icon" style={{ "--category": item.color }} aria-hidden="true">{item.icon}</span>
-                <div><span><strong>{item.name}</strong><small>{item.count} 笔</small></span><i role="progressbar" aria-label={`${item.name}支出占最高分类的比例`} aria-valuemin="0" aria-valuemax="100" aria-valuenow={Math.round(item.amount / maximumCategory * 100)}><b style={{ width: `${item.amount / maximumCategory * 100}%`, "--category": item.color }} /></i></div>
-                <strong>{formatMoney(item.amount)}</strong>
-              </div>
-            ))}
+          <header><div><span className="overline">CATEGORY MIX</span><h2>分类占比</h2></div><span className="chart-caption">本月构成</span></header>
+          <div className="category-donut-layout">
+            <div className="category-donut" style={{ background: categoryGradient }} role="img" aria-label="本月分类支出环形图"><span><strong>{summary.byCategory.length}</strong><small>个分类</small></span></div>
+            <div className="category-legend">
+              {summary.byCategory.map((item) => <div key={item.name}><i style={{ background: item.color }} /><span><strong>{item.name}</strong><small>{(item.amount / summary.total * 100).toFixed(1)}% · {item.count} 笔</small></span><b>{formatMoney(item.amount)}</b></div>)}
+            </div>
           </div>
         </article>
         <article className="panel payer-chart">
