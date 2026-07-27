@@ -315,7 +315,7 @@ export function DashboardPage() {
       <main className="workspace">
         <header className="topbar">
           <div className="mobile-brand"><span className="brand-mark">L</span><strong>LuckyWallet</strong></div>
-          {isUserManagement ? <span /> : <label className="search-box"><AppIcon name="search" size={18} /><input name="global-search" type="search" aria-label="搜索账单或分类" autoComplete="off" spellCheck={false} value={query} onChange={(e) => setQuery(e.target.value)} placeholder="搜索账单或分类…" /></label>}
+          {isUserManagement || activeNav === "账单" ? <span /> : <label className="search-box"><AppIcon name="search" size={18} /><input name="global-search" type="search" aria-label="搜索账单或分类" autoComplete="off" spellCheck={false} value={query} onChange={(e) => setQuery(e.target.value)} placeholder="搜索账单或分类…" /></label>}
           <div className="top-actions"><button className="icon-button" onClick={() => setDark((value) => !value)} aria-label="切换主题"><AppIcon name={dark ? "sun" : "moon"} /></button><button className="icon-button notification" aria-label="通知"><AppIcon name="bell" /></button>{isUserManagement ? null : <button className="add-button" onClick={() => setIsAdding(true)}><AppIcon name="plus" size={18} />记一笔</button>}</div>
         </header>
 
@@ -325,7 +325,7 @@ export function DashboardPage() {
           {isUserManagement ? null : <section className="welcome"><div><p className="overline">JULY · SHARED WALLET</p><h1>{activeNav === "总览" ? `早上好，${user.nickname ?? user.username}` : activeNav}</h1><p>{activeNav === "总览" ? "共同生活的每一笔，都清清楚楚。" : "共同生活的账目，都在这里。"}</p></div><button className="add-button mobile-add" onClick={() => setIsAdding(true)}><AppIcon name="plus" size={18} />记一笔</button></section>}
 
           {isUserManagement ? <AdminUsersView currentUserId={Number(user.id)} />
-            : activeNav === "账单" ? <BillsView bills={bills} members={members} query={query} onAdd={() => setIsAdding(true)} onOpen={setSelectedBill} />
+            : activeNav === "账单" ? <BillsView bills={bills} members={members} onAdd={() => setIsAdding(true)} onOpen={setSelectedBill} />
             : activeNav === "成员" ? <MembersView members={members} bills={bills} currentMemberId={currentUser?.id} />
               : activeNav === "统计" ? <StatisticsView bills={bills} members={members} /> : <>
           <section className="summary-grid">
