@@ -110,6 +110,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .participant-stack { display: flex; justify-content: flex-end; }
 .participant-stack .avatar + .avatar { margin-left: -8px; }
 .row-action { display: grid; width: 26px; height: 26px; place-items: center; border: 0; color: var(--muted); background: transparent; }
+.row-action:hover { border-radius: 7px; color: var(--plum-deep); background: var(--soft); }
 .right-column { display: grid; align-content: start; gap: 18px; }
 .member-count { padding: 5px 9px; border-radius: 20px; color: var(--muted); background: var(--soft); font-size: 11px; }
 .member-list { padding: 0 20px 17px; }
@@ -237,7 +238,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .bill-dialog form { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 0; padding: 10px 30px 30px; }
 .bill-dialog label, .bill-dialog fieldset { display: grid; gap: 7px; margin: 0; padding: 0; border: 0; color: var(--muted); font-size: 12px; font-weight: 600; }
 .field-wide { grid-column: 1 / -1; }
-.bill-dialog input, .bill-dialog select { width: 100%; height: 43px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; outline: none; color: var(--ink); background: var(--page); }
+.bill-dialog input, .bill-dialog select { width: 100%; height: 43px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; color: var(--ink); background: var(--page); }
 .money-input { position: relative; }
 .money-input span { position: absolute; top: 13px; left: 12px; }
 .money-input input { padding-left: 29px; }
@@ -333,7 +334,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   .content-grid { margin-top: 10px; }
   .bill-row { grid-template-columns: 40px 1fr auto; padding: 10px 6px; }
   .bill-amount { text-align: right; }
-  .row-action { display: none; }
+  .bill-row > .row-action { display: none; }
   .bill-dialog form { grid-template-columns: 1fr; padding: 8px 20px 22px; }
   .bill-dialog > header { padding: 22px 20px 15px; }
   .field-wide { grid-column: auto; }

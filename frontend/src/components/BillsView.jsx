@@ -8,6 +8,14 @@ const dateFormatter = new Intl.DateTimeFormat("zh-CN", {
   month: "short",
   day: "numeric",
 });
+const monthFormatter = new Intl.DateTimeFormat("zh-CN", {
+  year: "numeric",
+  month: "long",
+});
+
+function formatMonth(month) {
+  return monthFormatter.format(new Date(`${month}-01T00:00:00`));
+}
 
 export function BillsView({ bills, members, query, onAdd, onOpen }) {
   const [month, setMonth] = useState("2026-07");
@@ -48,7 +56,7 @@ export function BillsView({ bills, members, query, onAdd, onOpen }) {
 
       <div className="bill-register panel">
         <header>
-          <div><strong>{visibleBills.length} 笔账单</strong><span>{month ? `${month.replace("-", " 年 ")} 月` : "全部账期"}</span></div>
+          <div><strong>{visibleBills.length} 笔账单</strong><span>{month ? formatMonth(month) : "全部账期"}</span></div>
           <div><span>筛选结果合计</span><strong>{formatMoney(visibleTotal)}</strong></div>
         </header>
         {visibleBills.length ? (
