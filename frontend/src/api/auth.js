@@ -43,12 +43,29 @@ export async function authenticatedApiRequest(path, options = {}) {
     ...options,
     headers: {
       Authorization: `Bearer ${token}`,
-      ...(options.body ? { "Content-Type": "application/json" } : {}),
+      ...(options.body && !(options.body instanceof FormData)
+        ? { "Content-Type": "application/json" }
+        : {}),
       ...options.headers,
     },
   });
   if (!response.ok) throw await parseError(response);
   return response;
+}
+
+export function resolveAssetUrl(path) {
+  if (!path || /^https?:\/\//.test(path)) return path;
+  return `${new URL(API_BASE_URL, window.location.origin).origin}${path}`;
+}
+
+export async function uploadAvatarApi(file) {
+  const form = new FormData();
+  form.append("avatar", file);
+  const response = await authenticatedApiRequest("/auth/me/avatar", {
+    method: "POST",
+    body: form,
+  });
+  return response.json();
 }
 
 export async function loginApi(data) {

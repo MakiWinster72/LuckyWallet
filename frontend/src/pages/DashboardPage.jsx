@@ -7,6 +7,7 @@ import { BillsView } from "../components/BillsView";
 import { MembersView } from "../components/MembersView";
 import { createBillApi, deleteBillApi, listBillsApi, updateBillApi } from "../api/bills";
 import { useAuth } from "../auth/useAuth";
+import { resolveAssetUrl, uploadAvatarApi } from "../api/auth";
 import { listMembersApi } from "../api/members";
 import { categories, getCategory } from "../data/categories";
 import { summarizeSpending } from "../data/spendingSummary";
@@ -17,9 +18,67 @@ const sharedNavItems = [
   ["home", "总览"], ["receipt", "账单"], ["users", "成员"], ["chart", "统计"],
 ];
 
-function Avatar({ member, small = false }) {
+function Avatar({ member, small = false, avatarUrl = "" }) {
+  if (avatarUrl) {
+    return <span className={`avatar avatar-image ${small ? "avatar-small" : ""}`}><img src={resolveAssetUrl(avatarUrl)} alt="" /></span>;
+  }
   if (!member) return <span className={`avatar ${small ? "avatar-small" : ""}`}>?</span>;
   return <span className={`avatar ${small ? "avatar-small" : ""}`} style={{ "--avatar": member.color }}>{member.initials}</span>;
+}
+
+function ProfileCenter({ user, member, onClose, onUpdated }) {
+  const [preview, setPreview] = useState(user.avatar_url ? resolveAssetUrl(user.avatar_url) : "");
+  const [file, setFile] = useState(null);
+  const [status, setStatus] = useState({ saving: false, error: "" });
+
+  useEffect(() => () => {
+    if (preview.startsWith("blob:")) URL.revokeObjectURL(preview);
+  }, [preview]);
+
+  function chooseAvatar(event) {
+    const nextFile = event.target.files?.[0];
+    if (!nextFile) return;
+    if (nextFile.size > 5 * 1024 * 1024) {
+      setStatus({ saving: false, error: "头像大小不能超过 5 MB" });
+      event.target.value = "";
+      return;
+    }
+    setFile(nextFile);
+    setPreview(URL.createObjectURL(nextFile));
+    setStatus({ saving: false, error: "" });
+  }
+
+  async function saveAvatar() {
+    if (!file) return;
+    setStatus({ saving: true, error: "" });
+    try {
+      const nextUser = await uploadAvatarApi(file);
+      onUpdated(nextUser);
+      setFile(null);
+      setPreview(resolveAssetUrl(nextUser.avatar_url));
+      setStatus({ saving: false, error: "" });
+    } catch (error) {
+      setStatus({ saving: false, error: error.message });
+    }
+  }
+
+  return (
+    <div className="dialog-backdrop" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
+      <section className="profile-dialog" role="dialog" aria-modal="true" aria-labelledby="profile-title">
+        <header><div><span className="overline">MY PROFILE</span><h2 id="profile-title">个人中心</h2></div><button className="icon-button" type="button" onClick={onClose} aria-label="关闭">×</button></header>
+        <div className="profile-avatar-editor">
+          <span className="profile-avatar-preview">
+            {preview ? <img src={preview} alt="当前头像预览" /> : <Avatar member={member} />}
+          </span>
+          <label className="secondary-button">选择头像<input type="file" accept="image/jpeg,image/png,image/webp" onChange={chooseAvatar} /></label>
+          <small>支持 JPG、PNG、WebP，最大 5 MB</small>
+        </div>
+        <div className="profile-details"><span>显示名字</span><strong>{user.nickname?.trim() || user.username}</strong><small>@{user.username}</small></div>
+        {status.error ? <p className="form-error" role="alert">{status.error}</p> : null}
+        <footer><button className="text-button" type="button" onClick={onClose}>取消</button><button className="add-button" type="button" disabled={!file || status.saving} onClick={saveAvatar}>{status.saving ? "上传中…" : "保存头像"}</button></footer>
+      </section>
+    </div>
+  );
 }
 
 function BillRow({ bill, members, onOpen }) {
@@ -205,7 +264,7 @@ function DeleteBillDialog({ bill, onCancel, onConfirm }) {
 }
 
 export function DashboardPage() {
-  const { user, logout } = useAuth();
+  const { user, logout, updateUser } = useAuth();
   const navigate = useNavigate();
   const [activeNav, setActiveNav] = useState("总览");
   const [query, setQuery] = useState("");
@@ -214,6 +273,7 @@ export function DashboardPage() {
   const [editingBill, setEditingBill] = useState(null);
   const [deletingBill, setDeletingBill] = useState(null);
   const [dark, setDark] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [bills, setBills] = useState([]);
   const [members, setMembers] = useState([]);
   const [billStatus, setBillStatus] = useState({ loading: true, error: "" });
@@ -309,7 +369,7 @@ export function DashboardPage() {
         <div className="brand-lockup"><span className="brand-mark">L</span><span>LuckyWallet</span></div>
         <nav aria-label="主导航">{navItems.map(([icon, label]) => <button key={label} className={activeNav === label ? "active" : ""} onClick={() => setActiveNav(label)}><AppIcon name={icon} /><span>{label}</span></button>)}</nav>
         <div className="sidebar-note"><span>本月预算</span><strong>{formatMoney(total)} <small>/ ¥2,400</small></strong><div><i style={{ width: `${Math.min(total / 24, 100)}%` }} /></div><small>已使用 {Math.round(total / 24)}%</small></div>
-        <div className="profile-card"><Avatar member={currentUser} /><span><strong>{user.nickname ?? user.username}</strong><small>{user.role === "admin" ? "管理员" : "团队成员"}</small></span><button className="profile-logout" type="button" onClick={handleLogout} aria-label="退出登录" title="退出登录"><AppIcon name="logout" size={17} /></button></div>
+        <div className="profile-card" role="button" tabIndex={0} onClick={() => setIsProfileOpen(true)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") setIsProfileOpen(true); }}><Avatar member={currentUser} avatarUrl={user.avatar_url} /><span><strong>{user.nickname ?? user.username}</strong><small>{user.role === "admin" ? "管理员" : "团队成员"}</small></span><button className="profile-logout" type="button" onClick={(event) => { event.stopPropagation(); handleLogout(); }} aria-label="退出登录" title="退出登录"><AppIcon name="logout" size={17} /></button></div>
       </aside>
 
       <main className="workspace">
@@ -351,6 +411,7 @@ export function DashboardPage() {
       {selectedBill ? <BillDetails bill={selectedBill} members={members} onClose={() => setSelectedBill(null)} onEdit={startEditing} onDelete={startDeleting} /> : null}
       {editingBill ? <AddBillDialog members={members} initialBill={editingBill} onClose={() => setEditingBill(null)} onSave={updateBill} /> : null}
       {deletingBill ? <DeleteBillDialog bill={deletingBill} onCancel={() => setDeletingBill(null)} onConfirm={deleteBill} /> : null}
+      {isProfileOpen ? <ProfileCenter user={user} member={currentUser} onClose={() => setIsProfileOpen(false)} onUpdated={updateUser} /> : null}
     </div>
   );
 }

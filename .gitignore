@@ -1,0 +1,22 @@
+myDocs/
+.gitignore
+.agents/
+skills-lock.json
+
+
+.env
+.env.*
+!.env.example
+
+# Python
+__Pycache__/
+*.py[cod]
+.venv/
+
+# Node
+node_modules/
+frontend/dist/
+
+# Runtime uploads
+uploads/*
+!uploads/.gitkeep
