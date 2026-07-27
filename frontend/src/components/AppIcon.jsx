@@ -10,6 +10,8 @@ const paths = {
   sun: <><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"/></>,
   arrow: <path d="m9 18 6-6-6-6"/>,
   trend: <><path d="m3 17 6-6 4 4 8-8"/><path d="M14 7h7v7"/></>,
+  trendDown: <><path d="m3 7 6 6 4-4 8 8"/><path d="M14 17h7v-7"/></>,
+  minus: <path d="M5 12h14"/>,
   close: <path d="M18 6 6 18M6 6l12 12"/>,
   check: <path d="m5 12 4 4L19 6"/>,
   calendar: <><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></>,
