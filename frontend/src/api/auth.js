@@ -1,4 +1,9 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import { resolveApiBaseUrl } from "./api-config";
+
+const API_BASE_URL = resolveApiBaseUrl(
+  import.meta.env.VITE_API_BASE_URL,
+  import.meta.env.DEV,
+);
 
 export class ApiError extends Error {
   constructor(status, code, message) {
