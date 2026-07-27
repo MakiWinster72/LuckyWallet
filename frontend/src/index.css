@@ -277,6 +277,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .profile-ratio-track.is-share i { background: #8b6bb1; }
 .profile-dialog footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; }
 .profile-dialog .form-error { margin: 12px 0 0; color: #a64343; font-size: 12px; }
+.profile-dialog .form-success { margin: 12px 0 0; padding: 10px 12px; border-radius: 10px; color: #326c55; background: #e8f5ee; font-size: 12px; font-weight: 600; }
 @media (max-width: 520px) {
   .profile-dialog { padding: 20px; }
   .profile-avatar-editor { padding: 22px 0 18px; }
