@@ -11,6 +11,7 @@ import { resolveAssetUrl, uploadAvatarApi } from "../api/auth";
 import { listMembersApi } from "../api/members";
 import { categories, getCategory } from "../data/categories";
 import { getChineseMonthLabel, getLocalDateString, summarizeMonthlyBills } from "../data/monthlyBills";
+import { summarizeProfileFinance } from "../data/profileFinance";
 import { summarizeSpending } from "../data/spendingSummary";
 import { summarizePendingSettlement } from "../data/settlementSummary";
 import { formatMoney } from "../utils/money";
@@ -27,7 +28,7 @@ function Avatar({ member, small = false, avatarUrl = "" }) {
   return <span className={`avatar ${small ? "avatar-small" : ""}`} style={{ "--avatar": member.color }}>{member.initials}</span>;
 }
 
-function ProfileCenter({ user, member, onClose, onUpdated }) {
+function ProfileCenter({ user, member, finance, monthLabel, onClose, onUpdated }) {
   const [preview, setPreview] = useState(user.avatar_url ? resolveAssetUrl(user.avatar_url) : "");
   const [file, setFile] = useState(null);
   const [status, setStatus] = useState({ saving: false, error: "" });
@@ -75,6 +76,26 @@ function ProfileCenter({ user, member, onClose, onUpdated }) {
           <small>支持 JPG、PNG、WebP，最大 5 MB</small>
         </div>
         <div className="profile-details"><span>显示名字</span><strong>{user.nickname?.trim() || user.username}</strong><small>@{user.username}</small></div>
+        <section className="profile-finance" aria-labelledby="profile-finance-title">
+          <header>
+            <div><span className="overline">MY FINANCE</span><h3 id="profile-finance-title">{monthLabel}收支概览</h3></div>
+            <small>按共同账单均摊</small>
+          </header>
+          <div className="profile-finance-grid">
+            <article>
+              <span>我的付款</span>
+              <strong>{formatMoney(finance.paid)}</strong>
+              <div className="profile-ratio-track" aria-hidden="true"><i style={{ width: `${Math.min(finance.paidRatio, 100)}%` }} /></div>
+              <small>占家庭总支出 {finance.paidRatio.toFixed(1)}%</small>
+            </article>
+            <article>
+              <span>我的分摊</span>
+              <strong>{formatMoney(finance.share)}</strong>
+              <div className="profile-ratio-track is-share" aria-hidden="true"><i style={{ width: `${Math.min(finance.shareRatio, 100)}%` }} /></div>
+              <small>占家庭总分摊 {finance.shareRatio.toFixed(1)}%</small>
+            </article>
+          </div>
+        </section>
         {status.error ? <p className="form-error" role="alert">{status.error}</p> : null}
         <footer><button className="text-button" type="button" onClick={onClose}>取消</button><button className="add-button" type="button" disabled={!file || status.saving} onClick={saveAvatar}>{status.saving ? "上传中…" : "保存头像"}</button></footer>
       </section>
@@ -323,6 +344,10 @@ export function DashboardPage() {
     () => summarizePendingSettlement(bills, currentUser?.id),
     [bills, currentUser?.id],
   );
+  const profileFinance = useMemo(
+    () => summarizeProfileFinance(bills, currentUser?.id, referenceDate),
+    [bills, currentUser?.id, referenceDate],
+  );
 
   async function saveBill(form) {
     try {
@@ -420,7 +445,7 @@ export function DashboardPage() {
       {selectedBill ? <BillDetails bill={selectedBill} members={members} onClose={() => setSelectedBill(null)} onEdit={startEditing} onDelete={startDeleting} /> : null}
       {editingBill ? <AddBillDialog members={members} initialBill={editingBill} onClose={() => setEditingBill(null)} onSave={updateBill} /> : null}
       {deletingBill ? <DeleteBillDialog bill={deletingBill} onCancel={() => setDeletingBill(null)} onConfirm={deleteBill} /> : null}
-      {isProfileOpen ? <ProfileCenter user={user} member={currentUser} onClose={() => setIsProfileOpen(false)} onUpdated={updateUser} /> : null}
+      {isProfileOpen ? <ProfileCenter user={user} member={currentUser} finance={profileFinance} monthLabel={monthLabel} onClose={() => setIsProfileOpen(false)} onUpdated={updateUser} /> : null}
     </div>
   );
 }
