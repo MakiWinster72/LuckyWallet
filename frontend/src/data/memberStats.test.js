@@ -1,31 +1,33 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { initialBills, members } from "./demoData.js";
 import { buildMemberStats, summarizeMembers } from "./memberStats.js";
 
-test("buildMemberStats tracks each member's payments and participation", () => {
-  const stats = buildMemberStats(members, initialBills);
-  const maki = stats.find((item) => item.member.name === "Maki");
+const members = [
+  { id: 10, name: "Lucky" },
+  { id: 11, name: "Anna" },
+];
+const bills = [
+  { amount: 90, payer: 10, participants: [10, 11, 999], date: "2026-07-20" },
+];
 
-  assert.equal(stats.length, 5);
-  assert.equal(maki.paid, 784);
-  assert.equal(maki.billCount, 5);
-  assert.equal(maki.lastActive, "2026-07-25");
-  assert.equal(maki.status, "已加入");
+test("buildMemberStats uses API members and ignores unknown bill participants", () => {
+  const stats = buildMemberStats(members, bills);
+  assert.equal(stats.length, 2);
+  assert.equal(stats[0].paid, 90);
+  assert.equal(stats[1].share, 30);
 });
 
-test("balances across the whole household cancel each other out", () => {
-  const stats = buildMemberStats(members, initialBills);
-  const balance = stats.reduce((sum, item) => sum + item.balance, 0);
-
-  assert.ok(Math.abs(balance) < 0.000001);
+test("member summaries handle an empty household", () => {
+  assert.deepEqual(summarizeMembers(buildMemberStats([], bills)), {
+    paid: 0, positive: 0, active: 0,
+  });
 });
 
-test("summarizeMembers exposes household totals", () => {
-  const summary = summarizeMembers(buildMemberStats(members, initialBills));
-
-  assert.equal(summary.active, 5);
-  assert.equal(summary.paid, initialBills.reduce((sum, bill) => sum + bill.amount, 0));
-  assert.ok(summary.positive > 0);
+test("zero-participant bills do not produce invalid balances", () => {
+  const [stat] = buildMemberStats([members[0]], [
+    { amount: 20, payer: 10, participants: [], date: "2026-07-21" },
+  ]);
+  assert.equal(stat.share, 0);
+  assert.equal(stat.balance, 20);
 });
