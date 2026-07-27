@@ -1,24 +1,13 @@
 import { useMemo, useState } from "react";
 
 import { AppIcon } from "./AppIcon";
+import { filterBills } from "../data/billFilters";
 import { categories, formatMoney } from "../data/demoData";
 
 const dateFormatter = new Intl.DateTimeFormat("zh-CN", {
   month: "short",
   day: "numeric",
 });
-
-export function filterBills(bills, { month, category, payerId, query }) {
-  const normalizedQuery = query.trim().toLocaleLowerCase("zh-CN");
-  return bills.filter((bill) => (
-    (!month || bill.date.startsWith(month))
-    && (!category || bill.category === category)
-    && (!payerId || bill.payer === Number(payerId))
-    && (!normalizedQuery
-      || bill.title.toLocaleLowerCase("zh-CN").includes(normalizedQuery)
-      || bill.category.toLocaleLowerCase("zh-CN").includes(normalizedQuery))
-  ));
-}
 
 export function BillsView({ bills, members, query, onAdd, onOpen }) {
   const [month, setMonth] = useState("2026-07");
