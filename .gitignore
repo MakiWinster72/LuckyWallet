@@ -20,3 +20,7 @@ frontend/dist/
 # Runtime uploads
 uploads/*
 !uploads/.gitkeep
+
+docs/.vitepress/dist/*
+docs/.vitepress/cache/*
+docs/.vitepress/temp/*
