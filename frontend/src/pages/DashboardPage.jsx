@@ -6,6 +6,7 @@ import { AdminUsersView } from "../components/AdminUsersView";
 import { BillsView } from "../components/BillsView";
 import { MembersView } from "../components/MembersView";
 import { SettlementDialog } from "../components/SettlementDialog";
+import { UserAvatar } from "../components/UserAvatar";
 import { createBillApi, deleteBillApi, listBillsApi, updateBillApi } from "../api/bills";
 import { getBudgetApi, updateBudgetApi } from "../api/budget";
 import { useAuth } from "../auth/useAuth";
@@ -26,14 +27,6 @@ import { formatMoney } from "../utils/money";
 const sharedNavItems = [
   ["home", "总览"], ["receipt", "账单"], ["users", "成员"], ["chart", "统计"],
 ];
-
-function Avatar({ member, small = false, avatarUrl = "" }) {
-  if (avatarUrl) {
-    return <span className={`avatar avatar-image ${small ? "avatar-small" : ""}`}><img src={resolveAssetUrl(avatarUrl)} alt="" /></span>;
-  }
-  if (!member) return <span className={`avatar ${small ? "avatar-small" : ""}`}>?</span>;
-  return <span className={`avatar ${small ? "avatar-small" : ""}`} style={{ "--avatar": member.color }}>{member.initials}</span>;
-}
 
 function ProfileCenter({ user, member, finance, onClose, onUpdated }) {
   const [preview, setPreview] = useState(user.avatar_url ? resolveAssetUrl(user.avatar_url) : "");
@@ -76,9 +69,7 @@ function ProfileCenter({ user, member, finance, onClose, onUpdated }) {
       <section className="profile-dialog" role="dialog" aria-modal="true" aria-labelledby="profile-title">
         <header><div><span className="overline">MY PROFILE</span><h2 id="profile-title">个人中心</h2></div><button className="icon-button" type="button" onClick={onClose} aria-label="关闭">×</button></header>
         <div className="profile-avatar-editor">
-          <span className="profile-avatar-preview">
-            {preview ? <img src={preview} alt="当前头像预览" /> : <Avatar member={member} />}
-          </span>
+          <UserAvatar user={member} avatarUrl={preview} variant="profile" className="profile-avatar-preview" label="当前头像预览" />
           <label className="secondary-button">选择头像<input type="file" accept="image/jpeg,image/png,image/webp" onChange={chooseAvatar} /></label>
           <small>支持 JPG、PNG、WebP，最大 5 MB</small>
         </div>
@@ -122,7 +113,7 @@ function BillRow({ bill, members, onOpen }) {
         <span>{bill.date.slice(5).replace("-", "月")}日 · {payer?.name ?? "未知成员"} 付款</span>
       </div>
       <div className="participant-stack" aria-label={`${bill.participants.length} 位成员参与`}>
-        {bill.participants.slice(0, 3).map((id) => <Avatar key={id} member={members.find((member) => member.id === id)} small />)}
+        {bill.participants.slice(0, 3).map((id) => <UserAvatar key={id} user={members.find((member) => member.id === id)} variant="small" />)}
         {bill.participants.length > 3 ? <span className="avatar avatar-small avatar-more">+{bill.participants.length - 3}</span> : null}
       </div>
       <div className="bill-amount"><strong>{formatMoney(bill.amount)}</strong><span>人均 {formatMoney(bill.amount / bill.participants.length)}</span></div>
@@ -151,7 +142,7 @@ function BillDetails({ bill, members, onClose, onDelete, onEdit }) {
           <p><AppIcon name="calendar" size={15} /> {bill.date}</p>
         </div>
         <dl className="detail-facts">
-          <div><dt>付款人</dt><dd><Avatar member={payer} small />{payer?.name ?? "未知成员"}</dd></div>
+          <div><dt>付款人</dt><dd><UserAvatar user={payer} variant="small" />{payer?.name ?? "未知成员"}</dd></div>
           <div><dt>参与人数</dt><dd>{bill.participants.length} 人</dd></div>
           <div><dt>分摊方式</dt><dd>平均分摊</dd></div>
         </dl>
@@ -160,7 +151,7 @@ function BillDetails({ bill, members, onClose, onDelete, onEdit }) {
           <div>
             {bill.participants.map((id) => {
               const member = members.find((item) => item.id === id);
-              return <article key={id}><Avatar member={member} /><span><strong>{member?.name ?? "未知成员"}</strong><small>{id === bill.payer ? "已付款" : "待结算"}</small></span><b>{formatMoney(share)}</b></article>;
+              return <article key={id}><UserAvatar user={member} /><span><strong>{member?.name ?? "未知成员"}</strong><small>{id === bill.payer ? "已付款" : "待结算"}</small></span><b>{formatMoney(share)}</b></article>;
             })}
           </div>
         </section>
@@ -218,7 +209,7 @@ function AddBillDialog({ members, initialBill = null, onClose, onSave }) {
           <label>付款人<select name="bill-payer" value={form.payer} onChange={(e) => update("payer", e.target.value)}>{members.map((member) => <option key={member.id} value={member.id}>{member.name}</option>)}</select></label>
           <label>备注<input name="bill-note" autoComplete="off" value={form.note} onChange={(e) => update("note", e.target.value)} placeholder="可选…" /></label>
           <fieldset className="field-wide"><legend>参与分摊</legend><div className="member-options">
-            {members.map((member) => <button type="button" className={form.participants.includes(member.id) ? "selected" : ""} key={member.id} onClick={() => toggleParticipant(member.id)}><Avatar member={member} small /><span>{member.name}</span><span className="check"><AppIcon name="check" size={13} /></span></button>)}
+            {members.map((member) => <button type="button" className={form.participants.includes(member.id) ? "selected" : ""} key={member.id} onClick={() => toggleParticipant(member.id)}><UserAvatar user={member} variant="small" /><span>{member.name}</span><span className="check"><AppIcon name="check" size={13} /></span></button>)}
           </div></fieldset>
           {form.amount && form.participants.length ? <div className="split-preview field-wide"><span>平均分给 {form.participants.length} 人</span><strong>每人 {formatMoney(Number(form.amount) / form.participants.length)}</strong></div> : null}
           {error ? <p className="dialog-error field-wide" role="alert">{error}</p> : null}
@@ -385,7 +376,7 @@ function StatisticsView({ bills, members }) {
             {summary.byPayer.map((member, index) => (
               <div key={member.id}>
                 <span className="rank">{String(index + 1).padStart(2, "0")}</span>
-                <Avatar member={member} />
+                <UserAvatar user={member} />
                 <span><strong>{member.name}</strong><i role="progressbar" aria-label={`${member.name}垫付占最高垫付金额的比例`} aria-valuemin="0" aria-valuemax="100" aria-valuenow={Math.round(member.amount / maximumPayer * 100)}><b style={{ width: `${member.amount / maximumPayer * 100}%` }} /></i></span>
                 <strong>{formatMoney(member.amount)}</strong>
               </div>
@@ -590,7 +581,7 @@ export function DashboardPage() {
         <div className="brand-lockup"><span className="brand-mark">L</span><span>LuckyWallet</span></div>
         <nav aria-label="主导航">{navItems.map(([icon, label]) => <button key={label} className={activeNav === label ? "active" : ""} onClick={() => setActiveNav(label)}><AppIcon name={icon} /><span>{label}</span></button>)}</nav>
         <BudgetCard spending={monthlySummary.total} summary={budgetSummary} canEdit={user.role === "admin"} onEdit={() => setIsBudgetOpen(true)} />
-        <div className="profile-card" role="button" tabIndex={0} onClick={() => setIsProfileOpen(true)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") setIsProfileOpen(true); }}><Avatar member={currentUser} avatarUrl={user.avatar_url} /><span><strong>{user.nickname ?? user.username}</strong><small>{user.role === "admin" ? "管理员" : "团队成员"}</small></span><button className="profile-logout" type="button" onClick={(event) => { event.stopPropagation(); handleLogout(); }} aria-label="退出登录" title="退出登录"><AppIcon name="logout" size={17} /></button></div>
+        <div className="profile-card" role="button" tabIndex={0} onClick={() => setIsProfileOpen(true)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") setIsProfileOpen(true); }}><UserAvatar user={currentUser} avatarUrl={user.avatar_url} label={`${user.nickname ?? user.username}的头像`} /><span><strong>{user.nickname ?? user.username}</strong><small>{user.role === "admin" ? "管理员" : "团队成员"}</small></span><button className="profile-logout" type="button" onClick={(event) => { event.stopPropagation(); handleLogout(); }} aria-label="退出登录" title="退出登录"><AppIcon name="logout" size={17} /></button></div>
       </aside>
 
       <main className="workspace">
@@ -620,7 +611,7 @@ export function DashboardPage() {
               <div className="bill-list">{visibleBills.length ? visibleBills.slice(0, 5).map((bill) => <BillRow key={bill.id} bill={bill} members={members} onOpen={setSelectedBill} />) : <div className="empty-state">没有找到匹配的账单，换个关键词试试。</div>}</div>
             </section>
             <aside className="right-column">
-              <section className="panel member-panel"><header><div><span className="overline">THE HOUSE</span><h2>共同成员</h2></div><span className="member-count">{members.length} 人</span></header><div className="member-list">{overviewStats.byPayer.map((member) => <div key={member.id}><Avatar member={member} /><span><strong>{member.name}</strong><small>{member.amount > 0 ? "本月有垫付" : "暂无垫付"}</small></span><b>{formatMoney(member.amount)}</b></div>)}</div></section>
+              <section className="panel member-panel"><header><div><span className="overline">THE HOUSE</span><h2>共同成员</h2></div><span className="member-count">{members.length} 人</span></header><div className="member-list">{overviewStats.byPayer.map((member) => <div key={member.id}><UserAvatar user={member} /><span><strong>{member.name}</strong><small>{member.amount > 0 ? "本月有垫付" : "暂无垫付"}</small></span><b>{formatMoney(member.amount)}</b></div>)}</div></section>
               <section className="settle-card"><span className="overline">QUICK SETTLE</span><h3>让欠款不过夜</h3><p>{pendingSettlement.count ? `当前有 ${pendingSettlement.count} 笔账单可以合并结算。` : "当前没有需要结算的账单。"}</p><button onClick={() => setIsSettlementOpen(true)}>查看结算方案 <AppIcon name="arrow" size={16} /></button></section>
             </aside>
           </div>

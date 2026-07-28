@@ -1,19 +1,11 @@
 import { useMemo, useState } from "react";
 
-import { resolveAssetUrl } from "../api/auth";
 import { formatMoney } from "../utils/money";
 import { summarizeMemberFinance } from "../data/memberFinance";
 import { buildMemberStats, summarizeMembers } from "../data/memberStats";
 import { getLocalDateString } from "../data/monthlyBills";
 import { buildSmoothSvgPath } from "../data/statisticsCharts";
-
-function MemberAvatar({ member }) {
-  const [imageFailed, setImageFailed] = useState(false);
-  if (member.avatarUrl && !imageFailed) {
-    return <span className="member-avatar member-avatar-image"><img src={resolveAssetUrl(member.avatarUrl)} alt="" onError={() => setImageFailed(true)} /></span>;
-  }
-  return <span className="member-avatar" style={{ "--avatar": member.color }}>{member.initials}</span>;
-}
+import { UserAvatar } from "./UserAvatar";
 
 const filters = [
   ["all", "全部成员"],
@@ -88,7 +80,7 @@ export function MembersView({ members, bills, currentMemberId }) {
         {visibleMembers.map((item) => (
           <article className="member-card" key={item.member.id} role="button" tabIndex={0} onClick={() => setSelectedId(item.member.id)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") setSelectedId(item.member.id); }}>
             <header>
-              <MemberAvatar member={item.member} />
+              <UserAvatar user={item.member} variant="member" />
               <div><h3>{item.member.name}{item.member.id === currentMemberId ? <small> 我</small> : null}</h3><span>最近参与 {item.lastActive ?? "暂无记录"}</span></div>
               <span className="member-card-more" aria-hidden="true">•••</span>
             </header>
@@ -108,7 +100,7 @@ export function MembersView({ members, bills, currentMemberId }) {
         <div className="member-detail-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setSelectedId(null)}>
           <aside className="member-detail" role="dialog" aria-modal="true" aria-labelledby="member-detail-title">
             <button className="member-detail-close" type="button" onClick={() => setSelectedId(null)} aria-label="关闭">×</button>
-            <MemberAvatar member={selected.member} />
+            <UserAvatar user={selected.member} variant="memberDetail" />
             <span className="overline">MEMBER PROFILE</span>
             <h2 id="member-detail-title">{selected.member.name}</h2>
             <p>最近参与 {selected.lastActive ?? "暂无记录"}</p>
