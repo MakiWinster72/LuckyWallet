@@ -313,6 +313,15 @@ export function BillsView({ bills, members, canAdd = false, onAdd, onOpen }) {
     setPage(1);
   }
 
+  function exportBills() {
+    const exportOptions = {
+      bills: visibleBills,
+      members,
+      rangeLabel: formatRange(startDate, endDate),
+    };
+    downloadBillsCsv(exportOptions);
+  }
+
   return (
     <section className="bills-view" aria-labelledby="bills-title">
       <header className="bills-heading">
@@ -321,18 +330,8 @@ export function BillsView({ bills, members, canAdd = false, onAdd, onOpen }) {
           <p>筛选、核对并查看每一笔共同消费。</p>
         </div>
         <div className="bills-heading-actions">
-          <button
-            className="secondary-button"
-            type="button"
-            onClick={() =>
-              downloadBillsCsv({
-                bills: visibleBills,
-                members,
-                rangeLabel: formatRange(startDate, endDate),
-              })
-            }
-          >
-            导出账单
+          <button className="secondary-button" type="button" onClick={exportBills}>
+            导出账单 CSV
           </button>
           {canAdd ? (
             <button className="add-button" type="button" onClick={onAdd}>
