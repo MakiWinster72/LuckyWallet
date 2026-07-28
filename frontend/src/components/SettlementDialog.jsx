@@ -23,7 +23,7 @@ export function SettlementDialog({ bills, members, onClose }) {
           <div className="settlement-summary">
             <span>合并 {bills.length} 笔账单后</span>
             <strong>{plan.transfers.length} 笔转账即可结清</strong>
-            <small>建议转账总额 {formatMoney(plan.total)}</small>
+            <small>本月建议转账总额 {formatMoney(plan.total)}</small>
           </div>
           <ol className="settlement-list">
             {plan.transfers.map((transfer, index) => (
@@ -41,11 +41,11 @@ export function SettlementDialog({ bills, members, onClose }) {
         </> : <div className="settlement-empty">
           <span aria-hidden="true">✓</span>
           <h3>现在不需要结算</h3>
-          <p>成员之间的付款与分摊已经平衡，新增共同账单后会自动重新计算。</p>
+          <p>本月成员之间的付款与分摊已经平衡，新增本月账单后会自动重新计算。</p>
         </div>}
 
         <footer>
-          <p><AppIcon name="info" size={15} />这是依据现有账单生成的转账建议，不会自动付款或标记结清。</p>
+          <p><AppIcon name="info" size={15} />这是依据本月账单生成的转账建议，不会自动付款或标记结清。</p>
           <button className="add-button" type="button" onClick={onClose}>知道了</button>
         </footer>
       </section>

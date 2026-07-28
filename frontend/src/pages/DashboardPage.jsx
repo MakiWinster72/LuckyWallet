@@ -1351,8 +1351,8 @@ export function DashboardPage() {
     [monthlySummary.bills, members],
   );
   const pendingSettlement = useMemo(
-    () => summarizePendingSettlement(bills, currentUser?.id),
-    [bills, currentUser?.id],
+    () => summarizePendingSettlement(monthlySummary.bills, currentUser?.id),
+    [monthlySummary.bills, currentUser?.id],
   );
   const profileFinance = useMemo(
     () => summarizeProfileFinance(bills, currentUser?.id),
@@ -1724,7 +1724,7 @@ export function DashboardPage() {
       ) : null}
       {isSettlementOpen ? (
         <SettlementDialog
-          bills={bills}
+          bills={monthlySummary.bills}
           members={members}
           onClose={() => setIsSettlementOpen(false)}
         />
