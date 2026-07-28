@@ -11,8 +11,6 @@
 | uv      | latest   | Python 依赖和虚拟环境 |
 | Node.js | 20+      | 前端与文档构建        |
 
-可选：页面内的 Claude Code 助手要求本机已安装并登录 Claude Code CLI。未配置该能力不影响账单、预算和统计功能。
-
 Windows 用户如果尚未安装 `uv`，可以使用 PowerShell 执行：
 
 ```powershell
@@ -107,16 +105,6 @@ uv run python -m scripts.create_admin --username admin --nickname 管理员
 ```
 
 命令会交互式要求输入两次密码，密码至少 8 个字符。
-
-## 可选：启动 Claude Code 助手
-
-本地后端通过系统中的 `claude` 命令提供对话能力。先确认：
-
-```bash
-claude --version
-```
-
-并按 Claude Code CLI 的提示完成登录。助手从项目根目录运行：普通用户使用 `plan` 只读模式；管理员使用 `auto` 模式，可能直接修改项目文件或执行命令。只应向可信管理员开放该能力。
 
 ## 常见启动问题
 

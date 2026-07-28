@@ -78,7 +78,6 @@ LuckyWallet/
 │  │  │     ├─ statistics.py        # 月度统计接口
 │  │  │     ├─ settings.py          # 团队预算
 │  │  │     ├─ admin_users.py       # 管理员用户管理
-│  │  │     └─ claude_code.py       # Claude Code WebSocket
 │  │  ├─ core/security.py           # Argon2 和 JWT
 │  │  ├─ models/                    # user、bill、audit_log 等 ORM 模型
 │  │  ├─ repositories/              # 数据库读写和聚合查询

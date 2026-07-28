@@ -500,36 +500,6 @@ Authorization: Bearer <access_token>
 
 ---
 
-## Claude Code WebSocket
-
-### WS /api/v1/ws/claude
-
-页面内嵌的 Claude Code 对话通道，与其他业务路由一样挂载在 `/api/v1` 前缀下。
-
-**鉴权**：连接时通过查询参数携带 JWT：`ws://host/api/v1/ws/claude?token=<JWT>`。HTTPS 页面应使用 `wss://`。令牌无效、过期或用户已停用会立即关闭连接（`1008`）并下发一条 `error` 帧。
-
-**协议**：JSON 文本帧。
-
-客户端 → 服务端：
-
-| `type`    | 说明                                                  |
-| --------- | ----------------------------------------------------- |
-| `message` | 发送一条对话，字段 `content` 为文本                   |
-| `restore` | 恢复历史会话，字段 `history` 为 `[{role, text}]` 数组 |
-
-服务端 → 客户端：
-
-| `type`   | 说明                                 |
-| -------- | ------------------------------------ |
-| `status` | 连接就绪，`content` 提示当前模式     |
-| `chunk`  | 流式响应的一个片段，`content` 为文本 |
-| `done`   | 当前响应结束                         |
-| `error`  | 出错，`content` 为错误消息           |
-
-模式由角色决定：管理员为 `auto (yolo)`，普通用户为 `plan (只读)`。详见 `backend/app/api/routes/claude_code.py`。
-
----
-
 ## 健康检查
 
 ### GET /health
@@ -563,5 +533,4 @@ Authorization: Bearer <access_token>
 | GET    | `/api/v1/admin/users`           | Bearer         | admin | 用户列表    |
 | POST   | `/api/v1/admin/users`           | Bearer         | admin | 新建用户    |
 | PATCH  | `/api/v1/admin/users/{user_id}` | Bearer         | admin | 更新用户    |
-| WS     | `/api/v1/ws/claude`             | token 查询参数 | 任意  | Claude 对话 |
 | GET    | `/health`                       | —              | —     | 健康检查    |

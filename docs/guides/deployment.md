@@ -101,16 +101,6 @@ docker compose logs -f db
 curl http://localhost:8000/health
 ```
 
-### 3. Claude Code 助手
-
-后端镜像已安装 Claude Code CLI，并将宿主机的 `${HOME}/.claude` 挂载到容器。启动前应先在宿主机完成 Claude Code 登录，并确认 Compose 能解析 `HOME`。
-
-::: danger 管理员执行权限
-普通用户的助手使用 `plan` 只读模式；管理员使用 `auto` 模式，可能修改挂载的项目文件或执行命令。公开部署前应评估这一能力，不应给不可信账号授予管理员角色。
-:::
-
-不使用助手时，核心记账功能仍可正常工作；对话入口会因 CLI 凭据不可用而无法建立有效会话。
-
 ## 运维命令
 
 查看日志：

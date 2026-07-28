@@ -7,14 +7,13 @@
 ```text
 浏览器
   ├─ HTTP /api/v1/* ───────────────┐
-  ├─ WebSocket /api/v1/ws/claude ──┤
   └─ GET /uploads/* ────────────────┤
                                     ▼
 React + Vite                FastAPI + SQLAlchemy
                                     │
                      ┌──────────────┼──────────────┐
-                     ▼              ▼              ▼
-                  MySQL 8       uploads/      Claude Code CLI
+                     ▼              ▼
+                  MySQL 8       uploads/
 ```
 
 开发环境中，Vite 将 `/api` 请求和 WebSocket 代理到 `127.0.0.1:8000`。Docker 环境由 Nginx 完成同样的代理。
@@ -104,19 +103,6 @@ docs/                   VitePress 文档站
 - `DashboardPage` 负责工作台视图编排，复用业务视图组件。
 
 开发环境不设置 `VITE_API_BASE_URL` 时默认使用 `/api/v1`。生产构建必须显式配置，Dockerfile 已通过构建参数设置为 `/api/v1`。
-
-## Claude Code 对话通道
-
-`/api/v1/ws/claude` 接收 JSON 文本帧，并通过本机 Claude Code CLI 逐条生成响应。后端会把历史记录拼入提示词以维持上下文，前端按用户 ID 将聊天历史保存在浏览器本地。
-
-角色对应 CLI 权限模式：
-
-| 角色 | 模式 | 行为 |
-| --- | --- | --- |
-| 普通用户 | `plan` | 只分析和生成方案 |
-| 管理员 | `auto` | 自动批准操作，可能执行命令或修改文件 |
-
-该通道运行目录是项目根目录。修改相关代码时，必须保留 JWT 校验和角色隔离，并评估命令执行风险。
 
 ## 测试与质量检查
 
