@@ -235,7 +235,7 @@ export function HomePage() {
       <section className="home-final-cta" aria-labelledby="final-cta-title">
         <div>
           <p>READY WHEN YOU ARE</p>
-          <h2 id="final-cta-title">下一笔，从清楚开始。</h2>
+          <h2 id="final-cta-title">下一笔，从 LuckyWallet 开始。</h2>
         </div>
         <div>
           <Link className="home-primary-action is-light" to="/login">
@@ -251,7 +251,7 @@ export function HomePage() {
           <BrandIcon size={32} />
           <span>LuckyWallet</span>
         </Link>
-        <p>为长期相处的人，留下一本清楚的账。</p>
+        <p>为团队留下一本清楚的账。</p>
         <span>© 2026 LuckyWallet</span>
       </footer>
     </main>
