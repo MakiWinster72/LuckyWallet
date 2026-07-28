@@ -7,6 +7,7 @@ export function adaptAdminUserFromApi(user) {
     nickname: user.nickname ?? "",
     role: VALID_ROLES.has(user.role) ? user.role : "user",
     isActive: Boolean(user.is_active),
+    avatarUrl: user.avatar_url ?? "",
     createdAt: user.created_at ?? null,
   };
 }
