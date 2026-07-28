@@ -96,8 +96,9 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .welcome h1 { margin: 7px 0 5px; font-family: "Noto Serif SC", serif; font-size: clamp(30px, 3vw, 42px); letter-spacing: -.045em; }
 .welcome p:last-child { margin: 0; color: var(--muted); }
 
-.summary-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr; gap: 16px; margin-top: 34px; }
+.summary-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 34px; }
 .hero-total, .summary-card { position: relative; min-height: 162px; overflow: hidden; padding: 25px 27px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); box-shadow: var(--shadow); }
+.hero-total, .summary-card { min-width: 0; }
 .hero-total { color: white; border: 0; border-radius: 18px 18px 5px 18px; background: linear-gradient(135deg, #704264, #49243e); }
 .hero-total::before { position: absolute; width: 190px; height: 190px; right: -45px; bottom: -100px; border: 35px solid rgb(255 255 255 / 6%); border-radius: 50%; content: ""; }
 .card-label { display: block; color: var(--muted); font-size: 13px; }
@@ -573,6 +574,9 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   .content-grid { grid-template-columns: 1fr; }
   .right-column { grid-template-columns: 1fr 1fr; }
   .stats-layout, .stats-trend-grid { grid-template-columns: 1fr; }
+  .summary-grid { grid-template-columns: minmax(0, 1.35fr) repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .hero-total, .summary-card { padding-inline: 20px; }
+  .hero-total > strong, .summary-card > strong { font-size: clamp(23px, 3vw, 32px); }
   .member-card-grid { grid-template-columns: repeat(2, 1fr); }
   .admin-user-toolbar { flex-wrap: wrap; }
   .admin-user-toolbar .admin-user-search { flex-basis: 100%; }
