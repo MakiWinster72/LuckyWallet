@@ -717,10 +717,24 @@
   }
 
   .home-marquee {
-    min-height: 58px;
-    justify-content: flex-start;
-    gap: 20px;
-    padding-inline: 16px;
+    display: grid;
+    min-height: 0;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0;
+    padding: 8px 16px;
+    white-space: normal;
+  }
+
+  .home-marquee span {
+    display: grid;
+    min-height: 44px;
+    place-items: center;
+    padding-inline: 8px;
+    text-align: center;
+  }
+
+  .home-marquee i {
+    display: none;
   }
 
   .home-process {
@@ -922,6 +936,14 @@
   .home-process {
     width: calc(100% - 28px);
     padding: 66px 0 70px;
+  }
+
+  .home-marquee {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .home-marquee span:last-child {
+    grid-column: 1 / -1;
   }
 
   .home-section-heading h2,
