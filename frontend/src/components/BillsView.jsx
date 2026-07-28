@@ -68,6 +68,7 @@ function BillRegister({
   onQuery,
   onPage,
   onPageSize,
+  canAdd,
   onAdd,
   onOpen,
 }) {
@@ -417,6 +418,7 @@ export function BillsView({ bills, members, canAdd = false, onAdd, onOpen }) {
           setPageSize(size);
           setPage(1);
         }}
+        canAdd={canAdd}
         onAdd={onAdd}
         onOpen={onOpen}
       />
