@@ -7,3 +7,4 @@ class MemberRead(BaseModel):
     id: int
     username: str
     nickname: str | None
+    avatar_url: str | None = None

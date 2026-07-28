@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 
+import { resolveAssetUrl } from "../api/auth";
 import { formatMoney } from "../utils/money";
 import { summarizeMemberFinance } from "../data/memberFinance";
 import { buildMemberStats, summarizeMembers } from "../data/memberStats";
@@ -7,6 +8,10 @@ import { getLocalDateString } from "../data/monthlyBills";
 import { buildSmoothSvgPath } from "../data/statisticsCharts";
 
 function MemberAvatar({ member }) {
+  const [imageFailed, setImageFailed] = useState(false);
+  if (member.avatarUrl && !imageFailed) {
+    return <span className="member-avatar member-avatar-image"><img src={resolveAssetUrl(member.avatarUrl)} alt="" onError={() => setImageFailed(true)} /></span>;
+  }
   return <span className="member-avatar" style={{ "--avatar": member.color }}>{member.initials}</span>;
 }
 
@@ -64,11 +69,11 @@ export function MembersView({ members, bills, currentMemberId }) {
     <section className="members-view" aria-labelledby="members-title">
       <header className="members-heading">
         <div><span className="overline">THE HOUSE</span><h2 id="members-title">共同成员</h2><p>看看每个人这个月的参与和垫付情况。</p></div>
-        <span className="member-total">{summary.active} / {members.length} 已加入</span>
+        <span className="member-total">{members.length} 位成员</span>
       </header>
 
       <div className="member-summary">
-        <article><span>团队成员</span><strong>{members.length}<small> 人</small></strong><p>本月全部成员都有参与</p></article>
+        <article><span>团队成员</span><strong>{members.length}<small> 人</small></strong><p>成员账户由管理员统一维护</p></article>
         <article><span>共同垫付</span><strong>{formatMoney(summary.paid)}</strong><p>账目记录中的付款总额</p></article>
         <article><span>待收回金额</span><strong>{formatMoney(summary.positive)}</strong><p>结算后即可清零</p></article>
       </div>
@@ -84,7 +89,7 @@ export function MembersView({ members, bills, currentMemberId }) {
           <article className="member-card" key={item.member.id} role="button" tabIndex={0} onClick={() => setSelectedId(item.member.id)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") setSelectedId(item.member.id); }}>
             <header>
               <MemberAvatar member={item.member} />
-              <div><h3>{item.member.name}{item.member.id === currentMemberId ? <small> 我</small> : null}</h3><span><i />{item.status}</span></div>
+              <div><h3>{item.member.name}{item.member.id === currentMemberId ? <small> 我</small> : null}</h3><span>最近参与 {item.lastActive ?? "暂无记录"}</span></div>
               <span className="member-card-more" aria-hidden="true">•••</span>
             </header>
             <dl>
@@ -106,7 +111,7 @@ export function MembersView({ members, bills, currentMemberId }) {
             <MemberAvatar member={selected.member} />
             <span className="overline">MEMBER PROFILE</span>
             <h2 id="member-detail-title">{selected.member.name}</h2>
-            <p>{selected.status} · 最近参与 {selected.lastActive ?? "暂无记录"}</p>
+            <p>最近参与 {selected.lastActive ?? "暂无记录"}</p>
             <dl>
               <div><dt>累计垫付</dt><dd>{formatMoney(selected.paid)}</dd></div>
               <div><dt>个人分摊</dt><dd>{formatMoney(selected.share)}</dd></div>

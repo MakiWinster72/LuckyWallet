@@ -15,5 +15,6 @@ export function adaptMemberFromApi(member) {
     name,
     initials: initials(name),
     color: avatarColors[(member.id - 1) % avatarColors.length],
+    avatarUrl: member.avatar_url ?? "",
   };
 }
