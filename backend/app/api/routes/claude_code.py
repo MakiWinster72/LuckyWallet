@@ -83,7 +83,7 @@ async def claude_chat(websocket: WebSocket) -> None:
                 for entry in history:
                     role = entry.get("role", "user")
                     content = entry.get("text", "")
-                    if content.strip():
+                    if role in {"user", "assistant"} and isinstance(content, str) and content.strip():
                         session.restore_history.append({"role": role, "content": content})
                 logger.info("Restored %d history entries for user=%s", len(history), user.username)
                 continue
