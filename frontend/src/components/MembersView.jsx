@@ -1,7 +1,10 @@
 import { useMemo, useState } from "react";
 
 import { formatMoney } from "../utils/money";
+import { summarizeMemberFinance } from "../data/memberFinance";
 import { buildMemberStats, summarizeMembers } from "../data/memberStats";
+import { getLocalDateString } from "../data/monthlyBills";
+import { buildSmoothSvgPath } from "../data/statisticsCharts";
 
 function MemberAvatar({ member }) {
   return <span className="member-avatar" style={{ "--avatar": member.color }}>{member.initials}</span>;
@@ -13,9 +16,37 @@ const filters = [
   ["debit", "待补款"],
 ];
 
+function MemberFinanceChart({ finance }) {
+  const maximum = Math.max(
+    ...finance.series.flatMap((item) => [item.expense, item.income]),
+    1,
+  );
+  const coordinates = (key) => finance.series.map((item, index) => ({
+    x: 10 + index * 80,
+    y: Number((125 - item[key] / maximum * 105).toFixed(1)),
+  }));
+  const expensePoints = coordinates("expense");
+  const incomePoints = coordinates("income");
+
+  return (
+    <div className="member-finance-chart">
+      <div className="member-chart-legend"><span className="is-expense"><i />个人支出</span><span className="is-income"><i />收入（应收）</span></div>
+      <svg viewBox="0 0 420 145" role="img" aria-label="近六个月个人支出与应收收入曲线">
+        <path d="M10 125H410M10 72.5H410M10 20H410" className="member-chart-grid" />
+        <path d={buildSmoothSvgPath(expensePoints)} className="member-expense-curve" />
+        <path d={buildSmoothSvgPath(incomePoints)} className="member-income-curve" />
+        {expensePoints.map((point, index) => <circle className="member-expense-point" key={`expense-${finance.series[index].month}`} cx={point.x} cy={point.y} r="3"><title>{finance.series[index].label}支出 {formatMoney(finance.series[index].expense)}</title></circle>)}
+        {incomePoints.map((point, index) => <circle className="member-income-point" key={`income-${finance.series[index].month}`} cx={point.x} cy={point.y} r="3"><title>{finance.series[index].label}应收 {formatMoney(finance.series[index].income)}</title></circle>)}
+      </svg>
+      <div className="member-chart-axis">{finance.series.map((item) => <span key={item.month}>{item.label}</span>)}</div>
+    </div>
+  );
+}
+
 export function MembersView({ members, bills, currentMemberId }) {
   const [filter, setFilter] = useState("all");
   const [selectedId, setSelectedId] = useState(null);
+  const [referenceDate] = useState(() => getLocalDateString());
   const stats = useMemo(() => buildMemberStats(members, bills), [members, bills]);
   const summary = useMemo(() => summarizeMembers(stats), [stats]);
   const visibleMembers = stats.filter((item) => (
@@ -24,6 +55,10 @@ export function MembersView({ members, bills, currentMemberId }) {
         : true
   ));
   const selected = stats.find((item) => item.member.id === selectedId);
+  const selectedFinance = useMemo(
+    () => selected ? summarizeMemberFinance(bills, selected.member.id, referenceDate) : null,
+    [bills, selected, referenceDate],
+  );
 
   return (
     <section className="members-view" aria-labelledby="members-title">
@@ -46,11 +81,11 @@ export function MembersView({ members, bills, currentMemberId }) {
 
       <div className="member-card-grid">
         {visibleMembers.map((item) => (
-          <article className="member-card" key={item.member.id}>
+          <article className="member-card" key={item.member.id} role="button" tabIndex={0} onClick={() => setSelectedId(item.member.id)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") setSelectedId(item.member.id); }}>
             <header>
               <MemberAvatar member={item.member} />
               <div><h3>{item.member.name}{item.member.id === currentMemberId ? <small> 我</small> : null}</h3><span><i />{item.status}</span></div>
-              <button type="button" onClick={() => setSelectedId(item.member.id)} aria-label={`查看 ${item.member.name} 的明细`}>•••</button>
+              <span className="member-card-more" aria-hidden="true">•••</span>
             </header>
             <dl>
               <div><dt>本月垫付</dt><dd>{formatMoney(item.paid)}</dd></div>
@@ -64,7 +99,7 @@ export function MembersView({ members, bills, currentMemberId }) {
         ))}
       </div>
 
-      {selected ? (
+      {selected && selectedFinance ? (
         <div className="member-detail-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setSelectedId(null)}>
           <aside className="member-detail" role="dialog" aria-modal="true" aria-labelledby="member-detail-title">
             <button className="member-detail-close" type="button" onClick={() => setSelectedId(null)} aria-label="关闭">×</button>
@@ -81,6 +116,15 @@ export function MembersView({ members, bills, currentMemberId }) {
               <span>{selected.balance >= 0 ? "当前应收回" : "当前应补款"}</span>
               <strong>{formatMoney(Math.abs(selected.balance))}</strong>
             </div>
+            <section className="member-finance" aria-labelledby="member-finance-title">
+              <header><div><span className="overline">CASH FLOW</span><h3 id="member-finance-title">收支统计</h3></div><small>收入按代付应收口径</small></header>
+              <div className="member-finance-kpis">
+                <article><span>个人支出</span><strong>{formatMoney(selectedFinance.expense)}</strong></article>
+                <article><span>收入（应收）</span><strong>{formatMoney(selectedFinance.income)}</strong></article>
+                <article><span>收支差额</span><strong className={selectedFinance.net >= 0 ? "is-positive" : "is-negative"}>{formatMoney(selectedFinance.net)}</strong></article>
+              </div>
+              <MemberFinanceChart finance={selectedFinance} />
+            </section>
           </aside>
         </div>
       ) : null}
