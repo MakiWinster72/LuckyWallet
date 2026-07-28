@@ -31,6 +31,36 @@ uv sync
 uv run uvicorn app.main:app --reload --port 8000
 ```
 
+## Docker 局域网启动
+
+在项目根目录执行：
+
+```bash
+cp .env.example .env
+# 编辑 .env，至少修改 DB_PASSWORD、DB_ROOT_PASSWORD 和 JWT_SECRET
+docker compose up -d --build
+```
+
+Docker 前端会监听宿主机的 `80` 端口，局域网内其他设备访问：
+
+```text
+http://宿主机的局域网 IP/
+```
+
+例如宿主机 IP 是 `192.168.1.20`，则访问 `http://192.168.1.20/`。如果无法访问，检查操作系统防火墙是否放行 TCP `80` 端口。数据库数据保存在 Docker volume 中，初始化 SQL 只会在首次创建数据库 volume 时执行。
+
+停止服务但保留数据：
+
+```bash
+docker compose down
+```
+
+完全重置 Docker 数据库（会删除所有数据）：
+
+```bash
+docker compose down -v
+```
+
 详细环境和数据库说明见 [docs/how_to_start.md](docs/how_to_start.md) 与
 [docs/DATABASE.md](docs/DATABASE.md)。
 

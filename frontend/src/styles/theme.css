@@ -1,0 +1,92 @@
+:root {
+  color-scheme: light;
+
+  /* 基础文字、页面和容器颜色 */
+  --color-text: #34252f;
+  --color-page: #f5f1f2;
+  --color-app-muted: #806f78;
+  --color-app-surface: #fffdfd;
+  --color-surface-soft: #f5edef;
+  --color-app-border: #e8dfe2;
+
+  /* 品牌和导航颜色 */
+  --color-brand: #704264;
+  --color-brand-strong: #49243e;
+  --color-on-brand: #ffffff;
+  --color-sidebar: #49243e;
+  --color-sidebar-text: #f9eef4;
+  --color-sidebar-muted: #cbb8c3;
+  --color-sidebar-accent: #d9a9be;
+  --color-accent: #edcdc2;
+  --color-focus-ring: rgb(187 132 147 / 35%);
+
+  /* 状态颜色 */
+  --color-danger: #b85d66;
+
+  /* 账单分类颜色 */
+  --color-category-food: #b76770;
+  --color-category-snack: #9b6b48;
+  --color-category-daily: #547c78;
+  --color-category-party: #796597;
+  --color-category-transport: #b1743f;
+  --color-category-other: #6d6d73;
+
+  /* 成员头像颜色 */
+  --color-avatar-1: #704264;
+  --color-avatar-2: #b06c7e;
+  --color-avatar-3: #547c78;
+  --color-avatar-4: #c1815b;
+  --color-avatar-5: #7b6f9e;
+
+  /* 阴影 */
+  --shadow-card: 0 18px 50px rgb(73 36 62 / 7%);
+  --shadow-button: 0 8px 20px rgb(73 36 62 / 16%);
+  --shadow-dialog: 0 28px 80px rgb(73 36 62 / 24%);
+  --shadow-brand-icon: 0 2px 8px rgb(0 0 0 / 15%);
+
+  /* 历史别名：旧组件仍使用这些名称 */
+  --ink: var(--color-text);
+  --muted: var(--color-app-muted);
+  --page: var(--color-page);
+  --surface: var(--color-app-surface);
+  --soft: var(--color-surface-soft);
+  --line: var(--color-app-border);
+  --plum: var(--color-brand);
+  --plum-deep: var(--color-brand-strong);
+  --peach: var(--color-accent);
+  --shadow: var(--shadow-card);
+}
+
+/* 深色主题 */
+.theme-dark {
+  color-scheme: dark;
+  --color-text: #f5edf1;
+  --color-page: #251a22;
+  --color-app-muted: #bbaeb4;
+  --color-app-surface: #32242e;
+  --color-surface-soft: #3d2a37;
+  --color-app-border: #4d3846;
+  --color-brand: #d4a9c8;
+  --color-brand-strong: #f1cfdf;
+  --color-on-brand: #251a22;
+  --color-sidebar: #21151d;
+  --color-sidebar-text: #f5edf1;
+  --color-sidebar-muted: #bbaeb4;
+  --color-sidebar-accent: #d4a9c8;
+  --color-accent: #704f5f;
+  --color-focus-ring: rgb(212 169 200 / 38%);
+  --shadow-card: 0 18px 50px rgb(0 0 0 / 18%);
+  --shadow-button: 0 8px 20px rgb(0 0 0 / 24%);
+  --shadow-dialog: 0 28px 80px rgb(0 0 0 / 42%);
+
+  /* 兼容旧组件使用的主题别名 */
+  --ink: var(--color-text);
+  --muted: var(--color-app-muted);
+  --page: var(--color-page);
+  --surface: var(--color-app-surface);
+  --soft: var(--color-surface-soft);
+  --line: var(--color-app-border);
+  --plum: var(--color-brand);
+  --plum-deep: var(--color-brand-strong);
+  --peach: var(--color-accent);
+}

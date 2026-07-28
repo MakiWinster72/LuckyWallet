@@ -8,7 +8,7 @@
 -- changes should be executed through reviewed Alembic migrations.
 
 SET NAMES utf8mb4;
-SET time_zone = '+00:00';
+SET time_zone = '+08:00';
 
 CREATE DATABASE IF NOT EXISTS luckywallet_dev
   CHARACTER SET utf8mb4
@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS users (
     CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
   nickname VARCHAR(50) NULL,
+  avatar_url VARCHAR(255) NULL,
   role VARCHAR(20) NOT NULL DEFAULT 'user',
   is_active BOOLEAN NOT NULL DEFAULT TRUE,
   created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
@@ -30,6 +31,27 @@ CREATE TABLE IF NOT EXISTS users (
   PRIMARY KEY (id),
   CONSTRAINT uq_users_username UNIQUE (username),
   CONSTRAINT ck_users_role CHECK (role IN ('admin', 'user'))
+) ENGINE=InnoDB;
+
+-- 本地初始化管理员，首次登录后请立即修改密码。
+INSERT IGNORE INTO users (
+  username, password_hash, nickname, role, is_active, created_at, updated_at
+)
+VALUES (
+  'admin',
+  '$argon2id$v=19$m=65536,t=3,p=4$zGntKryEI7TokDLxxi8bgQ$JcO1X8ew//6JCugnzqYCuX7eNVN5oICcV02aw12c78Q',
+  '管理员',
+  'admin',
+  TRUE,
+  CURRENT_TIMESTAMP(6),
+  CURRENT_TIMESTAMP(6)
+);
+
+CREATE TABLE IF NOT EXISTS household_settings (
+  id INT NOT NULL,
+  monthly_budget DECIMAL(10,2) NOT NULL DEFAULT 2400.00,
+  PRIMARY KEY (id),
+  CONSTRAINT ck_household_settings_budget_positive CHECK (monthly_budget > 0)
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS categories (

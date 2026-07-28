@@ -1,0 +1,13 @@
+.git
+.github
+.idea
+.vscode
+.env
+.venv
+**/.venv
+**/node_modules
+**/dist
+docs/.vitepress/cache
+docs/.vitepress/.temp
+uploads
+TODO.md

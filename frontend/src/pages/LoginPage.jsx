@@ -4,6 +4,7 @@ import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { ApiError } from "../api/auth";
 import { useAuth } from "../auth/useAuth";
 import { AppIcon } from "../components/AppIcon";
+import { BrandIcon } from "../components/BrandIcon";
 
 export function LoginPage() {
   const { user, login } = useAuth();
@@ -47,7 +48,7 @@ export function LoginPage() {
       <section className="login-shell" aria-labelledby="login-title">
         <div className="login-intro">
           <div className="brand-lockup">
-            <span className="brand-mark" aria-hidden="true">L</span>
+            <BrandIcon size={38} />
             <span>LuckyWallet</span>
           </div>
 
@@ -62,7 +63,6 @@ export function LoginPage() {
           </div>
 
           <div>
-            <p className="eyebrow">共同消费，清楚分摊</p>
             <h1>每一笔集资，都有据可查。</h1>
             <p className="intro-copy">
               记录零食、派对和集体采购，随时查看谁支付、谁参与。
@@ -111,7 +111,10 @@ export function LoginPage() {
                   onClick={() => setIsPasswordVisible((visible) => !visible)}
                   disabled={isSubmitting}
                 >
-                  <AppIcon name={isPasswordVisible ? "eyeOff" : "eye"} size={18} />
+                  <AppIcon
+                    name={isPasswordVisible ? "eyeOff" : "eye"}
+                    size={18}
+                  />
                 </button>
               </div>
             </div>
@@ -120,7 +123,11 @@ export function LoginPage() {
               {error ? <p role="alert">{error}</p> : null}
             </div>
 
-            <button className="primary-button" type="submit" disabled={isSubmitting}>
+            <button
+              className="primary-button"
+              type="submit"
+              disabled={isSubmitting}
+            >
               {isSubmitting ? "正在登录…" : "登录"}
             </button>
           </form>
