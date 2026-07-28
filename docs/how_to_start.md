@@ -13,6 +13,14 @@
 
 可选：页面内的 Claude Code 助手要求本机已安装并登录 Claude Code CLI。未配置该能力不影响账单、预算和统计功能。
 
+Windows 用户如果尚未安装 `uv`，可以使用 PowerShell 执行：
+
+```powershell
+winget install --id=astral-sh.uv -e
+```
+
+安装完成后重新打开终端，并运行 `uv --version` 确认安装成功。若系统没有 `winget`，也可以在已配置 Python 和 pip 的情况下执行 `python -m pip install uv`。
+
 ## 1. 初始化数据库
 
 确认 MySQL 已启动，在项目根目录依次执行：
