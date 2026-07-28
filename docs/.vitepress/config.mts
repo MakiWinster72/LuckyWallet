@@ -34,10 +34,15 @@ export default defineConfig({
         ]
       },
       {
+        text: '实现细节',
+        items: [
+          { text: '项目实现细节', link: '/detail' }
+        ]
+      },
+      {
         text: '部署与设计',
         items: [
-          { text: '部署手册', link: '/deployment' },
-          { text: '颜色设计', link: '/color%20design' }
+          { text: '部署手册', link: '/deployment' }
         ]
       }
     ],
