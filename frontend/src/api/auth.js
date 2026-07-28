@@ -68,6 +68,13 @@ export async function uploadAvatarApi(file) {
   return response.json();
 }
 
+export async function changePasswordApi(data) {
+  await authenticatedApiRequest("/auth/me/password", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
 export async function loginApi(data) {
   const response = await fetch(`${API_BASE_URL}/auth/login`, {
     method: "POST",
