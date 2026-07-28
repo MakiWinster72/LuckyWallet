@@ -112,7 +112,10 @@ export function LoginPage() {
                   onClick={() => setIsPasswordVisible((visible) => !visible)}
                   disabled={isSubmitting}
                 >
-                  <AppIcon name={isPasswordVisible ? "eyeOff" : "eye"} size={18} />
+                  <AppIcon
+                    name={isPasswordVisible ? "eyeOff" : "eye"}
+                    size={18}
+                  />
                 </button>
               </div>
             </div>
@@ -121,7 +124,11 @@ export function LoginPage() {
               {error ? <p role="alert">{error}</p> : null}
             </div>
 
-            <button className="primary-button" type="submit" disabled={isSubmitting}>
+            <button
+              className="primary-button"
+              type="submit"
+              disabled={isSubmitting}
+            >
               {isSubmitting ? "正在登录…" : "登录"}
             </button>
           </form>
