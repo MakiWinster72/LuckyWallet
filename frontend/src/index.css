@@ -4078,6 +4078,34 @@ select:focus-visible {
   outline: none;
   transition: border-color 0.2s;
 }
+.cc-reset {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--line, #e8dfe2);
+  border-radius: 10px;
+  color: var(--muted, #806f78);
+  background: var(--page, #f5f1f2);
+  cursor: pointer;
+  transition: color .2s, border-color .2s, background .2s, transform .2s;
+}
+.cc-reset:hover:not(:disabled) {
+  border-color: #d97757;
+  color: #d97757;
+  background: var(--surface, #fffdfd);
+  transform: rotate(-35deg);
+}
+.cc-reset:disabled {
+  cursor: default;
+  opacity: .35;
+}
+.cc-reset:focus-visible {
+  outline: 3px solid rgb(217 119 87 / 30%);
+  outline-offset: 2px;
+}
 .cc-input:focus {
   border-color: #d97757;
 }

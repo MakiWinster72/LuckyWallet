@@ -164,6 +164,31 @@ export function ClaudeCodeChat() {
     wsRef.current.send(JSON.stringify({ type: "message", content: text.trim() }));
   }
 
+  function resetConversation() {
+    if (!window.confirm("确定要重置会话吗？当前聊天记录将被清除。")) return;
+
+    if (historyKey) localStorage.removeItem(historyKey);
+    messagesRef.current = [];
+    historyReadyRef.current = true;
+    setMessages([]);
+    setBusy(false);
+    setStatus("");
+
+    const currentSocket = wsRef.current;
+    if (currentSocket) {
+      currentSocket.onclose = null;
+      currentSocket.close();
+      wsRef.current = null;
+    }
+    setConnected(false);
+
+    if (open) {
+      setTimeout(() => {
+        if (open && !wsRef.current) connect();
+      }, 0);
+    }
+  }
+
   function handleKeyDown(event) {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
@@ -279,6 +304,16 @@ export function ClaudeCodeChat() {
 
           {/* input */}
           <div className="cc-footer">
+            <button
+              className="cc-reset"
+              type="button"
+              onClick={resetConversation}
+              disabled={!connected}
+              aria-label="重置会话"
+              title="重置会话"
+            >
+              <AppIcon name="reset" size={17} />
+            </button>
             <textarea
               className="cc-input"
               rows={1}
