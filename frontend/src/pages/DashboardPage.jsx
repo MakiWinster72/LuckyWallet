@@ -1487,9 +1487,6 @@ export function DashboardPage() {
             >
               <AppIcon name={dark ? "sun" : "moon"} />
             </button>
-            <button className="icon-button notification" aria-label="通知">
-              <AppIcon name="bell" />
-            </button>
             {isUserManagement || user.role !== "admin" ? null : (
               <button className="add-button" onClick={() => setIsAdding(true)}>
                 <AppIcon name="plus" size={18} />

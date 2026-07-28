@@ -336,17 +336,6 @@ select:focus-visible {
   color: var(--ink);
   background: var(--surface);
 }
-.notification::after {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 6px;
-  height: 6px;
-  border: 2px solid var(--surface);
-  border-radius: 50%;
-  background: var(--color-danger);
-  content: "";
-}
 .add-button,
 .primary-button {
   display: inline-flex;
