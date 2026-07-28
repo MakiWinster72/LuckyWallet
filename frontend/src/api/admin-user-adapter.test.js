@@ -14,6 +14,7 @@ const apiUser = {
   nickname: null,
   role: "user",
   is_active: true,
+  avatar_url: "/uploads/anna.png",
   created_at: "2026-07-27T13:28:00Z",
 };
 
@@ -24,6 +25,7 @@ test("adapts API users for the admin workspace", () => {
     nickname: "",
     role: "user",
     isActive: true,
+    avatarUrl: "/uploads/anna.png",
     createdAt: "2026-07-27T13:28:00Z",
   });
 });
