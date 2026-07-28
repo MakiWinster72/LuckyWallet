@@ -61,7 +61,7 @@ GitHub 是项目的代码、Issue、讨论和变更记录中心。功能需求�
 - Bug 反馈：提供复现步骤、实际结果、预期结果、环境和日志；
 - 发布检查：记录测试结果、数据库变更、部署影响和回滚方式。
 
-提交信息和分支命名遵循[提交和分支命名规范](/提交和分支命名规范)。通常使用 `feat`、`fix`、`docs`、`style`、`refactor`、`test`、`chore` 等类型；一个提交应尽量只表达一个完整意图。涉及数据库、权限或金额规则的改动，应在 Pull Request 中明确说明影响范围并附测试结果。
+提交信息和分支命名遵循[提交和分支命名规范](/collaboration/commit-conventions)。通常使用 `feat`、`fix`、`docs`、`style`、`refactor`、`test`、`chore` 等类型；一个提交应尽量只表达一个完整意图。涉及数据库、权限或金额规则的改动，应在 Pull Request 中明确说明影响范围并附测试结果。
 
 ## 五、项目结构与文件职责
 
@@ -217,4 +217,4 @@ cd ../frontend && npm test && npm run lint && npm run build
 cd ../docs && npm run docs:build
 ```
 
-相关文档：[快速启动](/how_to_start)、[使用手册](/user-guide)、[API 接口文档](/api)、[部署手册](/deployment)。
+相关文档：[快速启动](/guides/how_to_start)、[使用手册](/guides/user-guide)、[API 接口文档](/reference/api)、[部署手册](/guides/deployment)。

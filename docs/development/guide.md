@@ -1,6 +1,6 @@
 # 开发指南
 
-本页介绍 LuckyWallet 的代码结构、关键数据流和日常开发命令。首次运行项目请先完成[快速启动](/how_to_start)。
+本页介绍 LuckyWallet 的代码结构、关键数据流和日常开发命令。首次运行项目请先完成[快速启动](/guides/how_to_start)。
 
 ## 系统结构
 
@@ -91,7 +91,7 @@ docs/                   VitePress 文档站
 2. Pydantic Schema 与 Repository；
 3. `001_init_luckywallet.sql`；
 4. 受影响的演示数据和测试；
-5. [数据库说明](/DATABASE) 与 [API 文档](/api)。
+5. [数据库说明](/reference/DATABASE) 与 [API 文档](/reference/api)。
 
 已上线环境应使用经过评审的正式迁移方案，不要通过删除数据库升级。
 

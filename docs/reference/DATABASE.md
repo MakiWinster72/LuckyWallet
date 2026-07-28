@@ -6,7 +6,7 @@
 mysql -u root -p < sql/001_init_luckywallet.sql
 ```
 
-脚本会创建 `luckywallet_dev` 数据库、6 张业务表和 6 个默认分类。演示用户与演示账单的导入方式见[快速启动](/how_to_start#_1-初始化数据库)。
+脚本会创建 `luckywallet_dev` 数据库、6 张业务表和 6 个默认分类。演示用户与演示账单的导入方式见[快速启动](/guides/how_to_start#_1-初始化数据库)。
 
 ## 表一览
 

@@ -24,7 +24,7 @@ LuckyWallet 支持本地进程部署和 Docker Compose 部署。
 
 ## 手动部署
 
-按照[快速启动](/how_to_start)完成数据库和后端配置，然后分别启动：
+按照[快速启动](/guides/how_to_start)完成数据库和后端配置，然后分别启动：
 
 ```bash
 cd backend

@@ -321,7 +321,7 @@ Authorization: Bearer <access_token>
 | `share_amount` | decimal | 应承担金额 |
 
 ::: warning 没有独立的分类列表接口
-当前不存在 `GET /categories` 端点，分类信息只随账单响应的 `category` 字段返回。如需独立的分类选择器，需要后端新增路由，参见 [数据库说明](/DATABASE) 中的 `categories` 表。
+当前不存在 `GET /categories` 端点，分类信息只随账单响应的 `category` 字段返回。如需独立的分类选择器，需要后端新增路由，参见 [数据库说明](/reference/DATABASE) 中的 `categories` 表。
 :::
 
 ---

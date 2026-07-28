@@ -13,10 +13,10 @@ hero:
   actions:
     - theme: brand
       text: 快速开始
-      link: /how_to_start
+      link: /guides/how_to_start
     - theme: alt
       text: 使用手册
-      link: /user-guide
+      link: /guides/user-guide
 
 features:
   - title: 账单与分摊
@@ -48,12 +48,12 @@ LuckyWallet 不只记录消费金额，还区分实际付款人与参与消费�
 
 | 目标                       | 文档                      |
 | -------------------------- | ------------------------- |
-| 在本机运行项目             | [快速启动](/how_to_start) |
-| 了解页面和业务规则         | [使用手册](/user-guide)   |
-| 使用 Docker 或部署到服务器 | [部署手册](/deployment)   |
-| 参与开发和运行测试         | [开发指南](/development)  |
-| 了解项目实现细节           | [实现细节](/detail)       |
-| 对接后端接口               | [API 接口文档](/api)      |
-| 了解表结构和数据关系       | [数据库说明](/DATABASE)   |
+| 在本机运行项目             | [快速启动](/guides/how_to_start) |
+| 了解页面和业务规则         | [使用手册](/guides/user-guide)   |
+| 使用 Docker 或部署到服务器 | [部署手册](/guides/deployment)   |
+| 参与开发和运行测试         | [开发指南](/development/guide)   |
+| 了解项目实现细节           | [实现细节](/development/implementation) |
+| 对接后端接口               | [API 接口文档](/reference/api)  |
+| 了解表结构和数据关系       | [数据库说明](/reference/DATABASE) |
 
 后端启动后，还可通过 Swagger UI `<后端地址>/docs` 在线查看和调试接口。

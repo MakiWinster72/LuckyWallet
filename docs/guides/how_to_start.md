@@ -1,6 +1,6 @@
 # 快速启动
 
-本页用于在本地开发环境首次运行 LuckyWallet。若使用容器，请直接阅读[部署手册](/deployment#docker-compose-部署)。
+本页用于在本地开发环境首次运行 LuckyWallet。若使用容器，请直接阅读[部署手册](/guides/deployment#docker-compose-部署)。
 
 ## 环境要求
 
