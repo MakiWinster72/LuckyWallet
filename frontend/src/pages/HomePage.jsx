@@ -127,18 +127,6 @@ export function HomePage() {
         </div>
       </section>
 
-      <section className="home-marquee" aria-label="LuckyWallet 核心能力">
-        <span>账单分摊</span>
-        <i>✦</i>
-        <span>预算进度</span>
-        <i>✦</i>
-        <span>成员净额</span>
-        <i>✦</i>
-        <span>结算建议</span>
-        <i>✦</i>
-        <span>私有部署</span>
-      </section>
-
       <section
         className="home-process"
         id="how-it-works"
