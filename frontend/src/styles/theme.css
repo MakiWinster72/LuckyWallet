@@ -1,0 +1,70 @@
+:root {
+  color-scheme: light;
+
+  /* Brand palette from docs/color design.md */
+  --color-primary: #c8a5c2;
+  --color-primary-hover: #9a6986;
+  --color-on-primary: #331e2a;
+  --color-primary-container: #edcdc2;
+  --color-primary-container-soft: rgb(200 165 194 / 42%);
+  --color-on-primary-container: #704264;
+  --color-secondary: #9a6986;
+  --color-accent: #edcdc2;
+  --color-accent-hover: #dbafa0;
+  --color-on-accent: #331e2a;
+
+  /* Wallet illustration */
+  --color-wallet-back: #edcdc2;
+  --color-wallet-middle: #bb8493;
+
+  /* Surfaces */
+  --color-surface: #ffffff;
+  --color-surface-page: #fffdfc;
+  --color-surface-container: #f8f0f3;
+  --color-surface-highlight: #f8eef3;
+  --color-surface-hover: #f7e8e3;
+
+  /* Text */
+  --color-text-primary: #331e2a;
+  --color-text-brand: #49243e;
+  --color-text-secondary: #704264;
+  --color-text-muted: #76596b;
+  --color-text-label: #49243e;
+  --color-text-placeholder: #8a7180;
+
+  /* Borders and states */
+  --color-border: #ddc8d1;
+  --color-border-control: #9a6986;
+  --color-error: #a33d36;
+  --color-shadow-soft: rgb(73 36 62 / 7%);
+  --color-shadow-low: rgb(73 36 62 / 10%);
+  --color-shadow-medium: rgb(73 36 62 / 20%);
+  --color-shadow-strong: rgb(73 36 62 / 28%);
+  --color-wallet-shadow: rgb(73 36 62 / 16%);
+
+  /* Application semantic tokens */
+  --color-text: #34252f; --color-page: #f5f1f2; --color-app-muted: #806f78;
+  --color-app-surface: #fffdfd; --color-surface-soft: #f5edef; --color-app-border: #e8dfe2;
+  --color-brand: #704264; --color-brand-strong: #49243e; --color-on-brand: #ffffff;
+  --color-sidebar: #49243e; --color-sidebar-text: #f9eef4; --color-sidebar-muted: #cbb8c3; --color-sidebar-accent: #d9a9be;
+  --color-focus-ring: rgb(187 132 147 / 35%);
+  --color-success: #547c78; --color-warning: #d97757; --color-danger: #b85d66;
+  --color-category-food: #b76770; --color-category-snack: #9b6b48; --color-category-daily: #547c78;
+  --color-category-party: #796597; --color-category-transport: #b1743f; --color-category-other: #6d6d73;
+  --color-avatar-1: #704264; --color-avatar-2: #b06c7e; --color-avatar-3: #547c78; --color-avatar-4: #c1815b; --color-avatar-5: #7b6f9e;
+  --shadow-card: 0 18px 50px rgb(73 36 62 / 7%); --shadow-button: 0 8px 20px rgb(73 36 62 / 16%);
+  --shadow-dialog: 0 28px 80px rgb(73 36 62 / 24%); --shadow-brand-icon: 0 2px 8px rgb(0 0 0 / 15%);
+  /* Compatibility aliases */
+  --ink: var(--color-text); --muted: var(--color-app-muted); --page: var(--color-page);
+  --surface: var(--color-app-surface); --soft: var(--color-surface-soft); --line: var(--color-app-border);
+  --plum: var(--color-brand); --plum-deep: var(--color-brand-strong); --peach: var(--color-accent); --shadow: var(--shadow-card);
+}
+
+.theme-dark {
+  color-scheme: dark;
+  --color-text: #f5edf1; --color-text-muted: #bbaeb4; --color-app-muted: #bbaeb4; --color-page: #251a22;
+  --color-surface: #32242e; --color-app-surface: #32242e; --color-surface-soft: #3d2a37; --color-border: #4d3846; --color-app-border: #4d3846;
+  --color-brand: #d4a9c8; --color-brand-strong: #f1cfdf; --color-accent: #704f5f; --color-on-brand: #251a22;
+  --shadow-card: 0 18px 50px rgb(0 0 0 / 18%); --shadow-button: 0 8px 20px rgb(0 0 0 / 24%);
+  --shadow-dialog: 0 28px 80px rgb(0 0 0 / 42%);
+}

@@ -1,4 +1,4 @@
-const avatarColors = ["#704264", "#B06C7E", "#547C78", "#C1815B", "#7B6F9E"];
+const avatarColors = ["var(--color-avatar-1)", "var(--color-avatar-2)", "var(--color-avatar-3)", "var(--color-avatar-4)", "var(--color-avatar-5)"];
 
 function initials(value) {
   const words = value.trim().split(/\s+/).filter(Boolean);
