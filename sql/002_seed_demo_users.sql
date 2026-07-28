@@ -17,6 +17,7 @@ VALUES
   ('Landen', '$argon2id$v=19$m=65536,t=3,p=4$urveLYkiMYvbnSokqcqR0Q$19VUbTxNVWTpl2QlEJ7coGV/X3mKR+RK+x+7Rpoux0o', '李德志', 'admin', TRUE, NOW(), NOW()),
   ('Maki', '$argon2id$v=19$m=65536,t=3,p=4$bRceq0/HdbYzvgJ/Omy7Zg$IZaW112GiTbNA4QXXn2GTo+oGQlN1x+NoDdH4ETY+Do', '王源智', 'admin', TRUE, NOW(), NOW()),
   ('Anna', '$argon2id$v=19$m=65536,t=3,p=4$piiHb/WpmriH7zXaHDBmeA$UBW+FOk4ZBR+QDrh4Aw1ViU0MbYrBBj8xiiykl8VkL0', '张家艳', 'admin', TRUE, NOW(), NOW()),
+  ('Cara', '$argon2id$v=19$m=65536,t=3,p=4$adgcHIrZ7Go52Zc+ecX9Qg$MKuzBFqG4MsY/n4dXbfyBujbJFMP/5j7irgAr+xZBEA', 'Cara', 'user', TRUE, NOW(), NOW()),
   -- 普通成员
   ('Clamez', '$argon2id$v=19$m=65536,t=3,p=4$tTDrrFEDLF7Zw/cyaeWD1g$VSdbYSYDuBOm+wEUvzysLyVuAjsC71MRtm+Cb+ZxiIo', '谢应江', 'user', TRUE, NOW(), NOW()),
   ('Roy', '$argon2id$v=19$m=65536,t=3,p=4$/jTrcs94fkG84//8XoJogQ$RnJQEknsGziTNb0GCe7MK216yphK4Wg4dGvt1S37IxQ', '钟永尧', 'user', TRUE, NOW(), NOW()),
