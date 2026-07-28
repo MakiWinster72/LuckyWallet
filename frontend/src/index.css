@@ -729,6 +729,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .cc-fab:hover { transform: scale(1.08); box-shadow: 0 6px 24px rgb(217 119 87 / 52%); }
 .cc-fab:active { transform: scale(.95); }
 .cc-fab svg { width: 26px; height: 26px; }
+.cc-backdrop { display: none; }
 
 /* ── dialog ──────────────────────────────────────────── */
 
@@ -921,6 +922,12 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 /* ── mobile ──────────────────────────────────────────── */
 
 @media (max-width: 680px) {
+  .cc-backdrop {
+    position: fixed; inset: 0; z-index: 998; display: block;
+    border: 0; background: rgb(30 18 27 / 24%);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    animation: cc-backdrop-in .2s ease-out;
+  }
   .cc-dialog {
     right: 10px; bottom: calc(76px + env(safe-area-inset-bottom));
     width: calc(100vw - 20px); height: min(560px, calc(100dvh - 92px));
@@ -932,6 +939,8 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   .cc-msg { max-width: 94%; }
   .cc-bubble { font-size: 13px; }
 }
+
+@keyframes cc-backdrop-in { from { opacity: 0; } }
 
 @media (max-width: 380px) {
   .cc-dialog { right: 6px; width: calc(100vw - 12px); }

@@ -198,7 +198,14 @@ export function ClaudeCodeChat() {
 
       {/* ── chat dialog ──────────────────────────────────────── */}
       {open ? (
-        <aside className="cc-dialog" role="dialog" aria-modal="true" aria-label="Claude Code 聊天">
+        <>
+          <button
+            className="cc-backdrop"
+            type="button"
+            onClick={() => setOpen(false)}
+            aria-label="关闭 Claude Code 聊天"
+          />
+          <aside className="cc-dialog" role="dialog" aria-modal="true" aria-label="Claude Code 聊天">
           {/* header */}
           <header className="cc-header">
             <ClaudeCodeIcon />
@@ -280,7 +287,8 @@ export function ClaudeCodeChat() {
               <AppIcon name="arrow" size={16} />
             </button>
           </div>
-        </aside>
+          </aside>
+        </>
       ) : null}
     </>
   );
