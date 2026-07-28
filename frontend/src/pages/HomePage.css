@@ -630,6 +630,12 @@
 }
 
 @media (max-width: 720px) {
+  .home-page {
+    background:
+      radial-gradient(circle at 100% 5%, rgb(234 201 188 / 40%), transparent 18rem),
+      linear-gradient(180deg, #fffaf7 0%, #f9f1ef 100%);
+  }
+
   .home-nav {
     width: min(100% - 32px, 1180px);
     min-height: 72px;
@@ -651,39 +657,78 @@
   }
 
   .home-hero {
-    padding: 54px 0 72px;
+    gap: 34px;
+    padding: 48px 0 64px;
   }
 
   .home-hero h1 {
-    font-size: clamp(44px, 14vw, 68px);
+    font-size: clamp(42px, 13vw, 64px);
+    letter-spacing: -.055em;
+  }
+
+  .home-hero-lead {
+    max-width: 34rem;
+    margin-top: 22px;
+    line-height: 1.75;
+  }
+
+  .home-hero-actions {
+    margin-top: 28px;
   }
 
   .home-trust-list {
     gap: 18px;
+    margin-top: 32px;
   }
 
   .home-wallet-stage {
     width: 100%;
-    padding-left: 0;
+    padding: 28px 4px 52px 0;
+  }
+
+  .home-wallet-back {
+    inset: 4px 3% 24px 1%;
+    border-radius: 30px 30px 12px;
+  }
+
+  .home-wallet-screen {
+    border-width: 5px;
+    border-radius: 22px 22px 7px;
+  }
+
+  .home-wallet-screen img {
+    height: clamp(250px, 68vw, 430px);
+    object-fit: cover;
+    object-position: 15% top;
   }
 
   .home-wallet-clasp {
-    right: -10px;
-    width: 62px;
-    height: 60px;
+    top: 40%;
+    right: -4px;
+    width: 58px;
+    height: 56px;
+    border-width: 4px;
   }
 
   .home-floating-receipt {
-    right: 10px;
-    width: 190px;
+    right: 14px;
+    bottom: 2px;
+    width: min(190px, 58vw);
   }
 
   .home-marquee {
+    min-height: 58px;
     justify-content: flex-start;
+    gap: 20px;
+    padding-inline: 16px;
   }
 
   .home-process {
-    padding: 88px 0;
+    padding: 78px 0 82px;
+  }
+
+  .home-section-heading {
+    margin-bottom: 34px;
   }
 
   .home-step-grid {
@@ -692,26 +737,66 @@
 
   .home-step-grid article,
   .home-step-grid article:first-child {
+    display: grid;
     min-height: 0;
-    padding: 24px 4px 30px;
+    grid-template-columns: 38px 48px minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    column-gap: 14px;
+    padding: 22px 2px;
     border-right: 0;
     border-bottom: 1px solid rgb(85 48 68 / 16%);
     border-left: 0;
   }
 
+  .home-step-grid article > span {
+    grid-row: 1 / 3;
+    padding-top: 4px;
+  }
+
   .home-step-icon {
-    margin-top: 20px;
+    grid-row: 1 / 3;
+    margin-top: 0;
+  }
+
+  .home-step-grid h3 {
+    margin: 1px 0 5px;
+  }
+
+  .home-step-grid p {
+    line-height: 1.65;
   }
 
   .home-showcase {
-    padding: 80px 16px;
+    gap: 46px;
+    padding: 72px 16px 76px;
+  }
+
+  .home-login-frame {
+    border-width: 5px;
+    border-radius: 19px 19px 6px;
+    transform: rotate(-.7deg);
+  }
+
+  .home-login-frame img {
+    height: clamp(280px, 72vw, 450px);
+    object-fit: cover;
+    object-position: 13% top;
+  }
+
+  .home-frame-label {
+    min-height: 38px;
+  }
+
+  .home-showcase-copy > p:not(.home-eyebrow) {
+    margin-top: 18px;
+    line-height: 1.75;
   }
 
   .home-final-cta {
     align-items: flex-start;
     flex-direction: column;
     margin: 72px auto;
-    padding: 36px 28px;
+    padding: 36px 28px 32px;
   }
 
   .home-final-cta > div:last-child {
@@ -731,16 +816,41 @@
 }
 
 @media (max-width: 440px) {
-  .home-brand > span {
-    display: none;
+  .home-nav {
+    width: calc(100% - 24px);
+  }
+
+  .home-nav .home-brand {
+    gap: 7px;
+    font-size: 14px;
+  }
+
+  .home-nav .home-brand img {
+    width: 32px;
+    height: 32px;
   }
 
   .home-wiki-link {
     display: none;
   }
 
+  .home-nav-login {
+    min-height: 40px;
+    padding-inline: 13px;
+  }
+
   .home-hero {
-    padding-top: 42px;
+    width: calc(100% - 28px);
+    padding: 38px 0 56px;
+  }
+
+  .home-eyebrow {
+    margin-bottom: 16px;
+    letter-spacing: .09em;
+  }
+
+  .home-hero h1 {
+    font-size: clamp(39px, 13.2vw, 56px);
   }
 
   .home-hero-lead {
@@ -755,29 +865,46 @@
   .home-primary-action,
   .home-secondary-action {
     width: 100%;
+    min-height: 50px;
   }
 
   .home-trust-list {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 8px;
+    padding-top: 18px;
+  }
+
+  .home-trust-list dt {
+    font-size: 9px;
+  }
+
+  .home-trust-list dd {
+    font-size: 11px;
   }
 
   .home-wallet-stage {
-    padding-top: 28px;
-    padding-bottom: 56px;
+    padding: 20px 0 46px;
   }
 
   .home-wallet-screen {
-    border-width: 5px;
-    border-radius: 20px 20px 6px 20px;
+    border-radius: 18px 18px 5px;
+  }
+
+  .home-wallet-screen img {
+    height: 73vw;
+    min-height: 245px;
+  }
+
+  .home-screen-bar {
+    min-height: 34px;
+    padding-inline: 11px;
   }
 
   .home-wallet-clasp {
-    top: 40%;
-    right: -4px;
-    width: 48px;
-    height: 48px;
+    right: -2px;
+    width: 46px;
+    height: 46px;
     border-width: 3px;
   }
 
@@ -787,8 +914,86 @@
   }
 
   .home-floating-receipt {
-    width: 170px;
-    padding: 13px;
+    right: 8px;
+    width: min(166px, 58vw);
+    padding: 12px 13px;
+  }
+
+  .home-process {
+    width: calc(100% - 28px);
+    padding: 66px 0 70px;
+  }
+
+  .home-section-heading h2,
+  .home-showcase-copy h2,
+  .home-final-cta h2 {
+    font-size: clamp(30px, 9.5vw, 40px);
+  }
+
+  .home-step-grid article,
+  .home-step-grid article:first-child {
+    grid-template-columns: 28px 42px minmax(0, 1fr);
+    column-gap: 11px;
+  }
+
+  .home-step-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 13px 13px 4px;
+  }
+
+  .home-showcase {
+    padding-inline: 14px;
+  }
+
+  .home-frame-label span {
+    display: none;
+  }
+
+  .home-frame-label {
+    justify-content: flex-end;
+  }
+
+  .home-login-frame img {
+    height: 78vw;
+    min-height: 265px;
+  }
+
+  .home-feature-notes div {
+    grid-template-columns: 52px 1fr;
+    gap: 10px;
+  }
+
+  .home-final-cta {
+    width: calc(100% - 28px);
+    min-height: 0;
+    margin-block: 60px;
+    padding: 32px 22px 26px;
+    border-radius: 24px 24px 7px;
+  }
+
+  .home-footer {
+    width: calc(100% - 28px);
+    gap: 14px;
+  }
+}
+
+@media (max-width: 350px) {
+  .home-nav .home-brand > span {
+    display: none;
+  }
+
+  .home-hero h1 {
+    font-size: 38px;
+  }
+
+  .home-trust-list {
+    grid-template-columns: 1fr;
+  }
+
+  .home-trust-list div {
+    grid-template-columns: 72px 1fr;
+    align-items: baseline;
   }
 }
 
