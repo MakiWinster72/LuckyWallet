@@ -268,8 +268,17 @@ select:focus-visible {
   font-size: 20px;
 }
 .avatar-more {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  flex: 0 0 28px;
+  place-items: center;
+  border-radius: 50%;
   background: var(--soft);
   color: var(--muted);
+  font-size: 8px;
+  font-weight: 700;
 }
 
 .workspace {
@@ -529,7 +538,7 @@ select:focus-visible {
 }
 .bill-row {
   display: grid;
-  grid-template-columns: 44px minmax(130px, 1fr) 82px 115px 24px;
+  grid-template-columns: 44px minmax(0, 1fr) 82px 115px 26px;
   align-items: center;
   gap: 12px;
   min-height: 74px;
@@ -555,6 +564,9 @@ select:focus-visible {
   display: grid;
   gap: 5px;
 }
+.bill-main {
+  min-width: 0;
+}
 .bill-main strong,
 .bill-amount strong {
   font-size: 13px;
@@ -578,6 +590,7 @@ select:focus-visible {
 .row-action {
   display: grid;
   width: 26px;
+  min-width: 0;
   height: 26px;
   place-items: center;
   border: 0;
@@ -3288,7 +3301,7 @@ select:focus-visible {
     min-width: 100%;
   }
   .bill-row {
-    grid-template-columns: 42px minmax(100px, 1fr) 100px 20px;
+    grid-template-columns: 42px minmax(0, 1fr) 100px 26px;
   }
   .participant-stack {
     display: none;
