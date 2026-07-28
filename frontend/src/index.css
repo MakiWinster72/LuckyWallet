@@ -126,14 +126,15 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .participant-stack .user-avatar + .user-avatar, .participant-stack .user-avatar + .avatar-more { margin-left: -8px; }
 .row-action { display: grid; width: 26px; height: 26px; place-items: center; border: 0; color: var(--muted); background: transparent; }
 .row-action:hover { border-radius: 7px; color: var(--plum-deep); background: var(--soft); }
-.right-column { display: grid; align-content: start; gap: 18px; }
+.right-column { display: grid; align-content: start; gap: 18px; min-width: 0; }
+.right-column > * { min-width: 0; }
 .member-count { padding: 5px 9px; border-radius: 20px; color: var(--muted); background: var(--soft); font-size: 11px; }
 .member-list { padding: 0 20px 17px; }
 .member-list > div { display: flex; align-items: center; gap: 10px; padding: 11px 0; border-top: 1px solid var(--line); }
 .member-list > div > span:nth-child(2) { display: grid; flex: 1; gap: 2px; }
 .member-list strong, .member-list b { font-size: 12px; }
 .member-list small { color: var(--muted); font-size: 10px; }
-.settle-card { position: relative; overflow: hidden; padding: 24px; border-radius: 18px 18px 18px 4px; color: #49243e; background: #edcdc2; }
+.settle-card { position: relative; overflow: hidden; padding: 24px; border-radius: 18px 18px 18px 4px; color: #49243e; background: #edcdc2; overflow-wrap: break-word; }
 .settle-card::after { position: absolute; right: -20px; top: -25px; width: 100px; height: 100px; border: 20px solid rgb(73 36 62 / 6%); border-radius: 50%; content: ""; }
 .settle-card h3 { margin: 10px 0 5px; font-family: "Noto Serif SC", serif; }
 .settle-card p { margin: 0; color: #735765; font-size: 12px; }
@@ -634,6 +635,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   .login-intro { display: none; }
 }
 @media (max-width: 500px) {
+  .dialog-backdrop { padding: 0; }
   .welcome { align-items: center; }
   .welcome h1 { font-size: 26px; }
   .welcome p:last-child { max-width: 230px; font-size: 12px; }
@@ -681,7 +683,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   .member-finance-chart { padding-inline: 8px; }
   .member-toolbar button { flex: 0 0 auto; }
   .summary-card { min-height: 140px; padding: 19px; }
-  .settlement-dialog { width: 100vw; max-height: 100vh; border-radius: 0; }
+  .settlement-dialog { width: 100%; max-height: 100vh; border-radius: 0; }
   .settlement-dialog > header, .settlement-dialog > footer { padding-inline: 20px; }
   .settlement-summary { margin-inline: 20px; }
   .settlement-list { padding-inline: 20px; }
