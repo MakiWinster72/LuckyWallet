@@ -16,7 +16,7 @@ LuckyWallet 后端基于 FastAPI 实现，所有业务路由统一挂载在 `/ap
 | 项 | 值 |
 | --- | --- |
 | Base URL | `/api/v1` |
-| 请求体格式 | `application/json`（账单上传为 `multipart/form-data`） |
+| 请求体格式 | `application/json`（头像上传为 `multipart/form-data`） |
 | 响应体格式 | `application/json` |
 | 字符编码 | UTF-8 |
 | 时间格式 | ISO 8601，如 `2026-07-28T12:34:56.000000` |
@@ -29,7 +29,7 @@ Pydantic 默认把 `Decimal` 序列化成字符串，因此响应里 `amount`、
 
 ### 鉴权
 
-除 `POST /auth/login` 与 `GET /health` 外，所有端点都要求在请求头携带 JWT：
+除 `POST /auth/login` 与 `GET /health` 外，所有 REST 端点都要求在请求头携带 JWT：
 
 ```http
 Authorization: Bearer <access_token>
@@ -127,7 +127,7 @@ Authorization: Bearer <access_token>
 { "username": "MakiWinster", "password": "maki1234" }
 ```
 
-**201 响应** · `LoginResponse`
+**200 响应** · `LoginResponse`
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
@@ -509,11 +509,11 @@ Authorization: Bearer <access_token>
 
 ## Claude Code WebSocket
 
-### WS /ws/claude
+### WS /api/v1/ws/claude
 
-页面内嵌的 Claude Code 对话通道。**不**在 `/api/v1` 前缀下。
+页面内嵌的 Claude Code 对话通道，与其他业务路由一样挂载在 `/api/v1` 前缀下。
 
-**鉴权**：连接时通过查询参数携带 JWT：`ws://host/ws/claude?token=<JWT>`。令牌无效、过期或用户已停用会立即关闭连接（`1008`）并下发一条 `error` 帧。
+**鉴权**：连接时通过查询参数携带 JWT：`ws://host/api/v1/ws/claude?token=<JWT>`。HTTPS 页面应使用 `wss://`。令牌无效、过期或用户已停用会立即关闭连接（`1008`）并下发一条 `error` 帧。
 
 **协议**：JSON 文本帧。
 
@@ -570,5 +570,5 @@ Authorization: Bearer <access_token>
 | GET | `/api/v1/admin/users` | Bearer | admin | 用户列表 |
 | POST | `/api/v1/admin/users` | Bearer | admin | 新建用户 |
 | PATCH | `/api/v1/admin/users/{user_id}` | Bearer | admin | 更新用户 |
-| WS | `/ws/claude` | token 查询参数 | 任意 | Claude 对话 |
+| WS | `/api/v1/ws/claude` | token 查询参数 | 任意 | Claude 对话 |
 | GET | `/health` | — | — | 健康检查 |
