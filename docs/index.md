@@ -17,6 +17,9 @@ hero:
     - theme: alt
       text: 使用手册
       link: /guides/user-guide
+    - theme: alt
+      text: 实现细节
+      link: /development/implementation
 
 features:
   - title: 账单与分摊
