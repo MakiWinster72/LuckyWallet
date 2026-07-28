@@ -32,6 +32,31 @@ function formatRange(startDate, endDate) {
   return `${start} – ${end}`;
 }
 
+function getPageItems(currentPage, pageCount) {
+  if (pageCount <= 7) {
+    return Array.from({ length: pageCount }, (_, index) => index + 1);
+  }
+
+  const pages = new Set([1, pageCount, currentPage]);
+  if (currentPage <= 4) {
+    [2, 3, 4, 5].forEach((page) => pages.add(page));
+  } else if (currentPage >= pageCount - 3) {
+    [pageCount - 4, pageCount - 3, pageCount - 2, pageCount - 1].forEach(
+      (page) => pages.add(page),
+    );
+  } else {
+    [currentPage - 1, currentPage + 1].forEach((page) => pages.add(page));
+  }
+
+  const orderedPages = [...pages].sort((left, right) => left - right);
+  return orderedPages.flatMap((page, index) => {
+    const previousPage = orderedPages[index - 1];
+    return index > 0 && page - previousPage > 1
+      ? [`ellipsis-${page}`, page]
+      : [page];
+  });
+}
+
 function BillRegister({
   bills,
   members,
@@ -178,22 +203,34 @@ function BillRegister({
               >
                 上一页
               </button>
-              {Array.from(
-                { length: pagination.pageCount },
-                (_, index) => index + 1,
-              ).map((pageNumber) => (
-                <button
-                  key={pageNumber}
-                  type="button"
-                  aria-label={`第 ${pageNumber} 页`}
-                  aria-current={
-                    pagination.currentPage === pageNumber ? "page" : undefined
+              {getPageItems(pagination.currentPage, pagination.pageCount).map(
+                (pageItem) => {
+                  if (typeof pageItem !== "number") {
+                    return (
+                      <span
+                        key={pageItem}
+                        className="pagination-ellipsis"
+                        aria-hidden="true"
+                      >
+                        …
+                      </span>
+                    );
                   }
-                  onClick={() => onPage(pageNumber)}
-                >
-                  {pageNumber}
-                </button>
-              ))}
+                  return (
+                    <button
+                      key={pageItem}
+                      type="button"
+                      aria-label={`第 ${pageItem} 页`}
+                      aria-current={
+                        pagination.currentPage === pageItem ? "page" : undefined
+                      }
+                      onClick={() => onPage(pageItem)}
+                    >
+                      {pageItem}
+                    </button>
+                  );
+                },
+              )}
               <button
                 type="button"
                 onClick={() => onPage(pagination.currentPage + 1)}
