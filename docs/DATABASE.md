@@ -134,15 +134,6 @@ household_settings   独立的单行家庭配置
 - 账单统计按 `bill_date`，不按 `created_at`；
 - `created_at` 和 `updated_at` 使用微秒精度。
 
-## 旧开发库兼容
-
-后端启动时的 `runtime_schema.py` 会检查：
-
-- `users` 是否缺少 `avatar_url`；
-- 是否缺少 `household_settings` 表。
-
-这只用于兼容早期本地数据库，不代替生产迁移。完整建库始终应执行 `001_init_luckywallet.sql`。
-
 ## 备份与重置
 
 生产环境应定期使用 `mysqldump` 或托管数据库快照备份，并将 `uploads/` 与数据库作为同一个恢复单元。开发环境的完全重置命令见[使用手册](/user-guide#如何彻底重置本地演示数据)。

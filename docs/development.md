@@ -29,7 +29,6 @@ backend/
 ├─ app/repositories/    数据库查询和持久化
 ├─ app/schemas/         Pydantic 请求/响应模型
 ├─ app/services/        业务规则和领域计算
-├─ app/runtime_schema.py 旧开发库的最小兼容处理
 ├─ scripts/             管理命令
 └─ tests/               pytest 测试
 
@@ -83,7 +82,7 @@ docs/                   VitePress 文档站
 
 ## 数据库变更
 
-完整的新数据库以 `sql/001_init_luckywallet.sql` 为准。当前仓库没有接入迁移框架；`runtime_schema.py` 只用于给早期开发库补齐头像字段和预算表，不应扩展成通用迁移系统。
+完整的新数据库以 `sql/001_init_luckywallet.sql` 为准。当前仓库没有接入迁移框架；修改表结构时应同步更新初始化 SQL，并重建本地开发数据库。
 
 修改表结构时至少需要同步：
 

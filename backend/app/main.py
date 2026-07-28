@@ -15,7 +15,6 @@ from app.api.routes.claude_code import router as claude_code_router
 from app.api.routes.settings import router as settings_router
 from app.config import get_settings
 from app.database import engine
-from app.runtime_schema import ensure_household_settings_table, ensure_user_avatar_column
 
 
 settings = get_settings()
@@ -26,9 +25,6 @@ uploads_dir.mkdir(parents=True, exist_ok=True)
 @asynccontextmanager
 async def lifespan(application: FastAPI):
     del application
-    with engine.begin() as connection:
-        ensure_user_avatar_column(connection)
-        ensure_household_settings_table(connection)
     yield
 
 
