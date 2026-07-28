@@ -68,9 +68,25 @@
   --color-app-border: #4d3846;
   --color-brand: #d4a9c8;
   --color-brand-strong: #f1cfdf;
-  --color-accent: #704f5f;
   --color-on-brand: #251a22;
+  --color-sidebar: #21151d;
+  --color-sidebar-text: #f5edf1;
+  --color-sidebar-muted: #bbaeb4;
+  --color-sidebar-accent: #d4a9c8;
+  --color-accent: #704f5f;
+  --color-focus-ring: rgb(212 169 200 / 38%);
   --shadow-card: 0 18px 50px rgb(0 0 0 / 18%);
   --shadow-button: 0 8px 20px rgb(0 0 0 / 24%);
   --shadow-dialog: 0 28px 80px rgb(0 0 0 / 42%);
+
+  /* 兼容旧组件使用的主题别名 */
+  --ink: var(--color-text);
+  --muted: var(--color-app-muted);
+  --page: var(--color-page);
+  --surface: var(--color-app-surface);
+  --soft: var(--color-surface-soft);
+  --line: var(--color-app-border);
+  --plum: var(--color-brand);
+  --plum-deep: var(--color-brand-strong);
+  --peach: var(--color-accent);
 }
