@@ -9,8 +9,6 @@ export function BrandIcon({ className = "", size = 38 }) {
       aria-hidden="true"
       style={{
         display: "block",
-        borderRadius: "11px 11px 11px 3px",
-        boxShadow: "var(--shadow-brand-icon)",
         objectFit: "cover",
       }}
     />
