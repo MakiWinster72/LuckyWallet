@@ -1,21 +1,34 @@
 services:
-
   db:
     image: mysql:8.0
     restart: unless-stopped
     volumes:
       - db-data:/var/lib/mysql
-      - ./sql:/docker-entrypoint-initdb.d
+      # 只在首次创建数据卷时执行初始化和演示数据脚本。
+      # 不挂载 004_reset_database.sql，避免容器启动时删除数据库。
+      - ./sql/001_init_luckywallet.sql:/docker-entrypoint-initdb.d/001_init_luckywallet.sql:ro
+      - ./sql/002_seed_demo_users.sql:/docker-entrypoint-initdb.d/002_seed_demo_users.sql:ro
+      - ./sql/003_seed_demo_bills.sql:/docker-entrypoint-initdb.d/003_seed_demo_bills.sql:ro
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpass}
-      MYSQL_DATABASE: ${DB_NAME:-luckywallet}
+      MYSQL_DATABASE: ${DB_NAME:-luckywallet_dev}
       MYSQL_USER: ${DB_USER:-luckywallet}
       MYSQL_PASSWORD: ${DB_PASSWORD:-luckywallet}
       TZ: Asia/Shanghai
     command: --default-time-zone=+08:00
     # 不暴露端口到宿主机（后端通过内部网络连接）
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-rootpass}"]
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-u",
+          "root",
+          "-p${DB_ROOT_PASSWORD:-rootpass}",
+        ]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -28,17 +41,14 @@ services:
         condition: service_healthy
     volumes:
       - uploads:/app/uploads
-      # Mount host ~/.claude so Claude Code can read credentials & persist conversations
-      - ${HOME}/.claude:/root/.claude
     environment:
-      DATABASE_URL: mysql+pymysql://${DB_USER:-luckywallet}:${DB_PASSWORD:-luckywallet}@db:3306/${DB_NAME:-luckywallet}
+      DATABASE_URL: mysql+pymysql://${DB_USER:-luckywallet}:${DB_PASSWORD:-luckywallet}@db:3306/${DB_NAME:-luckywallet_dev}
       JWT_SECRET: ${JWT_SECRET:-dev-change-this-to-a-random-secret-at-least-32-char}
       JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}
       ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
       FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-http://localhost}
     ports:
       - "8000:8000"
-
   frontend:
     build:
       context: ./frontend
