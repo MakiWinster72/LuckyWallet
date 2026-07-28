@@ -82,6 +82,8 @@ class AdminUserService:
 
         if "nickname" in changes:
             user.nickname = changes["nickname"].strip()
+        if changes.get("password"):
+            user.password_hash = hash_password(changes["password"])
         if "role" in changes:
             user.role = changes["role"]
         if "is_active" in changes:
