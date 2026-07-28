@@ -1,116 +1,168 @@
 # 部署手册
 
-本文介绍 LuckyWallet 的本地开发部署和 Docker 部署方式。
+LuckyWallet 支持本地进程部署和 Docker Compose 部署。生产环境应使用独立数据库、HTTPS、强随机密钥和持久化备份。
 
-## 运行环境
+## 配置项
 
-- MySQL 8.0+
-- Python 3.12+
-- `uv`
-- Node.js 20+
-- npm
-- Docker Desktop（仅 Docker 部署需要）
+### 后端
 
-## 本地开发部署
+| 变量 | 必填 | 默认值 | 说明 |
+| --- | :---: | --- | --- |
+| `DATABASE_URL` | 是 | 无 | SQLAlchemy MySQL 连接串 |
+| `JWT_SECRET` | 是 | 无 | JWT 签名密钥，至少 32 个字符 |
+| `JWT_ALGORITHM` | 否 | `HS256` | JWT 签名算法 |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | 否 | `30` | 登录令牌有效分钟数，必须大于 0 |
+| `FRONTEND_ORIGIN` | 否 | `http://localhost:5173` | 唯一允许的浏览器跨域来源 |
 
-### 1. 初始化数据库
+### 前端
 
-确保 MySQL 已启动，在项目根目录进入 `sql` 文件夹：
+| 变量 | 使用阶段 | 说明 |
+| --- | --- | --- |
+| `VITE_API_BASE_URL` | 构建时 | API 前缀；本地开发默认 `/api/v1`，Docker 构建使用 `/api/v1` |
 
-```bash
-cd sql
-mysql -u root -p luckywallet_dev < 001_init_luckywallet.sql
-mysql -u root -p luckywallet_dev < 002_seed_demo_users.sql
-mysql -u root -p luckywallet_dev < 003_seed_demo_bills.sql
-```
+`VITE_API_BASE_URL` 会写入前端构建产物。修改后需要重新执行 `npm run build` 或重建镜像。
 
-如果需要完全重置本地数据库，可以执行：
+## 本地进程部署
 
-```bash
-mysql -u root -p luckywallet_dev < 004_reset_database.sql
-```
-
-`004_reset_database.sql` 会删除并重建 `luckywallet_dev`，仅用于开发环境。
-
-### 2. 配置后端
-
-进入 `backend`，创建 `.env` 文件：
-
-```env
-DATABASE_URL=mysql+pymysql://root:你的密码@127.0.0.1:3306/luckywallet_dev
-JWT_SECRET=请替换为随机且足够长的密钥
-JWT_ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-FRONTEND_ORIGIN=http://localhost:5173
-```
-
-安装依赖并启动：
+按照[快速启动](/how_to_start)完成数据库和后端配置，然后分别启动：
 
 ```bash
 cd backend
-uv sync
-uv run uvicorn app.main:app --reload --port 8000
+uv sync --frozen
+uv run uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
-
-Windows 使用 `--reload` 时，必须从 `backend` 目录启动，并确认 `.env` 位于 `backend/.env`。
-
-### 3. 启动前端
 
 ```bash
 cd frontend
-npm install
-npm run dev
+npm ci
+VITE_API_BASE_URL=https://example.com/api/v1 npm run build
 ```
 
-前端地址通常是 <http://localhost:5173>，后端 API 地址是 <http://127.0.0.1:8000>。
+将 `frontend/dist` 交给 Nginx 等静态服务器，并完成以下反向代理：
 
-## Docker 部署
+| 路径 | 上游 | 额外要求 |
+| --- | --- | --- |
+| `/api/` | FastAPI `:8000` | 支持普通 HTTP 请求和 WebSocket Upgrade |
+| `/uploads/` | FastAPI `:8000` | 保留上传头像路径 |
+| 其他路径 | `frontend/dist` | 未命中静态文件时回退到 `index.html` |
 
-在项目根目录创建 `.env`：
+仓库中的 `frontend/nginx.conf` 可作为配置参考。
 
-```env
-DB_ROOT_PASSWORD=修改为强密码
+## Docker Compose 部署
+
+### 1. 准备环境变量
+
+在项目根目录复制模板：
+
+::: code-group
+
+```bash [Linux / macOS]
+cp .env.docker .env
+```
+
+```powershell [Windows PowerShell]
+Copy-Item .env.docker .env
+```
+
+:::
+
+至少替换以下值：
+
+```dotenv
+DB_ROOT_PASSWORD=数据库root强密码
 DB_NAME=luckywallet
 DB_USER=luckywallet
-DB_PASSWORD=修改为强密码
-JWT_SECRET=修改为随机且足够长的密钥
-FRONTEND_ORIGIN=http://localhost
+DB_PASSWORD=应用数据库强密码
+JWT_SECRET=至少32个字符的独立随机密钥
+FRONTEND_ORIGIN=https://你的域名
 ```
 
-启动全部服务：
+在本机通过 `http://localhost` 访问时，`FRONTEND_ORIGIN` 保持 `http://localhost`。
+
+### 2. 检查并启动
 
 ```bash
+docker compose config
 docker compose up -d --build
+docker compose ps
 ```
 
-访问 <http://localhost>。查看日志：
+Compose 会启动：
+
+- `db`：MySQL 8，数据保存在 `db-data` 卷；
+- `backend`：FastAPI，头像保存在 `uploads` 卷；
+- `frontend`：Nginx 静态站点和 API 反向代理，对外监听 80 端口。
+
+首次创建空数据库卷时，MySQL 会执行 `sql/` 下的初始化脚本。访问 <http://localhost>，并用以下命令检查状态：
 
 ```bash
 docker compose logs -f backend
 docker compose logs -f db
+curl http://localhost:8000/health
 ```
 
-停止服务但保留数据库：
+### 3. Claude Code 助手
+
+后端镜像已安装 Claude Code CLI，并将宿主机的 `${HOME}/.claude` 挂载到容器。启动前应先在宿主机完成 Claude Code 登录，并确认 Compose 能解析 `HOME`。
+
+::: danger 管理员执行权限
+普通用户的助手使用 `plan` 只读模式；管理员使用 `auto` 模式，可能修改挂载的项目文件或执行命令。公开部署前应评估这一能力，不应给不可信账号授予管理员角色。
+:::
+
+不使用助手时，核心记账功能仍可正常工作；对话入口会因 CLI 凭据不可用而无法建立有效会话。
+
+## 运维命令
+
+查看日志：
+
+```bash
+docker compose logs -f
+docker compose logs -f backend
+```
+
+重启单个服务：
+
+```bash
+docker compose restart backend
+```
+
+停止服务并保留数据：
 
 ```bash
 docker compose down
 ```
 
-停止服务并删除数据库卷（会丢失全部 Docker 数据）：
+更新代码后重建：
 
 ```bash
-docker compose down -v
+docker compose up -d --build
 ```
+
+::: danger 删除持久化数据
+`docker compose down -v` 会删除数据库和头像数据卷。仅在明确需要清空全部 Docker 数据时执行。
+:::
 
 ## 发布前检查
 
 ```bash
-cd frontend
+cd backend
+uv run pytest
+
+cd ../frontend
+npm test
 npm run lint
 npm run build
 
-cd ../backend
-uv run pytest
+cd ../docs
+npm run docs:build
 ```
 
-生产环境应使用独立数据库、强随机 `JWT_SECRET`，并通过 HTTPS 暴露前端服务。
+## 生产安全清单
+
+- 使用与开发环境隔离的 MySQL 实例并定期备份；
+- 为数据库账号设置最小权限，不让应用使用 `root`；
+- 使用强随机 `JWT_SECRET`，不要提交任何 `.env`；
+- 通过 HTTPS 暴露站点，并将 `FRONTEND_ORIGIN` 精确设置为实际来源；
+- 限制后端 8000 端口，只让反向代理或受信网络访问；
+- 备份 `db-data` 和 `uploads`，并测试恢复流程；
+- 修改或停用演示账号，审慎分配管理员角色。
