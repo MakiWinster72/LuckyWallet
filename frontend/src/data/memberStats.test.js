@@ -16,11 +16,12 @@ test("buildMemberStats uses API members and ignores unknown bill participants", 
   assert.equal(stats.length, 2);
   assert.equal(stats[0].paid, 90);
   assert.equal(stats[1].share, 30);
+  assert.equal("status" in stats[0], false);
 });
 
 test("member summaries handle an empty household", () => {
   assert.deepEqual(summarizeMembers(buildMemberStats([], bills)), {
-    paid: 0, positive: 0, active: 0,
+    paid: 0, positive: 0,
   });
 });
 

@@ -289,11 +289,12 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .member-card:hover, .member-card:focus-visible { border-color: color-mix(in srgb, var(--plum) 50%, var(--line)); outline: none; transform: translateY(-2px); }
 .member-card > header { display: flex; align-items: center; gap: 11px; padding: 20px 20px 16px; }
 .member-avatar { display: grid; width: 46px; height: 46px; flex: 0 0 auto; place-items: center; border-radius: 15px; color: white; background: var(--avatar); font-size: 11px; font-weight: 700; box-shadow: inset 0 0 0 2px rgb(255 255 255 / 20%); }
+.member-avatar-image { overflow: hidden; background: var(--soft); }
+.member-avatar-image img { width: 100%; height: 100%; object-fit: cover; }
 .member-card header div { flex: 1; }
 .member-card h3 { margin: 0 0 4px; font-size: 14px; }
 .member-card h3 small { margin-left: 4px; color: var(--plum); font-size: 9px; }
 .member-card header div > span { color: var(--muted); font-size: 9px; }
-.member-card header div > span i { display: inline-block; width: 6px; height: 6px; margin-right: 5px; border-radius: 50%; background: #5b9a79; }
 .member-card-more { align-self: start; color: var(--muted); font-size: 12px; letter-spacing: 1px; }
 .member-card dl { display: grid; grid-template-columns: 1fr 1fr; margin: 0 20px; padding: 14px 0; border-top: 1px solid var(--line); }
 .member-card dl div + div { padding-left: 16px; border-left: 1px solid var(--line); }
