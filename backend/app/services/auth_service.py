@@ -1,12 +1,16 @@
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from app.core.security import create_access_token, verify_password
+from app.core.security import create_access_token, hash_password, verify_password
 from app.models import AuditLog, User
 from app.repositories.user_repository import UserRepository
 
 
 class InvalidCredentialsError(Exception):
+    pass
+
+
+class CurrentPasswordIncorrectError(Exception):
     pass
 
 
@@ -48,6 +52,17 @@ class AuthService:
             user_agent=user_agent,
         )
         return user, access_token
+
+    def change_password(
+        self,
+        user: User,
+        current_password: str,
+        new_password: str,
+    ) -> None:
+        if not verify_password(current_password, user.password_hash):
+            raise CurrentPasswordIncorrectError
+        user.password_hash = hash_password(new_password)
+        self.repository.commit()
 
     def _record_login(
         self,
