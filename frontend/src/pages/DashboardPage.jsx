@@ -982,7 +982,7 @@ function StatisticsView({ bills, members }) {
                 viewBox="0 0 500 150"
                 role="img"
                 aria-label="本月每日支出折线图"
-                preserveAspectRatio="none"
+                preserveAspectRatio="xMidYMid meet"
               >
                 <path
                   d="M12 132H488M12 76H488M12 20H488"
