@@ -1423,7 +1423,13 @@ export function DashboardPage() {
                     : activeNav}
                 </h1>
                 <p>
-                  {activeNav === "总览" ? "总览账单，每一笔都清清楚楚。" : ""}
+                  {activeNav === "总览"
+                    ? "总览账单，每一笔都清清楚楚。"
+                    : activeNav === "账单"
+                      ? "筛选、核对并查看每一笔账单。"
+                      : activeNav === "成员"
+                        ? "查看每个人本月的参与和垫付情况。"
+                        : "从不同维度了解支出情况。"}
                 </p>
               </div>
               <button

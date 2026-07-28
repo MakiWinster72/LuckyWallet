@@ -96,8 +96,9 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .welcome h1 { margin: 7px 0 5px; font-family: "Noto Serif SC", serif; font-size: clamp(30px, 3vw, 42px); letter-spacing: -.045em; }
 .welcome p:last-child { margin: 0; color: var(--muted); }
 
-.summary-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr; gap: 16px; margin-top: 34px; }
+.summary-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 34px; }
 .hero-total, .summary-card { position: relative; min-height: 162px; overflow: hidden; padding: 25px 27px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); box-shadow: var(--shadow); }
+.hero-total, .summary-card { min-width: 0; }
 .hero-total { color: white; border: 0; border-radius: 18px 18px 5px 18px; background: linear-gradient(135deg, #704264, #49243e); }
 .hero-total::before { position: absolute; width: 190px; height: 190px; right: -45px; bottom: -100px; border: 35px solid rgb(255 255 255 / 6%); border-radius: 50%; content: ""; }
 .card-label { display: block; color: var(--muted); font-size: 13px; }
@@ -248,21 +249,25 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .bills-heading { display: flex; align-items: end; justify-content: space-between; gap: 20px; padding-bottom: 20px; }
 .bills-heading h2 { margin: 6px 0 4px; font-family: "Noto Serif SC", serif; font-size: 25px; text-wrap: balance; }
 .bills-heading p { margin: 0; color: var(--muted); font-size: 12px; }
-.bill-filters { display: flex; align-items: end; gap: 10px; padding: 15px; border: 1px solid var(--line); border-radius: 15px; background: var(--surface); }
+.bill-filters { display: grid; grid-template-columns: minmax(280px, 2fr) repeat(2, minmax(150px, 1fr)) auto; align-items: end; gap: 10px; padding: 15px; border: 1px solid var(--line); border-radius: 15px; background: var(--surface); }
 .bill-filters label { display: grid; min-width: 150px; gap: 6px; color: var(--muted); font-size: 10px; font-weight: 600; }
 .bill-filters input, .bill-filters select { height: 38px; padding: 0 11px; border: 1px solid var(--line); border-radius: 9px; color: var(--ink); background-color: var(--page); }
 .date-range-fields { display: grid; grid-template-columns: repeat(2, minmax(150px, 1fr)); gap: 6px 10px; }
 .date-range-fields .filter-error { grid-column: 1 / -1; color: #b42318; font-size: 10px; font-weight: 600; }
 .bill-filters input[aria-invalid="true"] { border-color: #b42318; }
-.clear-filter { min-height: 38px; margin-left: auto; padding: 0 12px; border: 0; border-radius: 9px; color: var(--plum); background: var(--soft); font-size: 11px; font-weight: 600; }
+.clear-filter { min-height: 38px; padding: 0 12px; border: 0; border-radius: 9px; color: var(--plum); background: var(--soft); font-size: 11px; font-weight: 600; }
 .clear-filter:hover { color: var(--plum-deep); background: var(--peach); }
 .bill-register { margin-top: 14px; overflow: hidden; }
-.bill-register > header { display: flex; align-items: center; justify-content: space-between; padding: 21px 24px; border-bottom: 1px solid var(--line); }
-.bill-register > header > div { display: grid; gap: 4px; }
-.bill-register > header > div:last-child { text-align: right; }
-.bill-register > header strong { font-size: 14px; font-variant-numeric: tabular-nums; }
+.bill-register > header { display: grid; grid-template-columns: minmax(150px, 1fr) minmax(220px, 360px) auto; align-items: center; gap: 22px; padding: 18px 24px; border-bottom: 1px solid var(--line); }
+.bill-register-heading { display: grid; min-width: 0; gap: 4px; padding-left: 13px; border-left: 3px solid var(--peach); }
+.bill-register-heading .overline { font-size: 9px; letter-spacing: .18em; }
+.bill-register > header .bill-register-heading strong { overflow: hidden; font-size: 16px; text-overflow: ellipsis; white-space: nowrap; }
+.bill-register > header .bill-register-heading > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .bill-register > header span { color: var(--muted); font-size: 10px; }
+.bill-register-total { display: grid; justify-items: end; gap: 4px; min-width: 116px; padding-left: 20px; border-left: 1px solid var(--line); }
+.bill-register > header .bill-register-total strong { color: var(--plum-deep); font-size: 18px; font-variant-numeric: tabular-nums; letter-spacing: -.03em; }
 .bill-register-search { display: flex; width: min(360px, 42%); min-height: 40px; align-items: center; gap: 8px; padding: 0 10px; border: 1px solid var(--line); border-radius: 10px; color: var(--muted); background: var(--page); }
+.bill-register-search { width: 100%; }
 .bill-register-search:focus-within { border-color: var(--plum); box-shadow: 0 0 0 3px rgb(187 132 147 / 28%); }
 .bill-register-search input { min-width: 0; flex: 1; border: 0; color: var(--ink); background: transparent; }
 .bill-register-search input::placeholder { color: var(--muted); }
@@ -573,9 +578,21 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   .content-grid { grid-template-columns: 1fr; }
   .right-column { grid-template-columns: 1fr 1fr; }
   .stats-layout, .stats-trend-grid { grid-template-columns: 1fr; }
+  .summary-grid { grid-template-columns: minmax(0, 1.35fr) repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .hero-total, .summary-card { padding-inline: 20px; }
+  .hero-total > strong, .summary-card > strong { font-size: clamp(23px, 3vw, 32px); }
+  .bill-pagination { flex-wrap: wrap; row-gap: 8px; }
+  .bill-pagination > span { flex: 1 0 100%; margin-right: 0; }
+  .bill-pagination > div { max-width: 100%; margin-left: auto; overflow-x: auto; padding-bottom: 2px; }
+  .bill-pagination button { flex: 0 0 auto; }
+  .bill-register > header { grid-template-columns: minmax(0, 1fr) auto; gap: 14px; }
+  .bill-register-search { grid-column: 1 / -1; grid-row: 2; }
   .member-card-grid { grid-template-columns: repeat(2, 1fr); }
   .admin-user-toolbar { flex-wrap: wrap; }
   .admin-user-toolbar .admin-user-search { flex-basis: 100%; }
+  .bill-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .date-range-fields { grid-column: 1 / -1; }
+  .clear-filter { justify-self: start; }
 }
 @media (max-width: 760px) {
   .app-shell { display: block; padding-bottom: 68px; }
@@ -598,13 +615,10 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   .statistics-period-input { flex: 1; }
   .member-summary { grid-template-columns: 1fr 1fr; }
   .member-summary article:first-child { grid-column: 1 / -1; }
-  .bill-filters { align-items: stretch; flex-wrap: wrap; }
-  .bill-filters label { min-width: calc(50% - 5px); flex: 1; }
+  .bill-filters { align-items: stretch; }
+  .bill-filters label { min-width: 0; }
   .date-range-fields { width: 100%; }
   .date-range-fields label { min-width: 0; }
-  .clear-filter { margin-left: 0; }
-  .bill-register > header { flex-wrap: wrap; gap: 14px; }
-  .bill-register-search { order: 3; width: 100%; }
   .bill-pagination { flex-wrap: wrap; }
   .bill-pagination > span { flex: 1 0 100%; }
   .bill-pagination > div { margin-left: auto; }
@@ -644,8 +658,13 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   .export-date-range { grid-template-columns: 1fr; }
   .bills-heading { align-items: center; }
   .bills-heading .add-button { display: none; }
-  .bill-filters label { min-width: 100%; }
-  .bill-register > header > div:last-child { margin-left: auto; }
+  .bill-filters { grid-template-columns: 1fr; }
+  .bill-filters label { min-width: 0; }
+  .date-range-fields { grid-column: auto; }
+  .bill-register > header { grid-template-columns: 1fr; gap: 13px; padding: 18px; }
+  .bill-register-heading, .bill-register-total { min-width: 0; }
+  .bill-register-total { justify-items: start; padding: 11px 0 0; border-top: 1px solid var(--line); border-left: 0; }
+  .bill-register-search { grid-column: auto; grid-row: auto; }
   .date-range-fields { grid-template-columns: 1fr; }
   .date-range-fields .filter-error { grid-column: auto; }
   .bill-pagination { gap: 10px; padding: 12px; }
@@ -710,13 +729,14 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .cc-fab:hover { transform: scale(1.08); box-shadow: 0 6px 24px rgb(217 119 87 / 52%); }
 .cc-fab:active { transform: scale(.95); }
 .cc-fab svg { width: 26px; height: 26px; }
+.cc-backdrop { display: none; }
 
 /* ── dialog ──────────────────────────────────────────── */
 
 .cc-dialog {
   position: fixed; right: 24px; bottom: 88px; z-index: 999;
-  width: 400px; max-width: calc(100vw - 48px);
-  height: 560px; max-height: calc(100vh - 120px);
+  width: min(400px, calc(100vw - 48px));
+  height: min(560px, calc(100dvh - 120px)); max-height: calc(100dvh - 120px);
   display: flex; flex-direction: column;
   border-radius: 16px; overflow: hidden;
   background: var(--surface, #fffdfd);
@@ -762,7 +782,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 /* ── message list ────────────────────────────────────── */
 
 .cc-list {
-  flex: 1; overflow-y: auto; padding: 12px 14px;
+  flex: 1; min-height: 0; overflow-y: auto; padding: 14px;
   display: flex; flex-direction: column; gap: 8px;
   background: var(--page, #f5f1f2);
   scroll-behavior: smooth;
@@ -777,6 +797,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .cc-empty p { margin: 0; font-size: 13px; line-height: 1.5; }
 
 .cc-msg { display: flex; flex-direction: column; gap: 4px; max-width: 88%; }
+.cc-msg { min-width: 0; }
 .cc-msg-user { align-self: flex-end; align-items: flex-end; }
 .cc-msg-assistant { align-self: flex-start; }
 .cc-msg-system { align-self: center; max-width: 100%; }
@@ -787,7 +808,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 }
 
 .cc-bubble {
-  padding: 9px 13px; border-radius: 12px;
+  max-width: 100%; padding: 9px 13px; border-radius: 12px;
   font-size: 13.5px; line-height: 1.55; white-space: pre-wrap; word-break: break-word;
 }
 .cc-msg-user .cc-bubble {
@@ -866,14 +887,14 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 /* ── footer / input ──────────────────────────────────── */
 
 .cc-footer {
-  display: flex; align-items: flex-end; gap: 6px;
-  padding: 10px 12px 12px;
+  display: flex; align-items: flex-end; gap: 7px;
+  padding: 10px 12px calc(12px + env(safe-area-inset-bottom));
   background: var(--surface, #fffdfd);
   border-top: 1px solid var(--line, #e8dfe2);
 }
 
 .cc-input {
-  flex: 1; resize: none; min-height: 38px; max-height: 120px;
+  flex: 1; min-width: 0; resize: none; min-height: 38px; max-height: 120px;
   padding: 9px 12px; border: 1px solid var(--line, #e8dfe2); border-radius: 10px;
   background: var(--page, #f5f1f2); color: var(--ink, #34252f);
   font-size: 13px; line-height: 1.45; outline: none; transition: border-color .2s;
@@ -901,9 +922,29 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 /* ── mobile ──────────────────────────────────────────── */
 
 @media (max-width: 680px) {
-  .cc-dialog {
-    right: 12px; bottom: 80px;
-    width: calc(100vw - 24px); height: 460px;
+  .cc-backdrop {
+    position: fixed; inset: 0; z-index: 998; display: block;
+    border: 0; background: rgb(30 18 27 / 24%);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    animation: cc-backdrop-in .2s ease-out;
   }
-  .cc-fab { right: 16px; bottom: 72px; }
+  .cc-dialog {
+    right: 10px; bottom: calc(76px + env(safe-area-inset-bottom));
+    width: calc(100vw - 20px); height: min(560px, calc(100dvh - 92px));
+    max-height: calc(100dvh - 92px); border-radius: 18px;
+  }
+  .cc-fab { right: 16px; bottom: calc(76px + env(safe-area-inset-bottom)); width: 46px; height: 46px; }
+  .cc-header { padding: 12px 13px; }
+  .cc-list { padding: 12px 10px; }
+  .cc-msg { max-width: 94%; }
+  .cc-bubble { font-size: 13px; }
+}
+
+@keyframes cc-backdrop-in { from { opacity: 0; } }
+
+@media (max-width: 380px) {
+  .cc-dialog { right: 6px; width: calc(100vw - 12px); }
+  .cc-header strong { font-size: 13px; }
+  .cc-header small { font-size: 10px; }
+  .cc-footer { padding-inline: 8px; }
 }

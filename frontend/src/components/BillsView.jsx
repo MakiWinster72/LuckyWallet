@@ -52,8 +52,9 @@ function BillRegister({
 
   return (
     <div className="bill-register panel">
-      <header>
-        <div>
+      <header className="bill-register-header">
+        <div className="bill-register-heading">
+          <span className="overline">LEDGER</span>
           <strong>{bills.length} 笔账单</strong>
           <span>{dateError ? "请修正日期范围" : rangeLabel}</span>
         </div>
@@ -78,7 +79,7 @@ function BillRegister({
             </button>
           ) : null}
         </label>
-        <div>
+        <div className="bill-register-total">
           <span>筛选结果合计</span>
           <strong>{formatMoney(visibleTotal)}</strong>
         </div>
