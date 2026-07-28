@@ -269,9 +269,9 @@ export function ClaudeCodeChat() {
             {busy && messages.length > 0 && messages.at(-1)?.role !== "assistant" ? (
               <div className="cc-msg cc-msg-assistant">
                 <ClaudeCodeIcon />
-                <div className="cc-bubble cc-thinking">
+                <div className="cc-bubble cc-thinking" role="status" aria-live="polite">
+                  <span>思考中</span>
                   <span className="cc-dot-pulse"><span /></span>
-                  思考中
                 </div>
               </div>
             ) : null}
