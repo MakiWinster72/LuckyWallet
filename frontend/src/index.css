@@ -248,13 +248,13 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .bills-heading { display: flex; align-items: end; justify-content: space-between; gap: 20px; padding-bottom: 20px; }
 .bills-heading h2 { margin: 6px 0 4px; font-family: "Noto Serif SC", serif; font-size: 25px; text-wrap: balance; }
 .bills-heading p { margin: 0; color: var(--muted); font-size: 12px; }
-.bill-filters { display: flex; align-items: end; gap: 10px; padding: 15px; border: 1px solid var(--line); border-radius: 15px; background: var(--surface); }
+.bill-filters { display: grid; grid-template-columns: minmax(280px, 2fr) repeat(2, minmax(150px, 1fr)) auto; align-items: end; gap: 10px; padding: 15px; border: 1px solid var(--line); border-radius: 15px; background: var(--surface); }
 .bill-filters label { display: grid; min-width: 150px; gap: 6px; color: var(--muted); font-size: 10px; font-weight: 600; }
 .bill-filters input, .bill-filters select { height: 38px; padding: 0 11px; border: 1px solid var(--line); border-radius: 9px; color: var(--ink); background-color: var(--page); }
 .date-range-fields { display: grid; grid-template-columns: repeat(2, minmax(150px, 1fr)); gap: 6px 10px; }
 .date-range-fields .filter-error { grid-column: 1 / -1; color: #b42318; font-size: 10px; font-weight: 600; }
 .bill-filters input[aria-invalid="true"] { border-color: #b42318; }
-.clear-filter { min-height: 38px; margin-left: auto; padding: 0 12px; border: 0; border-radius: 9px; color: var(--plum); background: var(--soft); font-size: 11px; font-weight: 600; }
+.clear-filter { min-height: 38px; padding: 0 12px; border: 0; border-radius: 9px; color: var(--plum); background: var(--soft); font-size: 11px; font-weight: 600; }
 .clear-filter:hover { color: var(--plum-deep); background: var(--peach); }
 .bill-register { margin-top: 14px; overflow: hidden; }
 .bill-register > header { display: flex; align-items: center; justify-content: space-between; padding: 21px 24px; border-bottom: 1px solid var(--line); }
@@ -576,6 +576,9 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   .member-card-grid { grid-template-columns: repeat(2, 1fr); }
   .admin-user-toolbar { flex-wrap: wrap; }
   .admin-user-toolbar .admin-user-search { flex-basis: 100%; }
+  .bill-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .date-range-fields { grid-column: 1 / -1; }
+  .clear-filter { justify-self: start; }
 }
 @media (max-width: 760px) {
   .app-shell { display: block; padding-bottom: 68px; }
@@ -598,11 +601,10 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   .statistics-period-input { flex: 1; }
   .member-summary { grid-template-columns: 1fr 1fr; }
   .member-summary article:first-child { grid-column: 1 / -1; }
-  .bill-filters { align-items: stretch; flex-wrap: wrap; }
-  .bill-filters label { min-width: calc(50% - 5px); flex: 1; }
+  .bill-filters { align-items: stretch; }
+  .bill-filters label { min-width: 0; }
   .date-range-fields { width: 100%; }
   .date-range-fields label { min-width: 0; }
-  .clear-filter { margin-left: 0; }
   .bill-register > header { flex-wrap: wrap; gap: 14px; }
   .bill-register-search { order: 3; width: 100%; }
   .bill-pagination { flex-wrap: wrap; }
@@ -644,7 +646,9 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   .export-date-range { grid-template-columns: 1fr; }
   .bills-heading { align-items: center; }
   .bills-heading .add-button { display: none; }
-  .bill-filters label { min-width: 100%; }
+  .bill-filters { grid-template-columns: 1fr; }
+  .bill-filters label { min-width: 0; }
+  .date-range-fields { grid-column: auto; }
   .bill-register > header > div:last-child { margin-left: auto; }
   .date-range-fields { grid-template-columns: 1fr; }
   .date-range-fields .filter-error { grid-column: auto; }
