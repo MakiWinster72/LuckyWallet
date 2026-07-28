@@ -43,7 +43,16 @@ export function ClaudeCodeChat() {
     }
     try {
       const saved = JSON.parse(localStorage.getItem(historyKey) || "[]");
-      setMessages(Array.isArray(saved) ? saved : []);
+      setMessages(
+        Array.isArray(saved)
+          ? saved.filter(
+              (message) =>
+                (message?.role === "user" || message?.role === "assistant") &&
+                typeof message.text === "string" &&
+                message.text.trim(),
+            )
+          : [],
+      );
     } catch {
       setMessages([]);
     } finally {
@@ -54,7 +63,10 @@ export function ClaudeCodeChat() {
   useEffect(() => {
     if (!historyKey || !historyReadyRef.current) return;
     const conversation = messages.filter(
-      (message) => message.role === "user" || message.role === "assistant",
+      (message) =>
+        (message.role === "user" || message.role === "assistant") &&
+        typeof message.text === "string" &&
+        message.text.trim(),
     );
     localStorage.setItem(historyKey, JSON.stringify(conversation.slice(-100)));
   }, [historyKey, messages]);
@@ -71,7 +83,12 @@ export function ClaudeCodeChat() {
     ws.onopen = () => {
       setConnected(true);
       const history = messagesRef.current
-        .filter((message) => message.role === "user" || message.role === "assistant")
+        .filter(
+          (message) =>
+            (message.role === "user" || message.role === "assistant") &&
+            typeof message.text === "string" &&
+            message.text.trim(),
+        )
         .map((message) => ({ role: message.role, text: message.text }));
       if (history.length) {
         ws.send(JSON.stringify({ type: "restore", history }));
