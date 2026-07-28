@@ -8,7 +8,7 @@
 -- changes should be executed through reviewed Alembic migrations.
 
 SET NAMES utf8mb4;
-SET time_zone = '+00:00';
+SET time_zone = '+08:00';
 
 CREATE DATABASE IF NOT EXISTS luckywallet_dev
   CHARACTER SET utf8mb4

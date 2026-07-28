@@ -130,7 +130,7 @@ household_settings   独立的单行家庭配置
 
 - 金额在数据库中使用 `DECIMAL(10,2)`，后端使用 Python `Decimal`；
 - API 中 Decimal 默认序列化为字符串，例如 `"12.50"`；
-- `001_init_luckywallet.sql` 将会话时区设置为 UTC；
+- `001_init_luckywallet.sql` 将会话时区设置为北京时间（UTC+8）；
 - 账单统计按 `bill_date`，不按 `created_at`；
 - `created_at` 和 `updated_at` 使用微秒精度。
 

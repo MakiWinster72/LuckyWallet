@@ -11,6 +11,8 @@ services:
       MYSQL_DATABASE: ${DB_NAME:-luckywallet}
       MYSQL_USER: ${DB_USER:-luckywallet}
       MYSQL_PASSWORD: ${DB_PASSWORD:-luckywallet}
+      TZ: Asia/Shanghai
+    command: --default-time-zone=+08:00
     # 不暴露端口到宿主机（后端通过内部网络连接）
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-rootpass}"]

@@ -1,4 +1,5 @@
-from datetime import UTC, datetime
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from sqlalchemy.exc import IntegrityError
 
@@ -6,6 +7,9 @@ from app.core.security import hash_password
 from app.models import User
 from app.repositories.user_repository import UserRepository
 from app.schemas.admin_user import AdminUserCreate, AdminUserUpdate
+
+
+SHANGHAI_TZ = ZoneInfo("Asia/Shanghai")
 
 
 class UserNotFoundError(Exception):
@@ -82,6 +86,6 @@ class AdminUserService:
             user.role = changes["role"]
         if "is_active" in changes:
             user.is_active = changes["is_active"]
-        user.updated_at = datetime.now(UTC).replace(tzinfo=None)
+        user.updated_at = datetime.now(SHANGHAI_TZ).replace(tzinfo=None)
         self.repository.commit()
         return user

@@ -1,4 +1,5 @@
-from datetime import UTC, datetime
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from app.core.security import create_access_token, verify_password
 from app.models import AuditLog, User
@@ -7,6 +8,9 @@ from app.repositories.user_repository import UserRepository
 
 class InvalidCredentialsError(Exception):
     pass
+
+
+SHANGHAI_TZ = ZoneInfo("Asia/Shanghai")
 
 
 class AuthService:
@@ -60,7 +64,7 @@ class AuthService:
             ip=ip,
             user_agent=user_agent[:255] if user_agent else None,
             detail=None,
-            created_at=datetime.now(UTC).replace(tzinfo=None),
+            created_at=datetime.now(SHANGHAI_TZ).replace(tzinfo=None),
         )
         try:
             self.repository.add_audit_log(audit_log)
