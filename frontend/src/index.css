@@ -285,15 +285,17 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .member-toolbar button { min-height: 34px; padding: 0 13px; border: 1px solid var(--line); border-radius: 18px; color: var(--muted); background: var(--surface); font-size: 11px; }
 .member-toolbar button.active { border-color: var(--plum); color: white; background: var(--plum); }
 .member-card-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
-.member-card { overflow: hidden; border: 1px solid var(--line); border-radius: 17px; background: var(--surface); box-shadow: var(--shadow); }
+.member-card { overflow: hidden; border: 1px solid var(--line); border-radius: 17px; background: var(--surface); box-shadow: var(--shadow); cursor: pointer; transition: transform .18s ease, border-color .18s ease; }
+.member-card:hover, .member-card:focus-visible { border-color: color-mix(in srgb, var(--plum) 50%, var(--line)); outline: none; transform: translateY(-2px); }
 .member-card > header { display: flex; align-items: center; gap: 11px; padding: 20px 20px 16px; }
 .member-avatar { display: grid; width: 46px; height: 46px; flex: 0 0 auto; place-items: center; border-radius: 15px; color: white; background: var(--avatar); font-size: 11px; font-weight: 700; box-shadow: inset 0 0 0 2px rgb(255 255 255 / 20%); }
+.member-avatar-image { overflow: hidden; background: var(--soft); }
+.member-avatar-image img { width: 100%; height: 100%; object-fit: cover; }
 .member-card header div { flex: 1; }
 .member-card h3 { margin: 0 0 4px; font-size: 14px; }
 .member-card h3 small { margin-left: 4px; color: var(--plum); font-size: 9px; }
 .member-card header div > span { color: var(--muted); font-size: 9px; }
-.member-card header div > span i { display: inline-block; width: 6px; height: 6px; margin-right: 5px; border-radius: 50%; background: #5b9a79; }
-.member-card header button { align-self: start; border: 0; color: var(--muted); background: transparent; letter-spacing: 1px; }
+.member-card-more { align-self: start; color: var(--muted); font-size: 12px; letter-spacing: 1px; }
 .member-card dl { display: grid; grid-template-columns: 1fr 1fr; margin: 0 20px; padding: 14px 0; border-top: 1px solid var(--line); }
 .member-card dl div + div { padding-left: 16px; border-left: 1px solid var(--line); }
 .member-card dt { color: var(--muted); font-size: 9px; }
@@ -303,7 +305,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .is-credit { color: #527965; background: color-mix(in srgb, #dcece3 72%, var(--surface)); }
 .is-debit { color: #a15b55; background: color-mix(in srgb, #f4dfda 72%, var(--surface)); }
 .member-detail-backdrop { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; padding: 20px; background: rgb(30 18 27 / 52%); backdrop-filter: blur(4px); }
-.member-detail { position: relative; width: min(390px, 100%); padding: 32px; border-radius: 20px; color: var(--ink); background: var(--surface); box-shadow: 0 30px 80px rgb(20 10 17 / 30%); text-align: center; }
+.member-detail { position: relative; width: min(620px, 100%); max-height: calc(100vh - 40px); overflow-y: auto; padding: 32px; border-radius: 20px; color: var(--ink); background: var(--surface); box-shadow: 0 30px 80px rgb(20 10 17 / 30%); text-align: center; }
 .member-detail .member-avatar { width: 62px; height: 62px; margin: 0 auto 16px; font-size: 14px; }
 
 .profile-dialog { width: min(520px, calc(100vw - 32px)); max-height: calc(100vh - 32px); overflow-y: auto; padding: 26px; border: 1px solid var(--line); border-radius: 22px; background: var(--surface); box-shadow: 0 24px 70px rgb(43 25 37 / 24%); }
@@ -347,6 +349,30 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .member-detail dd { margin: 6px 0 0; font-size: 11px; font-weight: 600; }
 .member-balance { display: flex; align-items: center; justify-content: space-between; padding: 15px; border-radius: 11px; font-size: 11px; }
 .member-balance strong { font-size: 16px; }
+.member-finance { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--line); text-align: left; }
+.member-finance > header { display: flex; align-items: end; justify-content: space-between; gap: 16px; }
+.member-finance h3 { margin: 4px 0 0; font-family: "Noto Serif SC", serif; font-size: 17px; }
+.member-finance > header small { color: var(--muted); font-size: 9px; }
+.member-finance-kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; margin-top: 13px; }
+.member-finance-kpis article { display: grid; gap: 6px; padding: 12px; border-radius: 11px; background: var(--soft); }
+.member-finance-kpis span { color: var(--muted); font-size: 9px; }
+.member-finance-kpis strong { font-size: 15px; font-variant-numeric: tabular-nums; }
+.member-finance-kpis .is-positive { color: #397258; }
+.member-finance-kpis .is-negative { color: #a04f49; }
+.member-finance-chart { margin-top: 16px; padding: 14px 14px 10px; border: 1px solid var(--line); border-radius: 13px; }
+.member-chart-legend { display: flex; justify-content: flex-end; gap: 14px; color: var(--muted); font-size: 9px; }
+.member-chart-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.member-chart-legend i { width: 15px; height: 3px; border-radius: 9px; }
+.member-chart-legend .is-expense i { background: var(--plum); }
+.member-chart-legend .is-income i { background: #4f8b70; }
+.member-finance-chart svg { display: block; width: 100%; height: 145px; margin-top: 5px; overflow: visible; }
+.member-chart-grid { fill: none; stroke: var(--line); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.member-expense-curve, .member-income-curve { fill: none; stroke-width: 2.5; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.member-expense-curve { stroke: var(--plum); }
+.member-income-curve { stroke: #4f8b70; }
+.member-expense-point { fill: var(--surface); stroke: var(--plum); stroke-width: 2; vector-effect: non-scaling-stroke; }
+.member-income-point { fill: var(--surface); stroke: #4f8b70; stroke-width: 2; vector-effect: non-scaling-stroke; }
+.member-chart-axis { display: grid; grid-template-columns: repeat(6, 1fr); color: var(--muted); font-size: 8px; text-align: center; }
 
 .detail-backdrop { position: fixed; inset: 0; z-index: 9; background: rgb(30 18 27 / 45%); backdrop-filter: blur(3px); animation: fade .2s ease-out; }
 .detail-drawer { position: absolute; inset: 0 0 0 auto; width: min(440px, 100%); overflow-y: auto; overscroll-behavior: contain; color: var(--ink); background: var(--surface); box-shadow: -20px 0 70px rgb(20 10 17 / 22%); animation: slide-in .25s ease-out; }
@@ -588,6 +614,10 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   .member-card-grid, .member-summary { grid-template-columns: 1fr; }
   .member-summary article:first-child { grid-column: auto; }
   .member-toolbar { overflow-x: auto; }
+  .member-detail { padding: 24px 18px; }
+  .member-finance-kpis { grid-template-columns: 1fr 1fr; }
+  .member-finance-kpis article:last-child { grid-column: 1 / -1; }
+  .member-finance-chart { padding-inline: 8px; }
   .member-toolbar button { flex: 0 0 auto; }
   .summary-card { min-height: 140px; padding: 19px; }
   .settlement-dialog { width: 100vw; max-height: 100vh; border-radius: 0; }

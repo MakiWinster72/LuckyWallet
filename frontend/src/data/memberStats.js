@@ -27,7 +27,6 @@ export function buildMemberStats(members, bills) {
     return {
       ...entry,
       balance: entry.paid - entry.share,
-      status: entry.lastActive ? "已加入" : "待激活",
     };
   });
 }
@@ -36,6 +35,5 @@ export function summarizeMembers(memberStats) {
   return memberStats.reduce((summary, item) => ({
     paid: summary.paid + item.paid,
     positive: summary.positive + Math.max(item.balance, 0),
-    active: summary.active + (item.status === "已加入" ? 1 : 0),
-  }), { paid: 0, positive: 0, active: 0 });
+  }), { paid: 0, positive: 0 });
 }
