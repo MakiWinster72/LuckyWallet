@@ -1394,7 +1394,7 @@ export function DashboardPage() {
             <button className="icon-button notification" aria-label="通知">
               <AppIcon name="bell" />
             </button>
-            {isUserManagement ? null : (
+            {isUserManagement || user.role !== "admin" ? null : (
               <button className="add-button" onClick={() => setIsAdding(true)}>
                 <AppIcon name="plus" size={18} />
                 记一笔
@@ -1432,13 +1432,15 @@ export function DashboardPage() {
                         : "从不同维度了解支出情况。"}
                 </p>
               </div>
-              <button
-                className="add-button mobile-add"
-                onClick={() => setIsAdding(true)}
-              >
-                <AppIcon name="plus" size={18} />
-                记一笔
-              </button>
+              {user.role === "admin" ? (
+                <button
+                  className="add-button mobile-add"
+                  onClick={() => setIsAdding(true)}
+                >
+                  <AppIcon name="plus" size={18} />
+                  记一笔
+                </button>
+              ) : null}
             </section>
           )}
 
@@ -1448,6 +1450,7 @@ export function DashboardPage() {
             <BillsView
               bills={bills}
               members={members}
+              canAdd={user.role === "admin"}
               onAdd={() => setIsAdding(true)}
               onOpen={setSelectedBill}
             />

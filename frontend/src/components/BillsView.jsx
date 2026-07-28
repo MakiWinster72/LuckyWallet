@@ -217,18 +217,18 @@ function BillRegister({
             <button type="button" onClick={() => onQuery("")}>
               清除搜索
             </button>
-          ) : (
+          ) : canAdd ? (
             <button type="button" onClick={onAdd}>
               新增账单
             </button>
-          )}
+          ) : null}
         </div>
       )}
     </div>
   );
 }
 
-export function BillsView({ bills, members, onAdd, onOpen }) {
+export function BillsView({ bills, members, canAdd = false, onAdd, onOpen }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -281,10 +281,12 @@ export function BillsView({ bills, members, onAdd, onOpen }) {
           <h2 id="bills-title">全部账单</h2>
           <p>筛选、核对并查看每一笔共同消费。</p>
         </div>
-        <button className="add-button" type="button" onClick={onAdd}>
-          <AppIcon name="plus" size={18} />
-          新增账单
-        </button>
+        {canAdd ? (
+          <button className="add-button" type="button" onClick={onAdd}>
+            <AppIcon name="plus" size={18} />
+            新增账单
+          </button>
+        ) : null}
       </header>
       <div className="bill-filters" aria-label="筛选账单">
         <div className="date-range-fields">
