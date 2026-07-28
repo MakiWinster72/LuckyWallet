@@ -33,6 +33,20 @@ CREATE TABLE IF NOT EXISTS users (
   CONSTRAINT ck_users_role CHECK (role IN ('admin', 'user'))
 ) ENGINE=InnoDB;
 
+-- 本地初始化管理员，首次登录后请立即修改密码。
+INSERT IGNORE INTO users (
+  username, password_hash, nickname, role, is_active, created_at, updated_at
+)
+VALUES (
+  'admin',
+  '$argon2id$v=19$m=65536,t=3,p=4$zGntKryEI7TokDLxxi8bgQ$JcO1X8ew//6JCugnzqYCuX7eNVN5oICcV02aw12c78Q',
+  '管理员',
+  'admin',
+  TRUE,
+  CURRENT_TIMESTAMP(6),
+  CURRENT_TIMESTAMP(6)
+);
+
 CREATE TABLE IF NOT EXISTS household_settings (
   id INT NOT NULL,
   monthly_budget DECIMAL(10,2) NOT NULL DEFAULT 2400.00,
