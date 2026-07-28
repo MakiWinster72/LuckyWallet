@@ -619,7 +619,11 @@ select:focus-visible {
   font-size: 11px;
 }
 .member-list {
+  max-height: 360px;
+  overflow-y: auto;
   padding: 0 20px 17px;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
 }
 .member-list > div {
   display: flex;
@@ -1162,7 +1166,11 @@ select:focus-visible {
   transition: width 0.5s ease-out;
 }
 .payer-list {
+  max-height: 360px;
+  overflow-y: auto;
   padding: 0 23px 22px;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
 }
 .payer-list > div {
   display: flex;
