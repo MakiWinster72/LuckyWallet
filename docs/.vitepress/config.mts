@@ -6,6 +6,7 @@ export default defineConfig({
   description: 'LuckyWallet 项目部署、开发与使用文档',
   cleanUrls: true,
   themeConfig: {
+    logo: '/luckywallet.png',
     siteTitle: 'LuckyWallet Wiki',
     nav: [
       { text: '首页', link: '/' },
