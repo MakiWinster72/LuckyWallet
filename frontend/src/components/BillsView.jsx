@@ -142,7 +142,7 @@ function BillRegister({
                   const item = getCategory(bill.category);
                   return (
                     <tr key={bill.id}>
-                      <td>
+                      <td data-label="日期">
                         <span
                           className="category-icon"
                           style={{ "--category": item.color }}
@@ -159,10 +159,10 @@ function BillRegister({
                           new Date(`${bill.date}T00:00:00`),
                         )}
                       </td>
-                      <td>{memberIndex.get(bill.payer)?.name ?? "未知"}</td>
-                      <td>{bill.participants.length} 人</td>
-                      <td>{formatMoney(bill.amount)}</td>
-                      <td>
+                      <td data-label="付款人">{memberIndex.get(bill.payer)?.name ?? "未知"}</td>
+                      <td data-label="参与">{bill.participants.length} 人</td>
+                      <td data-label="金额">{formatMoney(bill.amount)}</td>
+                      <td className="bill-row-action">
                         <button
                           className="row-action"
                           type="button"

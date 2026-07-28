@@ -356,10 +356,10 @@ export function AdminUsersView({ currentUserId }) {
               <tbody>{visibleUsers.map((user) => (
                 <tr key={user.id}>
                   <td><UserAvatar user={user} variant="admin" /><span><strong>{displayName(user)}</strong><small translate="no">@{user.username}</small></span></td>
-                  <td><span className={`role-pill is-${user.role}`}>{user.role === "admin" ? "管理员" : "普通用户"}</span></td>
-                  <td><span className={`account-status ${user.isActive ? "is-active" : "is-inactive"}`}><i aria-hidden="true" />{user.isActive ? "已启用" : "已停用"}</span></td>
-                  <td>{user.createdAt ? dateFormatter.format(new Date(user.createdAt)) : "—"}</td>
-                  <td><button className="row-action" type="button" onClick={() => setEditingUser(user)} aria-label={`编辑${displayName(user)}`}><AppIcon name="edit" size={16} /></button></td>
+                  <td data-label="角色"><span className={`role-pill is-${user.role}`}>{user.role === "admin" ? "管理员" : "普通用户"}</span></td>
+                  <td data-label="状态"><span className={`account-status ${user.isActive ? "is-active" : "is-inactive"}`}><i aria-hidden="true" />{user.isActive ? "已启用" : "已停用"}</span></td>
+                  <td data-label="创建日期">{user.createdAt ? dateFormatter.format(new Date(user.createdAt)) : "—"}</td>
+                  <td className="admin-user-row-action"><button className="row-action" type="button" onClick={() => setEditingUser(user)} aria-label={`编辑${displayName(user)}`}><AppIcon name="edit" size={16} /></button></td>
                 </tr>
               ))}</tbody>
             </table>

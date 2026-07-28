@@ -3663,6 +3663,218 @@ select:focus-visible {
     padding: 8px 20px 22px;
   }
 }
+@media (max-width: 600px) {
+  .bills-view {
+    margin-top: 20px;
+  }
+  .bills-heading,
+  .admin-users-heading {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .bills-heading-actions {
+    width: 100%;
+    flex-direction: row;
+  }
+  .bills-heading-actions > button,
+  .admin-users-heading .add-button {
+    min-height: 44px;
+    flex: 1;
+    justify-content: center;
+  }
+  .bills-heading .add-button {
+    display: inline-flex;
+  }
+  .bill-filters,
+  .admin-user-toolbar {
+    padding: 12px;
+    border-radius: 13px;
+  }
+  .bill-filters input,
+  .bill-filters select,
+  .admin-user-toolbar select,
+  .admin-user-search > div,
+  .clear-filter {
+    min-height: 44px;
+  }
+  .clear-filter {
+    width: 100%;
+  }
+  .bill-register {
+    overflow: visible;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  .bill-register > header {
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--surface);
+  }
+  .bill-result-status {
+    margin: 10px 2px 8px;
+    padding: 0;
+    border: 0;
+  }
+  .bill-table-scroll,
+  .admin-user-table-scroll {
+    overflow: visible;
+  }
+  .bill-register table,
+  .bill-register tbody,
+  .admin-user-register table,
+  .admin-user-register tbody {
+    display: block;
+    width: 100%;
+  }
+  .bill-register thead,
+  .admin-user-register thead {
+    display: none;
+  }
+  .bill-register tbody,
+  .admin-user-register tbody {
+    display: grid;
+    gap: 10px;
+  }
+  .bill-register tbody tr,
+  .admin-user-register tbody tr {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--surface);
+    box-shadow: 0 8px 22px rgb(54 39 47 / 6%);
+  }
+  .bill-register tbody tr:hover,
+  .admin-user-register tbody tr:hover {
+    background: var(--surface);
+  }
+  .bill-register td,
+  .admin-user-register td {
+    display: block;
+    width: auto;
+    min-width: 0;
+    padding: 10px 14px;
+    border: 0;
+  }
+  .bill-register td[data-label]::before,
+  .admin-user-register td[data-label]::before {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--muted);
+    content: attr(data-label);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+  .bill-register td:first-child,
+  .admin-user-register td:first-child {
+    grid-column: 1 / -1;
+    width: auto;
+    min-width: 0;
+    padding: 14px 54px 12px 14px;
+    border-bottom: 1px solid var(--line);
+  }
+  .bill-register td:first-child strong,
+  .admin-user-register td:first-child strong {
+    max-width: 100%;
+    font-size: 13px;
+  }
+  .bill-register td[data-label="金额"] {
+    color: var(--plum-deep);
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .bill-register .bill-row-action,
+  .admin-user-register .admin-user-row-action {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    min-width: 36px;
+    padding: 0;
+  }
+  .bill-register .bill-row-action .row-action,
+  .admin-user-register .admin-user-row-action .row-action {
+    width: 36px;
+    height: 36px;
+    margin: 0;
+    background: var(--soft);
+  }
+  .bill-pagination {
+    margin-top: 10px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--surface);
+  }
+  .bill-pagination > div {
+    justify-content: space-between;
+    overflow: visible;
+  }
+  .bill-pagination > div .pagination-ellipsis,
+  .bill-pagination > div button[aria-label^="第 "] {
+    display: none;
+  }
+  .bill-pagination > div button:first-child,
+  .bill-pagination > div button:last-child {
+    display: block;
+    min-width: 96px;
+    min-height: 40px;
+  }
+  .admin-user-summary {
+    gap: 7px;
+  }
+  .admin-user-summary article {
+    min-width: 0;
+    padding: 14px 11px;
+    border-radius: 12px;
+  }
+  .admin-user-summary strong {
+    margin-top: 4px;
+    font-size: 22px;
+  }
+  .admin-user-toolbar {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .admin-user-toolbar .admin-user-search,
+  .admin-user-toolbar .clear-filter {
+    grid-column: 1 / -1;
+    min-width: 0;
+  }
+  .admin-user-toolbar > label {
+    min-width: 0;
+  }
+  .admin-user-register {
+    min-height: 0;
+    overflow: visible;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  .admin-user-register td[data-label="创建日期"] {
+    grid-column: 1 / -1;
+    padding-top: 4px;
+  }
+  .admin-user-dialog form {
+    overflow-y: auto;
+  }
+  .admin-user-dialog footer,
+  .admin-change-confirm footer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .admin-user-dialog footer button,
+  .admin-change-confirm footer button {
+    min-height: 44px;
+    margin: 0;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
