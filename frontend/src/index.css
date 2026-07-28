@@ -485,10 +485,25 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .login-panel form { display: grid; gap: 17px; margin-top: 30px; }
 .field { display: grid; gap: 7px; color: #49243e; font-size: 13px; font-weight: 600; }
 .field input { height: 46px; padding: 0 13px; border: 1px solid #ddc8d1; border-radius: 10px; }
-.password-control { position: relative; }
-.password-control input { padding-right: 52px; }
-.password-control button { position: absolute; top: 50%; right: 8px; display: grid; width: 34px; min-height: 34px; place-items: center; transform: translateY(-50%); border: 0; border-radius: 8px; color: #704264; background: transparent; }
+.password-control { position: relative; width: 100%; min-width: 0; }
+.password-control input { width: 100%; min-width: 0; padding-right: 58px; }
+.password-control button {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  transform: translateY(-50%);
+  border: 0;
+  border-radius: 8px;
+  color: #704264;
+  background: transparent;
+}
 .password-control button:hover:not(:disabled) { background: #f7e8e3; }
+.password-control button:focus-visible { outline: 2px solid rgb(112 66 100 / 45%); outline-offset: -2px; }
+.password-control button:disabled { cursor: not-allowed; opacity: .55; }
 .form-message { min-height: 18px; color: #a33d36; font-size: 12px; }
 .form-message p { margin: 0; }
 .login-panel .primary-button { width: 100%; }
