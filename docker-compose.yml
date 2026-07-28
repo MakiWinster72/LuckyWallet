@@ -51,7 +51,8 @@ services:
       - "8000:8000"
   frontend:
     build:
-      context: ./frontend
+      context: .
+      dockerfile: frontend/Dockerfile
       args:
         VITE_API_BASE_URL: /api/v1
     restart: unless-stopped

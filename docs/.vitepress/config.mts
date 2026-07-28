@@ -1,6 +1,7 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
+  base: '/wiki/',
   lang: 'zh-CN',
   title: 'LuckyWallet Wiki',
   description: 'LuckyWallet 项目部署、开发与使用文档',

@@ -3,9 +3,7 @@ import { Link } from "react-router-dom";
 import { AppIcon } from "../components/AppIcon";
 import { BrandIcon } from "../components/BrandIcon";
 
-const wikiUrl =
-  import.meta.env.VITE_WIKI_URL?.trim() ||
-  (import.meta.env.DEV ? "http://localhost:5174" : "/wiki/");
+const wikiUrl = "/wiki/";
 
 const steps = [
   {
