@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 
 import { AppIcon } from "./AppIcon";
 import { filterBills } from "../data/billFilters";
+import { downloadBillsCsv } from "../data/billsExport";
 import { categories, getCategory } from "../data/categories";
 import {
   DEFAULT_PAGE_SIZE,
@@ -319,12 +320,27 @@ export function BillsView({ bills, members, canAdd = false, onAdd, onOpen }) {
           <h2 id="bills-title">全部账单</h2>
           <p>筛选、核对并查看每一笔共同消费。</p>
         </div>
-        {canAdd ? (
-          <button className="add-button" type="button" onClick={onAdd}>
-            <AppIcon name="plus" size={18} />
-            新增账单
+        <div className="bills-heading-actions">
+          <button
+            className="secondary-button"
+            type="button"
+            onClick={() =>
+              downloadBillsCsv({
+                bills: visibleBills,
+                members,
+                rangeLabel: formatRange(startDate, endDate),
+              })
+            }
+          >
+            导出账单
           </button>
-        ) : null}
+          {canAdd ? (
+            <button className="add-button" type="button" onClick={onAdd}>
+              <AppIcon name="plus" size={18} />
+              新增账单
+            </button>
+          ) : null}
+        </div>
       </header>
       <div className="bill-filters" aria-label="筛选账单">
         <div className="date-range-fields">
