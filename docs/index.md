@@ -12,7 +12,7 @@ hero:
     height: 512
   actions:
     - theme: brand
-      text: 快速启动
+      text: 快速开始
       link: /how_to_start
     - theme: alt
       text: 使用手册

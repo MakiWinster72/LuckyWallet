@@ -1,34 +1,34 @@
 # 部署手册
 
-LuckyWallet 支持本地进程部署和 Docker Compose 部署。生产环境应使用独立数据库、HTTPS、强随机密钥和持久化备份。
+LuckyWallet 支持本地进程部署和 Docker Compose 部署。
 
 ## 配置项
 
 ### 后端
 
-| 变量 | 必填 | 默认值 | 说明 |
-| --- | :---: | --- | --- |
-| `DATABASE_URL` | 是 | 无 | SQLAlchemy MySQL 连接串 |
-| `JWT_SECRET` | 是 | 无 | JWT 签名密钥，至少 32 个字符 |
-| `JWT_ALGORITHM` | 否 | `HS256` | JWT 签名算法 |
-| `ACCESS_TOKEN_EXPIRE_MINUTES` | 否 | `30` | 登录令牌有效分钟数，必须大于 0 |
-| `FRONTEND_ORIGIN` | 否 | `http://localhost:5173` | 唯一允许的浏览器跨域来源 |
+| 变量                          | 必填 | 默认值                  | 说明                           |
+| ----------------------------- | :--: | ----------------------- | ------------------------------ |
+| `DATABASE_URL`                |  是  | 无                      | SQLAlchemy MySQL 连接串        |
+| `JWT_SECRET`                  |  是  | 无                      | JWT 签名密钥，至少 32 个字符   |
+| `JWT_ALGORITHM`               |  否  | `HS256`                 | JWT 签名算法                   |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` |  否  | `30`                    | 登录令牌有效分钟数，必须大于 0 |
+| `FRONTEND_ORIGIN`             |  否  | `http://localhost:5173` | 唯一允许的浏览器跨域来源       |
 
 ### 前端
 
-| 变量 | 使用阶段 | 说明 |
-| --- | --- | --- |
-| `VITE_API_BASE_URL` | 构建时 | API 前缀；本地开发默认 `/api/v1`，Docker 构建使用 `/api/v1` |
+| 变量                | 使用阶段 | 说明                                                        |
+| ------------------- | -------- | ----------------------------------------------------------- |
+| `VITE_API_BASE_URL` | 构建时   | API 前缀；本地开发默认 `/api/v1`，Docker 构建使用 `/api/v1` |
 
 `VITE_API_BASE_URL` 会写入前端构建产物。修改后需要重新执行 `npm run build` 或重建镜像。
 
-## 本地进程部署
+## 手动部署
 
 按照[快速启动](/how_to_start)完成数据库和后端配置，然后分别启动：
 
 ```bash
 cd backend
-uv sync --frozen
+uv sync
 uv run uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
@@ -40,11 +40,11 @@ VITE_API_BASE_URL=https://example.com/api/v1 npm run build
 
 将 `frontend/dist` 交给 Nginx 等静态服务器，并完成以下反向代理：
 
-| 路径 | 上游 | 额外要求 |
-| --- | --- | --- |
-| `/api/` | FastAPI `:8000` | 支持普通 HTTP 请求和 WebSocket Upgrade |
-| `/uploads/` | FastAPI `:8000` | 保留上传头像路径 |
-| 其他路径 | `frontend/dist` | 未命中静态文件时回退到 `index.html` |
+| 路径        | 上游            | 额外要求                               |
+| ----------- | --------------- | -------------------------------------- |
+| `/api/`     | FastAPI `:8000` | 支持普通 HTTP 请求和 WebSocket Upgrade |
+| `/uploads/` | FastAPI `:8000` | 保留上传头像路径                       |
+| 其他路径    | `frontend/dist` | 未命中静态文件时回退到 `index.html`    |
 
 仓库中的 `frontend/nginx.conf` 可作为配置参考。
 
@@ -69,10 +69,10 @@ Copy-Item .env.docker .env
 至少替换以下值：
 
 ```dotenv
-DB_ROOT_PASSWORD=数据库root强密码
+DB_ROOT_PASSWORD=数据库root密码
 DB_NAME=luckywallet
 DB_USER=luckywallet
-DB_PASSWORD=应用数据库强密码
+DB_PASSWORD=应用数据库密码
 JWT_SECRET=至少32个字符的独立随机密钥
 FRONTEND_ORIGIN=https://你的域名
 ```
@@ -93,7 +93,7 @@ Compose 会启动：
 - `backend`：FastAPI，头像保存在 `uploads` 卷；
 - `frontend`：Nginx 静态站点和 API 反向代理，对外监听 80 端口。
 
-首次创建空数据库卷时，MySQL 会执行 `sql/` 下的初始化脚本。访问 <http://localhost>，并用以下命令检查状态：
+首次创建空数据库卷时，MySQL 会执行 `sql/` 下的初始化脚本。用以下命令检查状态：
 
 ```bash
 docker compose logs -f backend
@@ -120,12 +120,6 @@ docker compose logs -f
 docker compose logs -f backend
 ```
 
-重启单个服务：
-
-```bash
-docker compose restart backend
-```
-
 停止服务并保留数据：
 
 ```bash
@@ -141,28 +135,3 @@ docker compose up -d --build
 ::: danger 删除持久化数据
 `docker compose down -v` 会删除数据库和头像数据卷。仅在明确需要清空全部 Docker 数据时执行。
 :::
-
-## 发布前检查
-
-```bash
-cd backend
-uv run pytest
-
-cd ../frontend
-npm test
-npm run lint
-npm run build
-
-cd ../docs
-npm run docs:build
-```
-
-## 生产安全清单
-
-- 使用与开发环境隔离的 MySQL 实例并定期备份；
-- 为数据库账号设置最小权限，不让应用使用 `root`；
-- 使用强随机 `JWT_SECRET`，不要提交任何 `.env`；
-- 通过 HTTPS 暴露站点，并将 `FRONTEND_ORIGIN` 精确设置为实际来源；
-- 限制后端 8000 端口，只让反向代理或受信网络访问；
-- 备份 `db-data` 和 `uploads`，并测试恢复流程；
-- 修改或停用演示账号，审慎分配管理员角色。
