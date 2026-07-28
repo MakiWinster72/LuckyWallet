@@ -8,7 +8,7 @@ export function buildStatisticsCsv({ month, bills, members }) {
   const total = bills.reduce((sum, bill) => sum + (Number(bill.amount) || 0), 0);
   const rows = [
     ["LuckyWallet 支出统计"],
-    ["统计月份", month],
+    [month?.includes("至") || month === "全部账单" || month?.endsWith("年度") ? "统计范围" : "统计月份", month],
     ["总支出", total.toFixed(2)],
     ["账单笔数", bills.length],
     ["平均每笔", (bills.length ? total / bills.length : 0).toFixed(2)],

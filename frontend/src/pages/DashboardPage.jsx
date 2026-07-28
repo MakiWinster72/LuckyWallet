@@ -13,11 +13,12 @@ import { resolveAssetUrl, uploadAvatarApi } from "../api/auth";
 import { listMembersApi } from "../api/members";
 import { categories, getCategory } from "../data/categories";
 import { summarizeBudgetProgress } from "../data/budgetProgress";
-import { getChineseMonthLabel, getLocalDateString, selectMonthlyBills, summarizeMonthlyBills } from "../data/monthlyBills";
+import { getChineseMonthLabel, getLocalDateString, summarizeMonthlyBills } from "../data/monthlyBills";
 import { summarizeMonthlyTrend } from "../data/monthlyTrend";
 import { summarizeProfileFinance } from "../data/profileFinance";
 import { buildDailySeries, buildMonthlySeries, buildSmoothSvgPath } from "../data/statisticsCharts";
 import { downloadStatisticsCsv } from "../data/statisticsExport";
+import { availableStatisticsYears, filterStatisticsBills, selectExportBills } from "../data/statisticsRange";
 import { summarizeSpending } from "../data/spendingSummary";
 import { summarizePendingSettlement } from "../data/settlementSummary";
 import { formatMoney } from "../utils/money";
@@ -228,24 +229,81 @@ function AddBillDialog({ members, initialBill = null, onClose, onSave }) {
   );
 }
 
-function StatisticsView({ bills, members }) {
-  const referenceDate = useMemo(() => getLocalDateString(), []);
-  const month = referenceDate.slice(0, 7);
-  const monthlyBills = useMemo(
-    () => selectMonthlyBills(bills, referenceDate),
-    [bills, referenceDate],
+function StatisticsExportDialog({ bills, currentBills, members, scopeLabel, onClose }) {
+  const [range, setRange] = useState("current");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [status, setStatus] = useState({ error: "", success: "" });
+  const exportBills = useMemo(
+    () => selectExportBills(bills, currentBills, { range, startDate, endDate }),
+    [bills, currentBills, range, startDate, endDate],
   );
+
+  function exportData() {
+    if (range === "custom" && startDate && endDate && startDate > endDate) {
+      setStatus({ error: "开始日期不能晚于结束日期", success: "" });
+      return;
+    }
+    const label = range === "all"
+      ? "全部账单"
+      : range === "custom"
+        ? `${startDate || "最早"} 至 ${endDate || "最新"}`
+        : scopeLabel;
+    downloadStatisticsCsv({ month: label, bills: exportBills, members });
+    setStatus({ error: "", success: `已导出 ${exportBills.length} 笔账单` });
+  }
+
+  return (
+    <div className="dialog-backdrop" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
+      <section className="statistics-export-dialog" role="dialog" aria-modal="true" aria-labelledby="statistics-export-title">
+        <header><div><span className="overline">EXPORT DATA</span><h2 id="statistics-export-title">导出统计数据</h2></div><button className="icon-button" type="button" onClick={onClose} aria-label="关闭">×</button></header>
+        <p>选择需要写入 CSV 的账单范围，汇总数字会随导出明细重新计算。</p>
+        <div className="export-range-options" role="group" aria-label="导出范围">
+          {[["current", "当前统计范围"], ["custom", "自定义日期"], ["all", "全部账单"]].map(([value, label]) => <button type="button" className={range === value ? "active" : ""} key={value} onClick={() => { setRange(value); setStatus({ error: "", success: "" }); }}>{label}</button>)}
+        </div>
+        {range === "custom" ? <div className="export-date-range"><label>开始日期<input type="date" value={startDate} onChange={(event) => setStartDate(event.target.value)} /></label><label>结束日期<input type="date" value={endDate} onChange={(event) => setEndDate(event.target.value)} /></label></div> : null}
+        <div className="export-preview"><span>将导出</span><strong>{exportBills.length} 笔账单</strong></div>
+        {status.error ? <p className="form-error" role="alert">{status.error}</p> : null}
+        {status.success ? <p className="form-success" role="status">✓ {status.success}</p> : null}
+        <footer><button className="text-button" type="button" onClick={onClose}>关闭</button><button className="add-button" type="button" onClick={exportData}><AppIcon name="download" size={16} />导出 CSV</button></footer>
+      </section>
+    </div>
+  );
+}
+
+function StatisticsView({ bills, members }) {
+  const [today] = useState(() => getLocalDateString());
+  const [selection, setSelection] = useState(() => ({
+    mode: "month",
+    month: today.slice(0, 7),
+    year: today.slice(0, 4),
+  }));
+  const [isExportOpen, setIsExportOpen] = useState(false);
+  const availableYears = useMemo(
+    () => availableStatisticsYears(bills, today.slice(0, 4)),
+    [bills, today],
+  );
+  const periodBills = useMemo(
+    () => filterStatisticsBills(bills, selection),
+    [bills, selection],
+  );
+  const referenceDate = selection.mode === "year"
+    ? `${selection.year}-12-31`
+    : `${selection.month}-01`;
+  const periodLabel = selection.mode === "year"
+    ? `${selection.year}年度`
+    : `${selection.month.slice(0, 4)}年${Number(selection.month.slice(5))}月`;
   const summary = useMemo(
-    () => summarizeSpending(monthlyBills, members),
-    [monthlyBills, members],
+    () => summarizeSpending(periodBills, members),
+    [periodBills, members],
   );
   const monthlySeries = useMemo(
-    () => buildMonthlySeries(bills, referenceDate),
-    [bills, referenceDate],
+    () => buildMonthlySeries(bills, referenceDate, selection.mode === "year" ? 12 : 6),
+    [bills, referenceDate, selection.mode],
   );
   const dailySeries = useMemo(
-    () => buildDailySeries(bills, referenceDate),
-    [bills, referenceDate],
+    () => selection.mode === "month" ? buildDailySeries(bills, referenceDate) : [],
+    [bills, referenceDate, selection.mode],
   );
   const maximumMonth = Math.max(...monthlySeries.map((item) => item.total), 1);
   const maximumDay = Math.max(...dailySeries.map((item) => item.total), 1);
@@ -264,36 +322,38 @@ function StatisticsView({ bills, members }) {
       return `${item.color} ${start}% ${categoryOffset}%`;
     }).join(", ")})`
     : "var(--soft)";
-  const hasSpending = monthlyBills.length > 0;
-
-  function exportReport() {
-    downloadStatisticsCsv({ month, bills: monthlyBills, members });
-  }
+  const hasSpending = periodBills.length > 0;
 
   return (
     <section className="statistics-view" aria-labelledby="statistics-title">
       <header className="statistics-heading">
         <div>
           <span className="overline">SPENDING INSIGHTS</span>
-          <h2 id="statistics-title">本月支出统计</h2>
+          <h2 id="statistics-title">{periodLabel}支出统计</h2>
           <p>从时间、分类与成员付款三个维度了解共同消费。</p>
         </div>
-        <button className="statistics-export" type="button" onClick={exportReport}><AppIcon name="download" size={17} />导出 CSV</button>
+        <div className="statistics-actions">
+          <div className="statistics-period-mode" role="group" aria-label="统计周期"><button type="button" className={selection.mode === "month" ? "active" : ""} onClick={() => setSelection((current) => ({ ...current, mode: "month" }))}>月度</button><button type="button" className={selection.mode === "year" ? "active" : ""} onClick={() => setSelection((current) => ({ ...current, mode: "year" }))}>年度</button></div>
+          {selection.mode === "month"
+            ? <input className="statistics-period-input" type="month" aria-label="选择统计月份" value={selection.month} onChange={(event) => setSelection((current) => ({ ...current, month: event.target.value }))} />
+            : <select className="statistics-period-input" aria-label="选择统计年度" value={selection.year} onChange={(event) => setSelection((current) => ({ ...current, year: event.target.value }))}>{availableYears.map((year) => <option value={year} key={year}>{year} 年</option>)}</select>}
+          <button className="statistics-export" type="button" onClick={() => setIsExportOpen(true)}><AppIcon name="download" size={17} />导出</button>
+        </div>
       </header>
       <div className="stats-kpis">
-        <article><span>本月总支出</span><strong>{formatMoney(summary.total)}</strong><small>全部共同账单</small></article>
-        <article><span>平均每笔</span><strong>{formatMoney(summary.average)}</strong><small>共 {monthlyBills.length} 笔消费</small></article>
+        <article><span>{periodLabel}总支出</span><strong>{formatMoney(summary.total)}</strong><small>所选范围共同账单</small></article>
+        <article><span>平均每笔</span><strong>{formatMoney(summary.average)}</strong><small>共 {periodBills.length} 笔消费</small></article>
         <article><span>最高分类</span><strong>{summary.byCategory[0]?.name ?? "暂无"}</strong><small>{formatMoney(summary.byCategory[0]?.amount ?? 0)}</small></article>
       </div>
-      <div className="stats-trend-grid">
+      <div className={`stats-trend-grid ${selection.mode === "year" ? "is-year" : ""}`}>
         <article className="panel monthly-chart">
-          <header><div><span className="overline">6-MONTH RHYTHM</span><h2>月度支出趋势</h2></div><span className="chart-caption">近 6 个月</span></header>
-          <div className="month-bars" role="img" aria-label="近六个月支出柱状图">
+          <header><div><span className="overline">SPENDING RHYTHM</span><h2>{selection.mode === "year" ? "全年月度分布" : "月度支出趋势"}</h2></div><span className="chart-caption">{selection.mode === "year" ? `${selection.year} 年` : "近 6 个月"}</span></header>
+          <div className="month-bars" style={{ gridTemplateColumns: `repeat(${monthlySeries.length}, minmax(0, 1fr))` }} role="img" aria-label="月度支出柱状图">
             {monthlySeries.map((item) => <div key={item.month}><strong>{item.total ? formatMoney(item.total) : "—"}</strong><span><i style={{ height: `${Math.max(item.total / maximumMonth * 100, item.total ? 8 : 2)}%` }} /></span><small>{item.label}</small></div>)}
           </div>
         </article>
-        <article className="panel daily-chart">
-          <header><div><span className="overline">DAILY PULSE</span><h2>每日支出走势</h2></div><span className="chart-caption">{Number(month.slice(5))}月</span></header>
+        {selection.mode === "month" ? <article className="panel daily-chart">
+          <header><div><span className="overline">DAILY PULSE</span><h2>每日支出走势</h2></div><span className="chart-caption">{Number(selection.month.slice(5))}月</span></header>
           <div className="daily-line">
             <svg viewBox="0 0 500 150" role="img" aria-label="本月每日支出折线图" preserveAspectRatio="none">
               <path d="M12 132H488M12 76H488M12 20H488" className="chart-grid-line" />
@@ -307,13 +367,13 @@ function StatisticsView({ bills, members }) {
             </svg>
             <div><span>1日</span><span>{Math.ceil(dailySeries.length / 2)}日</span><span>{dailySeries.length}日</span></div>
           </div>
-        </article>
+        </article> : null}
       </div>
       {hasSpending ? <div className="stats-layout">
         <article className="panel category-chart">
-          <header><div><span className="overline">CATEGORY MIX</span><h2>分类占比</h2></div><span className="chart-caption">本月构成</span></header>
+          <header><div><span className="overline">CATEGORY MIX</span><h2>分类占比</h2></div><span className="chart-caption">{periodLabel}构成</span></header>
           <div className="category-donut-layout">
-            <div className="category-donut" style={{ background: categoryGradient }} role="img" aria-label="本月分类支出环形图"><span><strong>{summary.byCategory.length}</strong><small>个分类</small></span></div>
+            <div className="category-donut" style={{ background: categoryGradient }} role="img" aria-label={`${periodLabel}分类支出环形图`}><span><strong>{summary.byCategory.length}</strong><small>个分类</small></span></div>
             <div className="category-legend">
               {summary.byCategory.map((item) => <div key={item.name}><i style={{ background: item.color }} /><span><strong>{item.name}</strong><small>{(item.amount / summary.total * 100).toFixed(1)}% · {item.count} 笔</small></span><b>{formatMoney(item.amount)}</b></div>)}
             </div>
@@ -332,7 +392,8 @@ function StatisticsView({ bills, members }) {
             ))}
           </div>
         </article>
-      </div> : <div className="statistics-empty"><span aria-hidden="true">⌁</span><h3>本月还没有支出</h3><p>记录第一笔共同消费后，这里会生成分类与成员垫付统计。</p></div>}
+      </div> : <div className="statistics-empty"><span aria-hidden="true">⌁</span><h3>{periodLabel}还没有支出</h3><p>切换其他月份或年度，或者记录一笔共同消费后再查看。</p></div>}
+      {isExportOpen ? <StatisticsExportDialog bills={bills} currentBills={periodBills} members={members} scopeLabel={periodLabel} onClose={() => setIsExportOpen(false)} /> : null}
     </section>
   );
 }
