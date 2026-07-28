@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 
 import { AppIcon } from "../components/AppIcon";
 import { BrandIcon } from "../components/BrandIcon";
-import "./HomePage.css";
 
 const wikiUrl =
   import.meta.env.VITE_WIKI_URL?.trim() ||
@@ -74,12 +73,12 @@ export function HomePage() {
         <div className="home-hero-copy">
           <p className="home-eyebrow">
             <span aria-hidden="true">✦</span>
-            为熟悉的人，算清楚每一笔
+            记录清楚每一笔
           </p>
           <h1 id="home-title">
-            钱不该让
+            多人账单
             <br />
-            <em>关系变复杂。</em>
+            <em>清楚有条理。</em>
           </h1>
           <p className="home-hero-lead">
             LuckyWallet 记录谁付款、谁参与，并把分摊与结算讲得明明白白。
@@ -94,23 +93,12 @@ export function HomePage() {
               阅读使用 Wiki
             </a>
           </div>
-          <dl className="home-trust-list">
-            <div>
-              <dt>平均分摊</dt>
-              <dd>精确到分</dd>
-            </div>
-            <div>
-              <dt>账目范围</dt>
-              <dd>随时筛选</dd>
-            </div>
-            <div>
-              <dt>数据归属</dt>
-              <dd>自己部署</dd>
-            </div>
-          </dl>
         </div>
 
-        <div className="home-wallet-stage" aria-label="LuckyWallet 产品界面预览">
+        <div
+          className="home-wallet-stage"
+          aria-label="LuckyWallet 产品界面预览"
+        >
           <div className="home-wallet-back" aria-hidden="true" />
           <div className="home-wallet-screen">
             <div className="home-screen-bar">
@@ -148,7 +136,6 @@ export function HomePage() {
         <header className="home-section-heading">
           <p>一笔账单的旅程</p>
           <h2 id="process-title">从垫付，到结清，只要三步。</h2>
-          <span>规则简单，才更容易坚持记录。</span>
         </header>
         <div className="home-step-grid">
           {steps.map((step) => (
@@ -200,8 +187,8 @@ export function HomePage() {
           </p>
           <h2 id="showcase-title">把日常来往，变成值得信任的记录。</h2>
           <p>
-            从一顿饭到一次旅行，付款人和承担人往往不是同一群人。
-            LuckyWallet 保留这层差别，也保留每次结算背后的依据。
+            从一顿饭到一次旅行，付款人和承担人往往不是同一群人。 LuckyWallet
+            保留这层差别，也保留每次结算背后的依据。
           </p>
           <div className="home-feature-notes">
             {featureNotes.map(([title, detail]) => (
