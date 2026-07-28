@@ -7,6 +7,7 @@ import {
   updateAdminUserApi,
 } from "../api/admin-users";
 import { AppIcon } from "./AppIcon";
+import { UserAvatar } from "./UserAvatar";
 
 const EMPTY_FILTERS = { query: "", role: "all", status: "all" };
 const EMPTY_NEW_USER = {
@@ -34,14 +35,6 @@ function readFiltersFromUrl() {
 
 function displayName(user) {
   return user.nickname || user.username;
-}
-
-function UserAvatar({ user }) {
-  return (
-    <span className="admin-user-avatar" aria-hidden="true">
-      {displayName(user).slice(0, 2).toLocaleUpperCase("zh-CN")}
-    </span>
-  );
 }
 
 function CreateUserDialog({ onClose, onCreated }) {
@@ -352,7 +345,7 @@ export function AdminUsersView({ currentUserId }) {
               <thead><tr><th>用户</th><th>角色</th><th>状态</th><th>创建日期</th><th><span className="sr-only">操作</span></th></tr></thead>
               <tbody>{visibleUsers.map((user) => (
                 <tr key={user.id}>
-                  <td><UserAvatar user={user} /><span><strong>{displayName(user)}</strong><small translate="no">@{user.username}</small></span></td>
+                  <td><UserAvatar user={user} variant="admin" /><span><strong>{displayName(user)}</strong><small translate="no">@{user.username}</small></span></td>
                   <td><span className={`role-pill is-${user.role}`}>{user.role === "admin" ? "管理员" : "普通用户"}</span></td>
                   <td><span className={`account-status ${user.isActive ? "is-active" : "is-inactive"}`}><i aria-hidden="true" />{user.isActive ? "已启用" : "已停用"}</span></td>
                   <td>{user.createdAt ? dateFormatter.format(new Date(user.createdAt)) : "—"}</td>

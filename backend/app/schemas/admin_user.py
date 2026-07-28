@@ -13,6 +13,7 @@ class AdminUserRead(BaseModel):
     id: int
     username: str
     nickname: str | None
+    avatar_url: str | None = None
     role: UserRole
     is_active: bool
     created_at: datetime
