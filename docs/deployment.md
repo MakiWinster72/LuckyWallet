@@ -62,7 +62,7 @@ npm install
 npm run dev
 ```
 
-前端地址通常是 <http://localhost:5173>，后端 API 地址是 <http://127.0.0.1:8000>。
+前端地址通常是 `http://localhost:5173`，后端 API 地址是 `http://127.0.0.1:8000`。
 
 ## Docker 部署
 
@@ -83,7 +83,7 @@ FRONTEND_ORIGIN=http://localhost
 docker compose up -d --build
 ```
 
-访问 <http://localhost>。查看日志：
+访问 `http://localhost`。查看日志：
 
 ```bash
 docker compose logs -f backend
