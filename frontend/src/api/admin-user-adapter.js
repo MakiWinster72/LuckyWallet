@@ -22,11 +22,13 @@ export function adaptNewAdminUserToApi(user) {
 }
 
 export function adaptAdminUserUpdateToApi(user) {
-  return {
+  const payload = {
     nickname: user.nickname.trim() || null,
     role: VALID_ROLES.has(user.role) ? user.role : "user",
     is_active: Boolean(user.isActive),
   };
+  if (user.password?.length) payload.password = user.password;
+  return payload;
 }
 
 export function filterAdminUsers(users, filters) {

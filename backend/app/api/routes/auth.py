@@ -6,8 +6,17 @@ from fastapi import APIRouter, File, HTTPException, Request, UploadFile, status
 from app.api.deps import CurrentUser, DbSession
 from app.config import get_settings
 from app.repositories.user_repository import UserRepository
-from app.schemas.auth import LoginRequest, LoginResponse, UserResponse
-from app.services.auth_service import AuthService, InvalidCredentialsError
+from app.schemas.auth import (
+    ChangePasswordRequest,
+    LoginRequest,
+    LoginResponse,
+    UserResponse,
+)
+from app.services.auth_service import (
+    AuthService,
+    CurrentPasswordIncorrectError,
+    InvalidCredentialsError,
+)
 
 
 router = APIRouter(prefix="/auth", tags=["认证"])
@@ -59,6 +68,28 @@ def login(
 @router.get("/me", response_model=UserResponse)
 def read_current_user(current_user: CurrentUser) -> UserResponse:
     return UserResponse.model_validate(current_user)
+
+
+@router.post("/me/password", status_code=status.HTTP_204_NO_CONTENT)
+def change_password(
+    data: ChangePasswordRequest,
+    db: DbSession,
+    current_user: CurrentUser,
+) -> None:
+    try:
+        AuthService(UserRepository(db)).change_password(
+            user=current_user,
+            current_password=data.current_password,
+            new_password=data.new_password,
+        )
+    except CurrentPasswordIncorrectError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                "code": "CURRENT_PASSWORD_INCORRECT",
+                "message": "当前密码不正确",
+            },
+        ) from None
 
 
 @router.post("/me/avatar", response_model=UserResponse)

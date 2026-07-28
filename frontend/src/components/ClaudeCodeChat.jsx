@@ -9,37 +9,67 @@ const marked = new Marked({
 });
 
 const TOKEN_KEY = "luckywallet_access_token";
-const STORAGE_KEY = "lw_claude_chat_history";
+const HISTORY_KEY_PREFIX = "luckywallet_claude_history_";
+ 
 
 function wsUrl(token) {
   const proto = window.location.protocol === "https:" ? "wss:" : "ws:";
   return `${proto}//${window.location.host}/api/v1/ws/claude?token=${token}`;
 }
 
-function loadHistory() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch { return []; }
-}
-
-function saveHistory(msgs) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(msgs));
-  } catch { /* ignore quota errors */ }
-}
-
 export function ClaudeCodeChat() {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState(() => loadHistory());
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [status, setStatus] = useState("");
   const [connected, setConnected] = useState(false);
   const [busy, setBusy] = useState(false);
   const wsRef = useRef(null);
   const listRef = useRef(null);
-  const restoredRef = useRef(false);
+  const messagesRef = useRef(messages);
+  const historyReadyRef = useRef(false);
+  const historyKey = user ? `${HISTORY_KEY_PREFIX}${user.id}` : "";
+
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
+
+  useEffect(() => {
+    historyReadyRef.current = false;
+    if (!historyKey) {
+      setMessages([]);
+      return;
+    }
+    try {
+      const saved = JSON.parse(localStorage.getItem(historyKey) || "[]");
+      setMessages(
+        Array.isArray(saved)
+          ? saved.filter(
+              (message) =>
+                (message?.role === "user" || message?.role === "assistant") &&
+                typeof message.text === "string" &&
+                message.text.trim(),
+            )
+          : [],
+      );
+    } catch {
+      setMessages([]);
+    } finally {
+      historyReadyRef.current = true;
+    }
+  }, [historyKey]);
+
+  useEffect(() => {
+    if (!historyKey || !historyReadyRef.current) return;
+    const conversation = messages.filter(
+      (message) =>
+        (message.role === "user" || message.role === "assistant") &&
+        typeof message.text === "string" &&
+        message.text.trim(),
+    );
+    localStorage.setItem(historyKey, JSON.stringify(conversation.slice(-100)));
+  }, [historyKey, messages]);
 
   // ── WebSocket lifecycle ────────────────────────────────────────
 
@@ -52,14 +82,18 @@ export function ClaudeCodeChat() {
 
     ws.onopen = () => {
       setConnected(true);
-      // Restore previous conversation history on the backend
-      const saved = loadHistory();
-      const conversations = saved.filter((m) => m.role === "user" || m.role === "assistant");
-      if (conversations.length > 0) {
-        ws.send(JSON.stringify({ type: "restore", history: conversations }));
-        restoredRef.current = true;
+      const history = messagesRef.current
+        .filter(
+          (message) =>
+            (message.role === "user" || message.role === "assistant") &&
+            typeof message.text === "string" &&
+            message.text.trim(),
+        )
+        .map((message) => ({ role: message.role, text: message.text }));
+      if (history.length) {
+        ws.send(JSON.stringify({ type: "restore", history }));
       }
-      setMessages((prev) => [...prev, { role: "system", text: restoredRef.current ? "会话已恢复" : "已连接到 Claude Code" }]);
+      setMessages((prev) => [...prev, { role: "system", text: "已连接到 Claude Code" }]);
     };
 
     ws.onmessage = (event) => {
@@ -137,12 +171,6 @@ export function ClaudeCodeChat() {
     };
   }, [open, connect]);
 
-  // ── persist messages ──────────────────────────────────────────
-
-  useEffect(() => {
-    saveHistory(messages);
-  }, [messages]);
-
   // ── send ───────────────────────────────────────────────────────
 
   function send(text) {
@@ -151,6 +179,31 @@ export function ClaudeCodeChat() {
     setInput("");
     setBusy(true);
     wsRef.current.send(JSON.stringify({ type: "message", content: text.trim() }));
+  }
+
+  function resetConversation() {
+    if (!window.confirm("确定要重置会话吗？当前聊天记录将被清除。")) return;
+
+    if (historyKey) localStorage.removeItem(historyKey);
+    messagesRef.current = [];
+    historyReadyRef.current = true;
+    setMessages([]);
+    setBusy(false);
+    setStatus("");
+
+    const currentSocket = wsRef.current;
+    if (currentSocket) {
+      currentSocket.onclose = null;
+      currentSocket.close();
+      wsRef.current = null;
+    }
+    setConnected(false);
+
+    if (open) {
+      setTimeout(() => {
+        if (open && !wsRef.current) connect();
+      }, 0);
+    }
   }
 
   function handleKeyDown(event) {
@@ -198,7 +251,14 @@ export function ClaudeCodeChat() {
 
       {/* ── chat dialog ──────────────────────────────────────── */}
       {open ? (
-        <aside className="cc-dialog" role="dialog" aria-modal="true" aria-label="Claude Code 聊天">
+        <>
+          <button
+            className="cc-backdrop"
+            type="button"
+            onClick={() => setOpen(false)}
+            aria-label="关闭 Claude Code 聊天"
+          />
+          <aside className="cc-dialog" role="dialog" aria-modal="true" aria-label="Claude Code 聊天">
           {/* header */}
           <header className="cc-header">
             <ClaudeCodeIcon />
@@ -218,7 +278,7 @@ export function ClaudeCodeChat() {
             <button
               className="cc-close"
               type="button"
-              onClick={() => { setOpen(false); setMessages([]); setStatus(""); setBusy(false); }}
+              onClick={() => { setOpen(false); setStatus(""); setBusy(false); }}
               aria-label="关闭"
             >
               <AppIcon name="close" size={16} />
@@ -251,9 +311,9 @@ export function ClaudeCodeChat() {
             {busy && messages.length > 0 && messages.at(-1)?.role !== "assistant" ? (
               <div className="cc-msg cc-msg-assistant">
                 <ClaudeCodeIcon />
-                <div className="cc-bubble cc-thinking">
+                <div className="cc-bubble cc-thinking" role="status" aria-live="polite">
+                  <span>思考中</span>
                   <span className="cc-dot-pulse"><span /></span>
-                  思考中
                 </div>
               </div>
             ) : null}
@@ -261,6 +321,16 @@ export function ClaudeCodeChat() {
 
           {/* input */}
           <div className="cc-footer">
+            <button
+              className="cc-reset"
+              type="button"
+              onClick={resetConversation}
+              disabled={!connected}
+              aria-label="重置会话"
+              title="重置会话"
+            >
+              <AppIcon name="reset" size={17} />
+            </button>
             <textarea
               className="cc-input"
               rows={1}
@@ -280,7 +350,8 @@ export function ClaudeCodeChat() {
               <AppIcon name="arrow" size={16} />
             </button>
           </div>
-        </aside>
+          </aside>
+        </>
       ) : null}
     </>
   );

@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 
 import { AppIcon } from "./AppIcon";
 import { filterBills } from "../data/billFilters";
+import { downloadBillsCsv } from "../data/billsExport";
 import { categories, getCategory } from "../data/categories";
 import {
   DEFAULT_PAGE_SIZE,
@@ -32,6 +33,31 @@ function formatRange(startDate, endDate) {
   return `${start} – ${end}`;
 }
 
+function getPageItems(currentPage, pageCount) {
+  if (pageCount <= 7) {
+    return Array.from({ length: pageCount }, (_, index) => index + 1);
+  }
+
+  const pages = new Set([1, pageCount, currentPage]);
+  if (currentPage <= 4) {
+    [2, 3, 4, 5].forEach((page) => pages.add(page));
+  } else if (currentPage >= pageCount - 3) {
+    [pageCount - 4, pageCount - 3, pageCount - 2, pageCount - 1].forEach(
+      (page) => pages.add(page),
+    );
+  } else {
+    [currentPage - 1, currentPage + 1].forEach((page) => pages.add(page));
+  }
+
+  const orderedPages = [...pages].sort((left, right) => left - right);
+  return orderedPages.flatMap((page, index) => {
+    const previousPage = orderedPages[index - 1];
+    return index > 0 && page - previousPage > 1
+      ? [`ellipsis-${page}`, page]
+      : [page];
+  });
+}
+
 function BillRegister({
   bills,
   members,
@@ -43,6 +69,7 @@ function BillRegister({
   onQuery,
   onPage,
   onPageSize,
+  canAdd,
   onAdd,
   onOpen,
 }) {
@@ -52,8 +79,9 @@ function BillRegister({
 
   return (
     <div className="bill-register panel">
-      <header>
-        <div>
+      <header className="bill-register-header">
+        <div className="bill-register-heading">
+          <span className="overline">LEDGER</span>
           <strong>{bills.length} 笔账单</strong>
           <span>{dateError ? "请修正日期范围" : rangeLabel}</span>
         </div>
@@ -78,7 +106,7 @@ function BillRegister({
             </button>
           ) : null}
         </label>
-        <div>
+        <div className="bill-register-total">
           <span>筛选结果合计</span>
           <strong>{formatMoney(visibleTotal)}</strong>
         </div>
@@ -177,22 +205,34 @@ function BillRegister({
               >
                 上一页
               </button>
-              {Array.from(
-                { length: pagination.pageCount },
-                (_, index) => index + 1,
-              ).map((pageNumber) => (
-                <button
-                  key={pageNumber}
-                  type="button"
-                  aria-label={`第 ${pageNumber} 页`}
-                  aria-current={
-                    pagination.currentPage === pageNumber ? "page" : undefined
+              {getPageItems(pagination.currentPage, pagination.pageCount).map(
+                (pageItem) => {
+                  if (typeof pageItem !== "number") {
+                    return (
+                      <span
+                        key={pageItem}
+                        className="pagination-ellipsis"
+                        aria-hidden="true"
+                      >
+                        …
+                      </span>
+                    );
                   }
-                  onClick={() => onPage(pageNumber)}
-                >
-                  {pageNumber}
-                </button>
-              ))}
+                  return (
+                    <button
+                      key={pageItem}
+                      type="button"
+                      aria-label={`第 ${pageItem} 页`}
+                      aria-current={
+                        pagination.currentPage === pageItem ? "page" : undefined
+                      }
+                      onClick={() => onPage(pageItem)}
+                    >
+                      {pageItem}
+                    </button>
+                  );
+                },
+              )}
               <button
                 type="button"
                 onClick={() => onPage(pagination.currentPage + 1)}
@@ -216,18 +256,18 @@ function BillRegister({
             <button type="button" onClick={() => onQuery("")}>
               清除搜索
             </button>
-          ) : (
+          ) : canAdd ? (
             <button type="button" onClick={onAdd}>
               新增账单
             </button>
-          )}
+          ) : null}
         </div>
       )}
     </div>
   );
 }
 
-export function BillsView({ bills, members, onAdd, onOpen }) {
+export function BillsView({ bills, members, canAdd = false, onAdd, onOpen }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -273,6 +313,15 @@ export function BillsView({ bills, members, onAdd, onOpen }) {
     setPage(1);
   }
 
+  function exportBills() {
+    const exportOptions = {
+      bills: visibleBills,
+      members,
+      rangeLabel: formatRange(startDate, endDate),
+    };
+    downloadBillsCsv(exportOptions);
+  }
+
   return (
     <section className="bills-view" aria-labelledby="bills-title">
       <header className="bills-heading">
@@ -280,10 +329,17 @@ export function BillsView({ bills, members, onAdd, onOpen }) {
           <h2 id="bills-title">全部账单</h2>
           <p>筛选、核对并查看每一笔共同消费。</p>
         </div>
-        <button className="add-button" type="button" onClick={onAdd}>
-          <AppIcon name="plus" size={18} />
-          新增账单
-        </button>
+        <div className="bills-heading-actions">
+          <button className="secondary-button" type="button" onClick={exportBills}>
+            导出账单 CSV
+          </button>
+          {canAdd ? (
+            <button className="add-button" type="button" onClick={onAdd}>
+              <AppIcon name="plus" size={18} />
+              新增账单
+            </button>
+          ) : null}
+        </div>
       </header>
       <div className="bill-filters" aria-label="筛选账单">
         <div className="date-range-fields">
@@ -377,6 +433,7 @@ export function BillsView({ bills, members, onAdd, onOpen }) {
           setPageSize(size);
           setPage(1);
         }}
+        canAdd={canAdd}
         onAdd={onAdd}
         onOpen={onOpen}
       />

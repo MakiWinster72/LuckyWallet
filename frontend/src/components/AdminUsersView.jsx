@@ -113,7 +113,7 @@ function CreateUserDialog({ onClose, onCreated }) {
 }
 
 function EditUserDialog({ user, currentUserId, onClose, onUpdated }) {
-  const [form, setForm] = useState(() => ({ ...user }));
+  const [form, setForm] = useState(() => ({ ...user, password: "" }));
   const [status, setStatus] = useState({ saving: false, error: "" });
   const [isConfirming, setIsConfirming] = useState(false);
   const isSelf = user.id === currentUserId;
@@ -127,6 +127,10 @@ function EditUserDialog({ user, currentUserId, onClose, onUpdated }) {
     event.preventDefault();
     if (!form.nickname.trim()) {
       setStatus({ saving: false, error: "请填写昵称，以便团队成员识别该用户。" });
+      return;
+    }
+    if (form.password && form.password.length < 8) {
+      setStatus({ saving: false, error: "新密码至少需要 8 个字符。" });
       return;
     }
     if (isSensitiveChange) {
@@ -171,6 +175,12 @@ function EditUserDialog({ user, currentUserId, onClose, onUpdated }) {
             <input name="nickname" autoComplete="off" required value={form.nickname}
               onChange={(event) => update("nickname", event.target.value)}
               placeholder="例如：小雨…" />
+          </label>
+          <label>
+            重置密码
+            <input name="password" type="password" autoComplete="new-password" minLength="8"
+              value={form.password} onChange={(event) => update("password", event.target.value)}
+              placeholder="留空表示不修改，至少 8 个字符…" />
           </label>
           <label>
             角色

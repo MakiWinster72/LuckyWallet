@@ -1,12 +1,20 @@
-from datetime import UTC, datetime
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
-from app.core.security import create_access_token, verify_password
+from app.core.security import create_access_token, hash_password, verify_password
 from app.models import AuditLog, User
 from app.repositories.user_repository import UserRepository
 
 
 class InvalidCredentialsError(Exception):
     pass
+
+
+class CurrentPasswordIncorrectError(Exception):
+    pass
+
+
+SHANGHAI_TZ = ZoneInfo("Asia/Shanghai")
 
 
 class AuthService:
@@ -45,6 +53,17 @@ class AuthService:
         )
         return user, access_token
 
+    def change_password(
+        self,
+        user: User,
+        current_password: str,
+        new_password: str,
+    ) -> None:
+        if not verify_password(current_password, user.password_hash):
+            raise CurrentPasswordIncorrectError
+        user.password_hash = hash_password(new_password)
+        self.repository.commit()
+
     def _record_login(
         self,
         user: User | None,
@@ -60,7 +79,7 @@ class AuthService:
             ip=ip,
             user_agent=user_agent[:255] if user_agent else None,
             detail=None,
-            created_at=datetime.now(UTC).replace(tzinfo=None),
+            created_at=datetime.now(SHANGHAI_TZ).replace(tzinfo=None),
         )
         try:
             self.repository.add_audit_log(audit_log)

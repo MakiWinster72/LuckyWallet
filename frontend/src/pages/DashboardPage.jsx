@@ -16,7 +16,11 @@ import {
 } from "../api/bills";
 import { getBudgetApi, updateBudgetApi } from "../api/budget";
 import { useAuth } from "../auth/useAuth";
-import { resolveAssetUrl, uploadAvatarApi } from "../api/auth";
+import {
+  changePasswordApi,
+  resolveAssetUrl,
+  uploadAvatarApi,
+} from "../api/auth";
 import { listMembersApi } from "../api/members";
 import { categories, getCategory } from "../data/categories";
 import { summarizeBudgetProgress } from "../data/budgetProgress";
@@ -54,6 +58,16 @@ function ProfileCenter({ user, member, finance, onClose, onUpdated }) {
     user.avatar_url ? resolveAssetUrl(user.avatar_url) : "",
   );
   const [file, setFile] = useState(null);
+  const [passwordForm, setPasswordForm] = useState({
+    current: "",
+    next: "",
+    confirm: "",
+  });
+  const [passwordStatus, setPasswordStatus] = useState({
+    saving: false,
+    error: "",
+    success: "",
+  });
   const [status, setStatus] = useState({
     saving: false,
     error: "",
@@ -91,6 +105,35 @@ function ProfileCenter({ user, member, finance, onClose, onUpdated }) {
       setStatus({ saving: false, error: "", success: "头像已保存" });
     } catch (error) {
       setStatus({ saving: false, error: error.message, success: "" });
+    }
+  }
+
+  function updatePasswordField(event) {
+    const { name, value } = event.target;
+    setPasswordForm((current) => ({ ...current, [name]: value }));
+    setPasswordStatus({ saving: false, error: "", success: "" });
+  }
+
+  async function savePassword(event) {
+    event.preventDefault();
+    if (passwordForm.next.length < 8) {
+      setPasswordStatus({ saving: false, error: "新密码至少需要 8 个字符", success: "" });
+      return;
+    }
+    if (passwordForm.next !== passwordForm.confirm) {
+      setPasswordStatus({ saving: false, error: "两次输入的新密码不一致", success: "" });
+      return;
+    }
+    setPasswordStatus({ saving: true, error: "", success: "" });
+    try {
+      await changePasswordApi({
+        current_password: passwordForm.current,
+        new_password: passwordForm.next,
+      });
+      setPasswordForm({ current: "", next: "", confirm: "" });
+      setPasswordStatus({ saving: false, error: "", success: "密码已更新" });
+    } catch (error) {
+      setPasswordStatus({ saving: false, error: error.message, success: "" });
     }
   }
 
@@ -172,6 +215,59 @@ function ProfileCenter({ user, member, finance, onClose, onUpdated }) {
             </article>
           </div>
         </section>
+        <form className="profile-password" onSubmit={savePassword}>
+          <header>
+            <div>
+              <span className="overline">SECURITY</span>
+              <h3>修改密码</h3>
+            </div>
+            <small>至少 8 个字符</small>
+          </header>
+          <label>
+            当前密码
+            <input
+              name="current"
+              type="password"
+              autoComplete="current-password"
+              value={passwordForm.current}
+              onChange={updatePasswordField}
+              required
+            />
+          </label>
+          <label>
+            新密码
+            <input
+              name="next"
+              type="password"
+              autoComplete="new-password"
+              minLength={8}
+              value={passwordForm.next}
+              onChange={updatePasswordField}
+              required
+            />
+          </label>
+          <label>
+            确认新密码
+            <input
+              name="confirm"
+              type="password"
+              autoComplete="new-password"
+              minLength={8}
+              value={passwordForm.confirm}
+              onChange={updatePasswordField}
+              required
+            />
+          </label>
+          {passwordStatus.error ? (
+            <p className="form-error" role="alert">{passwordStatus.error}</p>
+          ) : null}
+          {passwordStatus.success ? (
+            <p className="form-success" role="status">✓ {passwordStatus.success}</p>
+          ) : null}
+          <button className="add-button profile-password-submit" type="submit" disabled={passwordStatus.saving}>
+            {passwordStatus.saving ? "保存中…" : "更新密码"}
+          </button>
+        </form>
         {status.error ? (
           <p className="form-error" role="alert">
             {status.error}
@@ -886,7 +982,7 @@ function StatisticsView({ bills, members }) {
                 viewBox="0 0 500 150"
                 role="img"
                 aria-label="本月每日支出折线图"
-                preserveAspectRatio="none"
+                preserveAspectRatio="xMidYMid meet"
               >
                 <path
                   d="M12 132H488M12 76H488M12 20H488"
@@ -1255,8 +1351,8 @@ export function DashboardPage() {
     [monthlySummary.bills, members],
   );
   const pendingSettlement = useMemo(
-    () => summarizePendingSettlement(bills, currentUser?.id),
-    [bills, currentUser?.id],
+    () => summarizePendingSettlement(monthlySummary.bills, currentUser?.id),
+    [monthlySummary.bills, currentUser?.id],
   );
   const profileFinance = useMemo(
     () => summarizeProfileFinance(bills, currentUser?.id),
@@ -1391,10 +1487,7 @@ export function DashboardPage() {
             >
               <AppIcon name={dark ? "sun" : "moon"} />
             </button>
-            <button className="icon-button notification" aria-label="通知">
-              <AppIcon name="bell" />
-            </button>
-            {isUserManagement ? null : (
+            {isUserManagement || user.role !== "admin" ? null : (
               <button className="add-button" onClick={() => setIsAdding(true)}>
                 <AppIcon name="plus" size={18} />
                 记一笔
@@ -1423,16 +1516,24 @@ export function DashboardPage() {
                     : activeNav}
                 </h1>
                 <p>
-                  {activeNav === "总览" ? "总览账单，每一笔都清清楚楚。" : ""}
+                  {activeNav === "总览"
+                    ? "总览账单，每一笔都清清楚楚。"
+                    : activeNav === "账单"
+                      ? "筛选、核对并查看每一笔账单。"
+                      : activeNav === "成员"
+                        ? "查看每个人本月的参与和垫付情况。"
+                        : "从不同维度了解支出情况。"}
                 </p>
               </div>
-              <button
-                className="add-button mobile-add"
-                onClick={() => setIsAdding(true)}
-              >
-                <AppIcon name="plus" size={18} />
-                记一笔
-              </button>
+              {user.role === "admin" ? (
+                <button
+                  className="add-button mobile-add"
+                  onClick={() => setIsAdding(true)}
+                >
+                  <AppIcon name="plus" size={18} />
+                  记一笔
+                </button>
+              ) : null}
             </section>
           )}
 
@@ -1442,6 +1543,7 @@ export function DashboardPage() {
             <BillsView
               bills={bills}
               members={members}
+              canAdd={user.role === "admin"}
               onAdd={() => setIsAdding(true)}
               onOpen={setSelectedBill}
             />
@@ -1619,7 +1721,7 @@ export function DashboardPage() {
       ) : null}
       {isSettlementOpen ? (
         <SettlementDialog
-          bills={bills}
+          bills={monthlySummary.bills}
           members={members}
           onClose={() => setIsSettlementOpen(false)}
         />

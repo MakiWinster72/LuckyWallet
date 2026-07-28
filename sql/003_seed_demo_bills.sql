@@ -1,16 +1,10 @@
--- LuckyWallet demo bills for local development
--- Creates exactly 100 bills from 2025-01-01 through 2026-07-31.
--- Each month has at most 6 bills and the monthly total stays below 2000.
+-- LuckyWallet 示例账单
+-- 生成 2024-01-01 至 2026-07-29 期间的 300 笔账单。
+-- 每月生成 9 或 10 笔，单笔金额为 80.00–160.00，每月总额不超过 2000.00。
+-- 从 21 名成员中为每笔账单选择 3–10 名参与人，付款人按成员顺序轮换。
 --
--- Prerequisites:
---   1. Run sql/001_init_luckywallet.sql.
---   2. Create active users named Maki, Landen, Lucky, Ula, and Anna.
---
--- Usage:
---   mysql -u root -p luckywallet_dev < sql/003_seed_demo_bills.sql
---
--- This script is idempotent. It only replaces rows marked with its own
--- [demo-seed-2026] note prefix and never deletes user-created bills.
+-- 依赖：001_init_luckywallet.sql、002_seed_demo_users.sql
+-- 本脚本可重复执行，只删除自己生成的 [demo-seed-2026] 账单。
 
 SET NAMES utf8mb4;
 SET time_zone = '+08:00';
@@ -28,7 +22,6 @@ BEGIN
   DECLARE v_category_count INT DEFAULT 0;
   DECLARE v_payer_slot INT;
   DECLARE v_category_slot INT;
-  DECLARE v_participant_count INT;
   DECLARE v_payer_id INT UNSIGNED;
   DECLARE v_category_id INT UNSIGNED;
   DECLARE v_bill_id INT UNSIGNED;
@@ -37,6 +30,7 @@ BEGIN
   DECLARE v_total_cents INT;
   DECLARE v_base_share_cents INT;
   DECLARE v_remainder_cents INT;
+  DECLARE v_participant_count INT;
   DECLARE v_title VARCHAR(100);
 
   DECLARE EXIT HANDLER FOR SQLEXCEPTION
@@ -44,11 +38,13 @@ BEGIN
     ROLLBACK;
     DROP TEMPORARY TABLE IF EXISTS seed_users;
     DROP TEMPORARY TABLE IF EXISTS seed_categories;
+    DROP TEMPORARY TABLE IF EXISTS seed_bill_users;
     RESIGNAL;
   END;
 
   DROP TEMPORARY TABLE IF EXISTS seed_users;
   DROP TEMPORARY TABLE IF EXISTS seed_categories;
+  DROP TEMPORARY TABLE IF EXISTS seed_bill_users;
 
   CREATE TEMPORARY TABLE seed_users (
     slot INT NOT NULL PRIMARY KEY,
@@ -60,14 +56,35 @@ BEGIN
     category_id INT UNSIGNED NOT NULL
   );
 
+  CREATE TEMPORARY TABLE seed_bill_users (
+    slot INT NOT NULL PRIMARY KEY,
+    user_id INT UNSIGNED NOT NULL
+  );
+
   INSERT INTO seed_users (slot, user_id)
   SELECT required_users.slot, users.id
   FROM (
-    SELECT 1 AS slot, 'makiwinster' AS username
-    UNION ALL SELECT 2, 'landen'
-    UNION ALL SELECT 3, 'lucky'
-    UNION ALL SELECT 4, 'ula'
+    SELECT 1 AS slot, 'lucky' AS username
+    UNION ALL SELECT 2, 'ula'
+    UNION ALL SELECT 3, 'landen'
+    UNION ALL SELECT 4, 'maki'
     UNION ALL SELECT 5, 'anna'
+    UNION ALL SELECT 6, 'clamez'
+    UNION ALL SELECT 7, 'roy'
+    UNION ALL SELECT 8, 'jasper'
+    UNION ALL SELECT 9, 'phoenix'
+    UNION ALL SELECT 10, 'winnie'
+    UNION ALL SELECT 11, 'damien'
+    UNION ALL SELECT 12, 'vicky'
+    UNION ALL SELECT 13, 'cheryl'
+    UNION ALL SELECT 14, 'liam'
+    UNION ALL SELECT 15, 'wiley'
+    UNION ALL SELECT 16, 'bevin'
+    UNION ALL SELECT 17, 'anthony'
+    UNION ALL SELECT 18, 'kenton'
+    UNION ALL SELECT 19, 'leclerc'
+    UNION ALL SELECT 20, 'evander'
+    UNION ALL SELECT 21, 'cara'
   ) AS required_users
   JOIN users
     ON LOWER(users.username) = required_users.username
@@ -84,9 +101,9 @@ BEGIN
   SELECT COUNT(*) INTO v_user_count FROM seed_users;
   SELECT COUNT(*) INTO v_category_count FROM seed_categories;
 
-  IF v_user_count < 5 THEN
+  IF v_user_count < 21 THEN
     SIGNAL SQLSTATE '45000'
-      SET MESSAGE_TEXT = 'Demo seed requires active users: MakiWinster, Landen, Lucky, Ula, Anna';
+      SET MESSAGE_TEXT = 'Demo seed requires all 21 active users from 002_seed_demo_users.sql';
   END IF;
 
   IF v_category_count < 6 THEN
@@ -99,18 +116,15 @@ BEGIN
   DELETE FROM bills
   WHERE note LIKE '[demo-seed-2026]%';
 
-  WHILE v_index <= 100 DO
-    SET v_payer_slot = MOD(v_index - 1, 5) + 1;
+  WHILE v_index <= 300 DO
+    SET v_payer_slot = MOD(v_index - 1, 21) + 1;
     SET v_category_slot = MOD(v_index - 1, 6) + 1;
-    SET v_participant_count = MOD(v_index - 1, 4) + 2;
     SET v_bill_date = DATE_ADD(
-      DATE_ADD('2025-01-01', INTERVAL MOD(v_index - 1, 19) MONTH),
-      INTERVAL MOD(v_index * 7, 25) DAY
+      DATE_ADD('2024-01-01', INTERVAL MOD(v_index - 1, 31) MONTH),
+      INTERVAL MOD(v_index * 7, 29) DAY
     );
-    SET v_amount = 50 + MOD(v_index * 37, 251);
+    SET v_amount = 80 + MOD(v_index * 37, 81);
     SET v_total_cents = ROUND(v_amount * 100);
-    SET v_base_share_cents = FLOOR(v_total_cents / v_participant_count);
-    SET v_remainder_cents = MOD(v_total_cents, v_participant_count);
 
     SELECT user_id INTO v_payer_id
     FROM seed_users
@@ -120,29 +134,34 @@ BEGIN
     FROM seed_categories
     WHERE slot = v_category_slot;
 
+    TRUNCATE TABLE seed_bill_users;
+    INSERT INTO seed_bill_users (slot, user_id)
+    SELECT slot, user_id
+    FROM seed_users
+    WHERE slot = v_payer_slot
+       OR MOD(slot * 17 + v_index * 13, 21) < 2 + MOD(v_index, 8)
+    ORDER BY slot;
+
+    SELECT COUNT(*) INTO v_participant_count FROM seed_bill_users;
+    SET v_base_share_cents = FLOOR(v_total_cents / v_participant_count);
+    SET v_remainder_cents = MOD(v_total_cents, v_participant_count);
+
     SET v_title = CONCAT(
       CASE v_category_slot
         WHEN 1 THEN '一起吃饭'
         WHEN 2 THEN '零食补给'
         WHEN 3 THEN '日用品采购'
         WHEN 4 THEN '周末聚会'
-        WHEN 5 THEN '共同出行'
-        ELSE '临时共同支出'
+        WHEN 5 THEN '出行费用'
+        ELSE '临时支出'
       END,
       ' · ',
       LPAD(v_index, 3, '0')
     );
 
     INSERT INTO bills (
-      title,
-      amount,
-      payer_id,
-      bill_date,
-      category_id,
-      note,
-      created_by,
-      created_at,
-      updated_at
+      title, amount, payer_id, bill_date, category_id, note,
+      created_by, created_at, updated_at
     )
     VALUES (
       v_title,
@@ -164,10 +183,9 @@ BEGIN
       user_id,
       (
         v_base_share_cents
-        + CASE WHEN slot <= v_remainder_cents THEN 1 ELSE 0 END
+        + CASE WHEN ROW_NUMBER() OVER (ORDER BY slot) <= v_remainder_cents THEN 1 ELSE 0 END
       ) / 100
-    FROM seed_users
-    WHERE slot <= v_participant_count
+    FROM seed_bill_users
     ORDER BY slot;
 
     SET v_index = v_index + 1;
@@ -177,6 +195,7 @@ BEGIN
 
   DROP TEMPORARY TABLE seed_users;
   DROP TEMPORARY TABLE seed_categories;
+  DROP TEMPORARY TABLE seed_bill_users;
 END$$
 
 DELIMITER ;
@@ -184,7 +203,7 @@ DELIMITER ;
 CALL seed_luckywallet_demo_bills();
 DROP PROCEDURE seed_luckywallet_demo_bills;
 
--- Verification: expected result is 100 rows spanning 2025-01-01 to 2026-07-31.
+-- 验证：应为 300 笔，日期范围不晚于 2026-07-29，分摊错误数为 0。
 SELECT
   COUNT(*) AS demo_bill_count,
   MIN(bill_date) AS first_bill_date,
@@ -193,7 +212,6 @@ SELECT
 FROM bills
 WHERE note LIKE '[demo-seed-2026]%';
 
--- Every bill must be fully allocated to its participants.
 SELECT COUNT(*) AS bills_with_invalid_shares
 FROM (
   SELECT b.id
@@ -204,7 +222,7 @@ FROM (
   HAVING SUM(bp.share_amount) <> b.amount
 ) AS invalid_shares;
 
--- Every month must stay below the 2000 budget.
+-- 该查询应无返回行。
 SELECT
   DATE_FORMAT(bill_date, '%Y-%m') AS bill_month,
   COUNT(*) AS bill_count,
