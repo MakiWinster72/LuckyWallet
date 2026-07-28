@@ -11,8 +11,8 @@ export default defineConfig({
     siteTitle: 'LuckyWallet Wiki',
     nav: [
       { text: '首页', link: '/' },
-      { text: '使用手册', link: '/user-guide' },
-      { text: '开发指南', link: '/development' },
+      { text: '使用手册', link: '/guides/user-guide' },
+      { text: '开发指南', link: '/development/guide' },
       { text: 'GitHub', link: 'https://github.com/MakiWinster72/LuckyWallet' }
     ],
     sidebar: [
@@ -20,25 +20,30 @@ export default defineConfig({
         text: '开始使用',
         items: [
           { text: '项目介绍', link: '/' },
-          { text: '启动指南', link: '/how_to_start' },
-          { text: '使用手册', link: '/user-guide' },
-          { text: '部署手册', link: '/deployment' }
+          { text: '启动指南', link: '/guides/how_to_start' },
+          { text: '使用手册', link: '/guides/user-guide' },
+          { text: '部署手册', link: '/guides/deployment' }
         ]
       },
       {
         text: '接口与开发',
         items: [
-          { text: 'API 接口文档', link: '/api' },
-          { text: '数据库说明', link: '/DATABASE' },
-          { text: '开发指南', link: '/development' },
-          { text: '提交和分支规范', link: '/提交和分支命名规范' }
+          { text: 'API 接口文档', link: '/reference/api' },
+          { text: '数据库说明', link: '/reference/DATABASE' },
+          { text: '开发指南', link: '/development/guide' },
+          { text: '提交和分支规范', link: '/collaboration/commit-conventions' }
+        ]
+      },
+      {
+        text: '实现细节',
+        items: [
+          { text: '项目实现细节', link: '/development/implementation' }
         ]
       },
       {
         text: '部署与设计',
         items: [
-          { text: '部署手册', link: '/deployment' },
-          { text: '颜色设计', link: '/color%20design' }
+          { text: '部署手册', link: '/guides/deployment' }
         ]
       }
     ],

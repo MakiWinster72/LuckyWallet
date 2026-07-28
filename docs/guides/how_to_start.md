@@ -1,18 +1,23 @@
 # 快速启动
 
-本页用于在本地开发环境首次运行 LuckyWallet。若使用容器，请直接阅读[部署手册](/deployment#docker-compose-部署)。
+本页用于在本地开发环境首次运行 LuckyWallet。若使用容器，请直接阅读[部署手册](/guides/deployment#docker-compose-部署)。
 
 ## 环境要求
 
-| 工具 | 版本要求 | 用途 |
-| --- | --- | --- |
-| MySQL | 8.0+ | 业务数据 |
-| Python | 3.12+ | 后端运行时 |
-| uv | 当前稳定版 | Python 依赖和虚拟环境 |
-| Node.js | 20+ | 前端与文档构建 |
-| npm | 随 Node.js 安装 | JavaScript 依赖 |
+| 工具    | 版本要求 | 用途                  |
+| ------- | -------- | --------------------- |
+| MySQL   | 8.0+     | 业务数据              |
+| Python  | 3.12+    | 后端运行时            |
+| uv      | latest   | Python 依赖和虚拟环境 |
+| Node.js | 20+      | 前端与文档构建        |
 
-可选：页面内的 Claude Code 助手要求本机已安装并登录 Claude Code CLI。未配置该能力不影响账单、预算和统计功能。
+Windows 用户如果尚未安装 `uv`，可以使用 PowerShell 执行：
+
+```powershell
+winget install --id=astral-sh.uv -e
+```
+
+安装完成后重新打开终端，并运行 `uv --version` 确认安装成功。若系统没有 `winget`，也可以在已配置 Python 和 pip 的情况下执行 `python -m pip install uv`。
 
 ## 1. 初始化数据库
 
@@ -20,15 +25,15 @@
 
 ```bash
 mysql -u root -p < sql/001_init_luckywallet.sql
+# 初始化数据库，并且创建 admin, 密码 admin123
+# 应当创建新的管理员用户后删除 admin
+
+# 以下为 demo 数据，可选
 mysql -u root -p luckywallet_dev < sql/002_seed_demo_users.sql
 mysql -u root -p luckywallet_dev < sql/003_seed_demo_bills.sql
 ```
 
-第一条命令会创建 `luckywallet_dev` 数据库和表结构；后两条命令导入演示账号与 100 笔演示账单。只需要空数据库时，仅执行第一条命令，再按[创建管理员](#创建管理员)操作。
-
-::: warning 演示数据
-演示账号和账单只适用于本地开发，公开部署前应停用或替换这些账号。
-:::
+> 也可以把 root 改为你的用户
 
 ## 2. 配置后端
 
@@ -42,7 +47,7 @@ cp .env.example .env
 ```
 
 ```powershell [Windows PowerShell]
-Set-Location backend
+cd backend
 Copy-Item .env.example .env
 ```
 
@@ -51,14 +56,12 @@ Copy-Item .env.example .env
 编辑 `backend/.env`：
 
 ```dotenv
-DATABASE_URL=mysql+pymysql://root:你的数据库密码@127.0.0.1:3306/luckywallet_dev
+DATABASE_URL=mysql+pymysql://用户名:你的数据库密码@127.0.0.1:端口/luckywallet_dev
 JWT_SECRET=至少32个字符的随机密钥，请勿使用示例值
 JWT_ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 FRONTEND_ORIGIN=http://localhost:5173
 ```
-
-如果用户名或密码包含 `@`、`:`、`/` 等 URL 保留字符，需要先进行 URL 编码。
 
 安装依赖并启动后端：
 
@@ -67,7 +70,8 @@ uv sync
 uv run uvicorn app.main:app --reload --port 8000
 ```
 
-通过 <http://127.0.0.1:8000/health> 检查数据库连接；返回 `{"status":"ok"}` 表示后端可用。Swagger UI 位于 <http://127.0.0.1:8000/docs>。
+通过 <http://127.0.0.1:8000/health> 检查数据库连接；返回 `{"status":"ok"}` 表示后端可用。  
+Swagger UI 位于 <http://127.0.0.1:8000/docs>。
 
 ## 3. 启动前端
 
@@ -85,11 +89,11 @@ npm run dev
 
 执行 `002_seed_demo_users.sql` 后，可以使用：
 
-| 用户名 | 密码 | 角色 |
-| --- | --- | --- |
-| `MakiWinster` | `maki1234` | 管理员 |
-| `Ula` | `ula12345` | 普通用户 |
-| `Anna` | `anna1234` | 普通用户 |
+| 用户名        | 密码       | 角色     |
+| ------------- | ---------- | -------- |
+| `MakiWinster` | `maki1234` | 管理员   |
+| `Ula`         | `ula12345` | 普通用户 |
+| `Anna`        | `anna1234` | 普通用户 |
 
 ## 创建管理员
 
@@ -101,16 +105,6 @@ uv run python -m scripts.create_admin --username admin --nickname 管理员
 ```
 
 命令会交互式要求输入两次密码，密码至少 8 个字符。
-
-## 可选：启动 Claude Code 助手
-
-本地后端通过系统中的 `claude` 命令提供对话能力。先确认：
-
-```bash
-claude --version
-```
-
-并按 Claude Code CLI 的提示完成登录。助手从项目根目录运行：普通用户使用 `plan` 只读模式；管理员使用 `auto` 模式，可能直接修改项目文件或执行命令。只应向可信管理员开放该能力。
 
 ## 常见启动问题
 

@@ -12,11 +12,14 @@ hero:
     height: 512
   actions:
     - theme: brand
-      text: 快速启动
-      link: /how_to_start
+      text: 快速开始
+      link: /guides/how_to_start
     - theme: alt
       text: 使用手册
-      link: /user-guide
+      link: /guides/user-guide
+    - theme: alt
+      text: 实现细节
+      link: /development/implementation
 
 features:
   - title: 账单与分摊
@@ -29,9 +32,9 @@ features:
 
 <div class="home-intro-grid">
   <div>
-    <span class="home-kicker">A SMALL WALLET, A CLEARER HOUSEHOLD</span>
+    <span class="home-kicker">A SHARED WALLET, A CLEARER TEAM</span>
     <h2>从“谁先付了”开始，走到“现在该给谁”。</h2>
-    <p>LuckyWallet 把账单、分摊、预算与结算放在同一条清晰的记录里。适合家庭、合租室友、宿舍和固定小团队。</p>
+    <p>LuckyWallet 把账单、分摊、预算与结算放在同一条清晰的记录里，帮助团队明确每一笔共同支出的来龙去脉。</p>
   </div>
   <div class="home-ledger-note">
     <span>记录原则</span>
@@ -48,11 +51,12 @@ LuckyWallet 不只记录消费金额，还区分实际付款人与参与消费�
 
 | 目标                       | 文档                      |
 | -------------------------- | ------------------------- |
-| 在本机运行项目             | [快速启动](/how_to_start) |
-| 了解页面和业务规则         | [使用手册](/user-guide)   |
-| 使用 Docker 或部署到服务器 | [部署手册](/deployment)   |
-| 参与开发和运行测试         | [开发指南](/development)  |
-| 对接后端接口               | [API 接口文档](/api)      |
-| 了解表结构和数据关系       | [数据库说明](/DATABASE)   |
+| 在本机运行项目             | [快速启动](/guides/how_to_start) |
+| 了解页面和业务规则         | [使用手册](/guides/user-guide)   |
+| 使用 Docker 或部署到服务器 | [部署手册](/guides/deployment)   |
+| 参与开发和运行测试         | [开发指南](/development/guide)   |
+| 了解项目实现细节           | [实现细节](/development/implementation) |
+| 对接后端接口               | [API 接口文档](/reference/api)  |
+| 了解表结构和数据关系       | [数据库说明](/reference/DATABASE) |
 
 后端启动后，还可通过 Swagger UI `<后端地址>/docs` 在线查看和调试接口。
