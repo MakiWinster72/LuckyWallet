@@ -32,6 +32,19 @@ const featureNotes = [
   ["成员", "付款、分摊和净额都有依据"],
 ];
 
+const productViews = [
+  {
+    title: "成员花销",
+    detail: "汇总每位成员的垫付、参与账单与待结算金额。",
+    image: "/members.png",
+  },
+  {
+    title: "支出统计",
+    detail: "支持按月份或年份查看趋势、分类占比与成员垫付。",
+    image: "/statistic.png",
+  },
+];
+
 export function HomePage() {
   return (
     <main className="home-page">
@@ -202,6 +215,33 @@ export function HomePage() {
             前往登录页面
             <AppIcon name="arrow" size={17} />
           </Link>
+        </div>
+      </section>
+
+      <section className="home-viewbook" aria-labelledby="viewbook-title">
+        <header className="home-viewbook-heading">
+          <p>账本里的每一面</p>
+          <h2 id="viewbook-title">不只记下来，也要看得明白。</h2>
+          <span>成员、趋势与权限，各自在需要的时候出现。</span>
+        </header>
+        <div className="home-viewbook-grid">
+          {productViews.map((view) => (
+            <figure className="home-view-card" key={view.title}>
+              <div className="home-view-image">
+                <img
+                  src={view.image}
+                  alt={`LuckyWallet ${view.title}页面`}
+                  width="1920"
+                  height="1041"
+                  loading="lazy"
+                />
+              </div>
+              <figcaption>
+                <strong>{view.title}</strong>
+                <span>{view.detail}</span>
+              </figcaption>
+            </figure>
+          ))}
         </div>
       </section>
 

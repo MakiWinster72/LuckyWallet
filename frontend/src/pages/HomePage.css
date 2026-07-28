@@ -510,6 +510,87 @@
   font-weight: 800;
 }
 
+.home-viewbook {
+  width: min(1180px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 116px 0 8px;
+}
+
+.home-viewbook-heading {
+  display: grid;
+  max-width: 680px;
+  gap: 10px;
+  margin-bottom: 42px;
+}
+
+.home-viewbook-heading p {
+  margin: 0;
+  color: var(--home-plum);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .15em;
+}
+
+.home-viewbook-heading h2 {
+  margin: 0;
+  font-family: "Noto Serif SC", "Songti SC", Georgia, serif;
+  font-size: clamp(34px, 5vw, 52px);
+  line-height: 1.2;
+  letter-spacing: -.05em;
+}
+
+.home-viewbook-heading span {
+  color: var(--home-muted);
+  font-size: 14px;
+}
+
+.home-viewbook-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.home-view-card {
+  min-width: 0;
+  margin: 0;
+  padding: 9px;
+  border: 1px solid rgb(85 48 68 / 13%);
+  border-radius: 22px 22px 7px;
+  background: rgb(255 249 245 / 74%);
+  box-shadow: 0 20px 48px rgb(85 48 68 / 10%);
+}
+
+.home-view-image {
+  overflow: hidden;
+  aspect-ratio: 1920 / 1041;
+  border-radius: 14px 14px 4px;
+  background: #eee5e8;
+}
+
+.home-view-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.home-view-card figcaption {
+  display: grid;
+  gap: 5px;
+  padding: 15px 11px 11px;
+}
+
+.home-view-card figcaption strong {
+  font-family: "Noto Serif SC", "Songti SC", Georgia, serif;
+  font-size: 17px;
+}
+
+.home-view-card figcaption span {
+  color: var(--home-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
 .home-final-cta {
   display: flex;
   width: min(1080px, calc(100% - 48px));
@@ -763,6 +844,20 @@
     line-height: 1.75;
   }
 
+  .home-viewbook {
+    width: min(100% - 32px, 1080px);
+    padding-top: 78px;
+  }
+
+  .home-viewbook-heading {
+    margin-bottom: 32px;
+  }
+
+  .home-viewbook-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
   .home-final-cta {
     align-items: flex-start;
     flex-direction: column;
@@ -897,6 +992,7 @@
 
   .home-section-heading h2,
   .home-showcase-copy h2,
+  .home-viewbook-heading h2,
   .home-final-cta h2 {
     font-size: clamp(30px, 9.5vw, 40px);
   }
@@ -933,6 +1029,20 @@
   .home-feature-notes div {
     grid-template-columns: 52px 1fr;
     gap: 10px;
+  }
+
+  .home-viewbook {
+    width: calc(100% - 28px);
+    padding-top: 66px;
+  }
+
+  .home-view-card {
+    padding: 6px;
+    border-radius: 17px 17px 6px;
+  }
+
+  .home-view-card figcaption {
+    padding: 13px 8px 9px;
   }
 
   .home-final-cta {
