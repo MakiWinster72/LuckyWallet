@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="390" viewBox="0 0 1200 390" role="img" aria-labelledby="title desc">
+  <title id="title">LuckyWallet 多人共享账本</title>
+  <desc id="desc">记录付款人和参与成员，自动分摊每笔共同消费，并给出清晰的结算结果。</desc>
+  <defs>
+    <linearGradient id="wallet" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#704264"/>
+      <stop offset="1" stop-color="#49243E"/>
+    </linearGradient>
+    <clipPath id="receipt">
+      <path d="M760 40H1128C1141.3 40 1152 50.7 1152 64V326L1138 318L1124 326L1110 318L1096 326L1082 318L1068 326L1054 318L1040 326L1026 318L1012 326L998 318L984 326L970 318L956 326L942 318L928 326L914 318L900 326L886 318L872 326L858 318L844 326L830 318L816 326L802 318L788 326L774 318L760 326V40Z"/>
+    </clipPath>
+  </defs>
+
+  <rect width="1200" height="390" rx="28" fill="#F7F1F2"/>
+  <path d="M0 28C0 12.5 12.5 0 28 0H716V390H28C12.5 390 0 377.5 0 362V28Z" fill="url(#wallet)"/>
+
+  <g transform="translate(64 55)" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif">
+    <text x="0" y="22" fill="#E8C7D5" font-size="18" font-weight="700" letter-spacing="3">SHARED EXPENSE LEDGER</text>
+    <text x="0" y="104" fill="#FFF9F7" font-size="67" font-weight="760" letter-spacing="-2">LuckyWallet</text>
+    <text x="0" y="153" fill="#F3DFE7" font-size="27" font-weight="600">多人账单，清楚有条理。</text>
+    <text x="0" y="201" fill="#DCC6D1" font-size="20">记下谁付款、谁参与，自动分摊并看清结算。</text>
+
+    <g transform="translate(0 251)">
+      <rect width="174" height="48" rx="12" fill="#FFF9F7"/>
+      <text x="87" y="31" fill="#49243E" font-size="18" font-weight="700" text-anchor="middle">共同账单</text>
+      <path d="M194 24H230" stroke="#D9A9BE" stroke-width="3" stroke-linecap="round"/>
+      <path d="M222 16L230 24L222 32" fill="none" stroke="#D9A9BE" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="250" width="174" height="48" rx="12" fill="#BB8493"/>
+      <text x="337" y="31" fill="#FFF9F7" font-size="18" font-weight="700" text-anchor="middle">精确分摊</text>
+    </g>
+  </g>
+
+  <g clip-path="url(#receipt)" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif">
+    <rect x="760" y="40" width="392" height="294" fill="#FFFCFB"/>
+    <text x="796" y="78" fill="#9A7E8D" font-size="16" font-weight="700" letter-spacing="2">本月共同账单</text>
+    <text x="796" y="122" fill="#35202F" font-size="34" font-weight="760">¥ 755.00</text>
+    <line x1="796" y1="146" x2="1116" y2="146" stroke="#E8DDE1"/>
+
+    <g transform="translate(796 170)">
+      <circle cx="18" cy="18" r="18" fill="#EDCDC2"/>
+      <text x="18" y="24" fill="#704264" font-size="15" text-anchor="middle">餐</text>
+      <text x="54" y="16" fill="#35202F" font-size="18" font-weight="700">周末聚餐</text>
+      <text x="54" y="39" fill="#9A7E8D" font-size="16">Ula 付款 · 6 人参与</text>
+      <text x="320" y="27" fill="#49243E" font-size="19" font-weight="700" text-anchor="end">¥ 268</text>
+    </g>
+
+    <g transform="translate(796 234)">
+      <circle cx="18" cy="18" r="18" fill="#E5E9E7"/>
+      <text x="18" y="24" fill="#547C78" font-size="15" text-anchor="middle">行</text>
+      <text x="54" y="16" fill="#35202F" font-size="18" font-weight="700">共同出行</text>
+      <text x="54" y="39" fill="#9A7E8D" font-size="16">Anna 付款 · 4 人参与</text>
+      <text x="320" y="27" fill="#49243E" font-size="19" font-weight="700" text-anchor="end">¥ 151</text>
+    </g>
+  </g>
+
+  <circle cx="1126" cy="66" r="7" fill="#D9A9BE"/>
+</svg>
